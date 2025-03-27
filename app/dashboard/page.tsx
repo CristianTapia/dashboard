@@ -23,6 +23,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </Link>
             </li>
             <li>
+              <details>
+                <summary className="p-2 bg-gray-700 rounded hover:bg-gray-600">Mesas</summary>
+                <Link href="/dashboard/products" className="block p-2">
+                  Agregar Mesa
+                </Link>
+                <Link href="/dashboard/products" className="block p-2">
+                  Editar Mesa
+                </Link>
+                <Link href="/dashboard/products" className="block p-2">
+                  Borrar Mesa
+                </Link>
+              </details>
+            </li>
+            <li>
+              <details>
+                <summary className="p-2 bg-gray-700 rounded hover:bg-gray-600">Productos</summary>
+                <Link href="/dashboard/products" className="block p-2">
+                  Agregar Producto
+                </Link>
+                <Link href="/dashboard/products" className="block p-2">
+                  Editar Producto
+                </Link>
+                <Link href="/dashboard/products" className="block p-2">
+                  Borrar Producto
+                </Link>
+              </details>
+            </li>
+            <li>
               <Link href="/dashboard/settings" className="block p-2 bg-gray-700 rounded hover:bg-gray-600">
                 Configuración
               </Link>
