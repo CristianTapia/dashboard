@@ -5,7 +5,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="grid grid-cols-[250px_1fr] grid-rows-[60px_1fr] h-screen">
       {/* Header */}
       <header className="col-span-2 bg-gray-800 text-white flex items-center px-6">
-        <h1 className="text-lg font-semibold">Dashboard</h1>
+        <h1 className="text-lg font-semibold">Panel de Administración</h1>
       </header>
 
       {/* Sidebar */}
