@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Tables from "../ui/Tables";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -60,7 +61,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Contenido dinámico */}
-      <main className="p-6 bg-gray-100">{children}</main>
+      <main className="flex flex-wrap gap-2 items-start content-start p-3">
+        {/* {children} */}
+        <Tables />
+        <Tables />
+        <Tables />
+        <Tables />
+        <Tables />
+        <Tables />
+        <Tables />
+        <Tables />
+        <Tables />
+        <Tables />
+        <Tables />
+      </main>
     </div>
   );
 }
