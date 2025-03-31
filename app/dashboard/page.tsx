@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Tables from "../ui/Tables";
+import { tablesArray } from "../lib/data";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -63,16 +64,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Contenido dinámico */}
       <main className="flex flex-wrap gap-2 items-start content-start p-3">
         {/* {children} */}
-        <Tables />
-        <Tables />
-        <Tables />
-        <Tables />
-        <Tables />
-        <Tables />
-        <Tables />
-        <Tables />
-        <Tables />
-        <Tables />
         <Tables />
       </main>
     </div>

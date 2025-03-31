@@ -11,7 +11,7 @@ export const productArray = [
   { id: "p10", name: "Tiramisú", price: 7000, category: "Postres" },
 ];
 
-export const tablesArray = [
-  { id: 1, name: "Mesa 1" },
-  { id: 2, name: "Mesa 2" },
-];
+export const tablesArray = Array.from({ length: 50 }, (_, i) => ({
+  id: i + 1,
+  name: `Mesa ${i + 1}`,
+}));
