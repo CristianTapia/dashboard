@@ -15,12 +15,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <nav>
           <ul className="space-y-2">
             <li>
-              <Link href="/dashboard" className="block p-2 bg-gray-700 rounded hover:bg-gray-600">
+              <Link href="/dashboard/mesas-vista-bloques" className="block p-2 bg-gray-700 rounded hover:bg-gray-600">
                 Vista de Bloques
               </Link>
             </li>
             <li>
-              <Link href="/dashboard/users" className="block p-2 bg-gray-700 rounded hover:bg-gray-600">
+              <Link href="/dashboard/mesas-vista-planta" className="block p-2 bg-gray-700 rounded hover:bg-gray-600">
                 Vista de planta
               </Link>
             </li>
@@ -62,10 +62,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Contenido dinámico */}
-      <main className="flex flex-wrap gap-2 items-start content-start p-3">
-        {/* {children} */}
-        <Tables />
-      </main>
+      <main className="flex flex-wrap gap-2 items-start content-start p-3">{children}</main>
     </div>
   );
 }
