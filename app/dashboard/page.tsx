@@ -1,3 +1,3 @@
 export default function Page() {
-  return <h2>Bienvenido al Dashboard</h2>;
+  return <div>Welcome</div>;
 }

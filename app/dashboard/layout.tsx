@@ -9,7 +9,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </header>
 
       {/* Sidebar */}
-      <aside className="bg-gray-900 text-white p-4">
+      <aside className="bg-blue-900 text-white p-4">
         <nav>
           <ul className="space-y-2">
             <li>
