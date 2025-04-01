@@ -1,5 +1,5 @@
 import Tables from "@/app/ui/Tables";
 
-export default function tablesPage() {
+export default function BlocksView() {
   return <Tables />;
 }
