@@ -3,56 +3,72 @@
 import { tablesArray } from "../lib/data";
 import { useState } from "react";
 import Modal from "./Modal";
+import Dropdown from "./Dropdown";
 
 export default function Tables() {
   const [isModalOpen, setModalIsOpen] = useState(false);
+  const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
 
   function toggleModal() {
     setModalIsOpen((prev) => !prev);
   }
 
-  return (
-    <>
-      <div className="flex flex-col">
-        <div className="text-white flex items-center gap-4 pb-8">
-          <button onClick={toggleModal} className="bg-red-500 border-1 p-2 rounded">
-            Agregar Mesa
-          </button>
-          <input className="border-1 p-2 rounded" type="search" placeholder="Buscar Mesa" />
-        </div>
+  function toggleDropdown(id: number) {
+    setOpenDropdownId((prev) => (prev === id ? null : id)); // Si ya está abierto, lo cierra
+  }
 
-        <div className="flex flex-wrap gap-8 justify-center">
-          {tablesArray.map((option) => (
-            <div key={option.id} className="box-border border p-4 rounded shadow-md bg-gray w-[200px]">
-              <div className="flex justify-between items-center">
-                <div className="w-32">Mesa {option.id}</div>
-                {/* Dropdown */}
-                <div className="relative inline-block text-left">
-                  <button className="text-white p-2 py-1 rounded">O</button>
-                  <div
-                    className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white ring-1 shadow-lg ring-black/5 focus:outline-hidden"
-                    role="menu"
-                  >
-                    <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem">
-                      Editar
-                    </a>
-                    <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem">
-                      Eliminar
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-center gap-4 p-4">
-                <div className="p-2 box-border border rounded">Atención</div>
-                <div className="p-2 box-border border rounded">Cuenta</div>
-              </div>
-            </div>
-          ))}
-        </div>
+  function closeDropdown() {
+    setOpenDropdownId(null);
+  }
+
+  return (
+    <div onClick={closeDropdown} className="flex flex-col">
+      <div className="text-white flex items-center gap-4 pb-8">
+        <button
+          onClick={(e) => {
+            e.stopPropagation(); // Evita que cierre el dropdown
+            toggleModal();
+          }}
+          className="bg-red-500 border-1 p-2 rounded"
+        >
+          Agregar Mesa
+        </button>
+        <input
+          className="border-1 p-2 rounded"
+          type="search"
+          placeholder="Buscar Mesa"
+          onClick={(e) => e.stopPropagation()} // Evita que cierre al hacer clic en el input
+        />
       </div>
 
-      {/* Modal box */}
+      <div className="flex flex-wrap gap-8 justify-center">
+        {tablesArray.map((option) => (
+          <div
+            key={option.id}
+            onClick={(e) => e.stopPropagation()} // Evita que cierre al hacer clic en la caja
+            className="relative box-border border p-4 rounded shadow-md bg-gray w-[200px]"
+          >
+            <div className="flex justify-between items-center">
+              <div className="w-32">Mesa {option.id}</div>
+              <button
+                onClick={() => {
+                  toggleDropdown(option.id);
+                }}
+                className="text-white p-2 py-1 rounded"
+              >
+                ⋮
+              </button>
+              <Dropdown isOpen={openDropdownId === option.id} />
+            </div>
+            <div className="flex justify-center gap-4 p-4">
+              <div className="p-2 box-border border rounded">Atención</div>
+              <div className="p-2 box-border border rounded">Cuenta</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <Modal isOpen={isModalOpen} onCloseAction={toggleModal} />
-    </>
+    </div>
   );
 }
