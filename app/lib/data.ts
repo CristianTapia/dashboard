@@ -13,5 +13,5 @@ export const productArray = [
 
 export const tablesArray = Array.from({ length: 50 }, (_, i) => ({
   id: i + 1,
-  name: `Mesa ${i + 1}`,
+  name: `Nombre ${i + 1}`,
 }));
