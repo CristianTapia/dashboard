@@ -5,8 +5,7 @@ export default function Dropdown({ isOpen }: { isOpen: boolean }) {
 
   return (
     <div
-      //   onClick={(e) => e.stopPropagation()} // Evita que el evento de clic suba al contenedor principal
-      className="absolute right-0 top-[40px] z-10 mt-1 w-40 bg-white rounded-md shadow-lg border
+      className="absolute right-0 top-[30px] z-10 mt-1 w-40 bg-white rounded-md shadow-lg border
           transition-all duration-200 transform
           opacity-100 scale-100"
     >
