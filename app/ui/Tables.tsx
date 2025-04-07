@@ -4,6 +4,7 @@ import { tablesArray } from "../lib/data";
 import { useState } from "react";
 import Modal from "./Modal";
 import Dropdown from "./Dropdown";
+import AddTable from "./AddTable";
 
 export default function Tables() {
   const [isModalOpen, setModalIsOpen] = useState(false);
@@ -52,7 +53,9 @@ export default function Tables() {
         ))}
       </div>
 
-      <Modal isOpen={isModalOpen} onCloseAction={toggleModal} />
+      <Modal isOpen={isModalOpen} onCloseAction={toggleModal}>
+        <AddTable />
+      </Modal>
     </div>
   );
 }
