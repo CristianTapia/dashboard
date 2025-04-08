@@ -83,7 +83,7 @@ export default function Tables() {
         isOpen={activeModal === "confirmDelete"}
         onCloseAction={closeModal}
         title="¿Estás seguro/a?"
-        body={<div>Esta acción es irreversible</div>}
+        body={<div className="text-gray-900">Esta acción es irreversible</div>}
         buttonAName="Eliminar"
         onButtonAClickAction={() => {
           // lógica de eliminar
