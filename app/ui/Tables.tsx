@@ -2,9 +2,9 @@
 
 import { tablesArray } from "../lib/data";
 import { useState } from "react";
-import Modal from "./Modal";
+import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
-import AddTable from "./AddTable";
+import AddTable from "./Modals/AddTable";
 
 export default function Tables() {
   const [isModalOpen, setModalIsOpen] = useState(false);
@@ -53,9 +53,14 @@ export default function Tables() {
         ))}
       </div>
 
-      <Modal isOpen={isModalOpen} onCloseAction={toggleModal}>
-        <AddTable />
-      </Modal>
+      <Modal
+        isOpen={isModalOpen}
+        onCloseAction={toggleModal}
+        title="Agregar Mesa"
+        body={<AddTable />}
+        buttonAName="Agregar"
+        buttonBName="Cerrar"
+      ></Modal>
     </div>
   );
 }

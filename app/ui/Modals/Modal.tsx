@@ -1,13 +1,19 @@
 "use client";
 
 export default function Modal({
-  children,
   isOpen,
   onCloseAction,
+  title,
+  body,
+  buttonAName,
+  buttonBName,
 }: {
-  children: React.ReactNode;
   isOpen: boolean;
   onCloseAction: () => void;
+  title?: string;
+  body?: React.ReactNode;
+  buttonAName?: string;
+  buttonBName?: string;
 }) {
   return (
     <>
@@ -21,18 +27,18 @@ export default function Modal({
           <div className="bg-white p-6 rounded-lg w-96" onClick={(e) => e.stopPropagation()}>
             {/* Modal header */}
             <div className="flex pl-4 pb-6 justify-between text-xl">
-              <h2 className="text-gray-900">Agregar Mesa</h2>
+              <h2 className="text-gray-900">{title}</h2>
               <button className="pr-4 text-gray-900" onClick={onCloseAction}>
                 X
               </button>
             </div>
             {/* Modal body */}
-            <div className="p-4">{children}</div>
+            <div className="p-4">{body}</div>
             {/* Modal footer */}
             <div className="pt-4 pl-4">
-              <button className="p-2 bg-green-600 text-white rounded">Agregar</button>
+              <button className="p-2 bg-green-600 text-white rounded">{buttonAName}</button>
               <button onClick={onCloseAction} className="p-2 bg-red-600 text-white rounded ml-2">
-                Cerrar
+                {buttonBName}
               </button>
             </div>
           </div>
