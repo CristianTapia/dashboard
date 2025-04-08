@@ -7,20 +7,15 @@ import Dropdown from "./Dropdown";
 import AddTable from "./Modals/AddTable";
 
 export default function Tables() {
-  const [isModalOpen, setModalIsOpen] = useState(false);
+  const [activeModal, setActiveModal] = useState<null | "addTable" | "confirmDelete">(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  function openConfirmModal() {
-    setShowConfirmModal(true);
+  function openModal(modalName: "addTable" | "confirmDelete") {
+    setActiveModal(modalName);
   }
 
-  function closeConfirmModal() {
-    setShowConfirmModal(false);
-  }
-
-  function toggleModal() {
-    setModalIsOpen((prev) => !prev);
+  function closeModal() {
+    setActiveModal(null);
   }
 
   function toggleDropdown(id: number) {
@@ -30,7 +25,10 @@ export default function Tables() {
   return (
     <div className="flex flex-col">
       <div className="text-white flex items-center gap-4 pb-8">
-        <button onClick={toggleModal} className="bg-red-500 border-1 p-2 rounded cursor-pointer">
+        <button
+          onClick={() => openModal("addTable")} // Aquí se corrige el nombre de la función
+          className="bg-red-500 border-1 p-2 rounded cursor-pointer"
+        >
           Agregar Mesa
         </button>
         <input className="border-1 p-2 rounded" type="search" placeholder="Buscar Mesa" />
@@ -55,7 +53,7 @@ export default function Tables() {
                     isOpen={true}
                     onDeleteAction={() => {
                       setOpenDropdownId(null);
-                      openConfirmModal();
+                      openModal("confirmDelete");
                     }}
                   />
                 )}
@@ -71,32 +69,28 @@ export default function Tables() {
       </div>
 
       <Modal
-        isOpen={isModalOpen}
-        onCloseAction={toggleModal}
+        isOpen={activeModal === "addTable"}
+        onCloseAction={closeModal}
         title="Agregar Mesa"
         body={<AddTable />}
         buttonAName="Agregar"
         buttonBName="Cerrar"
-        onButtonAClickAction={function (): void {
-          throw new Error("Function not implemented.");
-        }}
-        onButtonBClickAction={function (): void {
-          throw new Error("Function not implemented.");
-        }}
-      ></Modal>
+        onButtonAClickAction={closeModal}
+        onButtonBClickAction={closeModal}
+      />
 
       <Modal
-        isOpen={showConfirmModal}
-        onCloseAction={closeConfirmModal}
+        isOpen={activeModal === "confirmDelete"}
+        onCloseAction={closeModal}
         title="¿Estás seguro/a?"
         body={<div>Esta acción es irreversible</div>}
         buttonAName="Eliminar"
         onButtonAClickAction={() => {
-          // eliminar
-          closeConfirmModal();
+          // lógica de eliminar
+          closeModal();
         }}
         buttonBName="Cancelar"
-        onButtonBClickAction={closeConfirmModal}
+        onButtonBClickAction={closeModal}
       />
     </div>
   );
