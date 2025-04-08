@@ -6,7 +6,9 @@ export default function Modal({
   title,
   body,
   buttonAName,
+  onButtonAClickAction,
   buttonBName,
+  onButtonBClickAction,
 }: {
   isOpen: boolean;
   onCloseAction: () => void;
@@ -14,6 +16,8 @@ export default function Modal({
   body?: React.ReactNode;
   buttonAName?: string;
   buttonBName?: string;
+  onButtonAClickAction: () => void;
+  onButtonBClickAction: () => void;
 }) {
   return (
     <>
@@ -36,10 +40,17 @@ export default function Modal({
             <div className="p-4">{body}</div>
             {/* Modal footer */}
             <div className="pt-4 pl-4">
-              <button className="p-2 bg-green-600 text-white rounded">{buttonAName}</button>
-              <button onClick={onCloseAction} className="p-2 bg-red-600 text-white rounded ml-2">
-                {buttonBName}
-              </button>
+              {buttonAName && (
+                <button onClick={onButtonAClickAction} className="p-2 bg-green-600 text-white rounded">
+                  {buttonAName}
+                </button>
+              )}
+
+              {buttonBName && (
+                <button onClick={onButtonBClickAction} className="p-2 bg-red-600 text-white rounded ml-2">
+                  {buttonBName}
+                </button>
+              )}
             </div>
           </div>
         </div>

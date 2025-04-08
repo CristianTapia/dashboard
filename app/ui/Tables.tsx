@@ -9,6 +9,15 @@ import AddTable from "./Modals/AddTable";
 export default function Tables() {
   const [isModalOpen, setModalIsOpen] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  function openConfirmModal() {
+    setShowConfirmModal(true);
+  }
+
+  function closeConfirmModal() {
+    setShowConfirmModal(false);
+  }
 
   function toggleModal() {
     setModalIsOpen((prev) => !prev);
@@ -35,13 +44,21 @@ export default function Tables() {
               {/* Contenedor con onBlur */}
               <div
                 tabIndex={0} // Permite que onBlur funcione
-                onBlur={() => setOpenDropdownId(null)} // Se cierra si pierdo el foco
+                onBlur={() => setTimeout(() => setOpenDropdownId(null), 100)} // Se cierra si pierdo el foco
                 className="relative"
               >
                 <button onClick={() => toggleDropdown(option.id)} className="text-white p-2 py-1 rounded">
                   ⋮
                 </button>
-                {openDropdownId === option.id && <Dropdown isOpen={true} />}
+                {openDropdownId === option.id && (
+                  <Dropdown
+                    isOpen={true}
+                    onDeleteAction={() => {
+                      setOpenDropdownId(null);
+                      openConfirmModal();
+                    }}
+                  />
+                )}
               </div>
             </div>
             <div className="w-32">{option.name}</div>
@@ -60,7 +77,27 @@ export default function Tables() {
         body={<AddTable />}
         buttonAName="Agregar"
         buttonBName="Cerrar"
+        onButtonAClickAction={function (): void {
+          throw new Error("Function not implemented.");
+        }}
+        onButtonBClickAction={function (): void {
+          throw new Error("Function not implemented.");
+        }}
       ></Modal>
+
+      <Modal
+        isOpen={showConfirmModal}
+        onCloseAction={closeConfirmModal}
+        title="¿Estás seguro/a?"
+        body={<div>Esta acción es irreversible</div>}
+        buttonAName="Eliminar"
+        onButtonAClickAction={() => {
+          // eliminar
+          closeConfirmModal();
+        }}
+        buttonBName="Cancelar"
+        onButtonBClickAction={closeConfirmModal}
+      />
     </div>
   );
 }
