@@ -14,7 +14,6 @@ export default function Dropdown({ isOpen, onDeleteAction }: { isOpen: boolean; 
         <li
           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
           onClick={() => {
-            console.log("click");
             onDeleteAction();
           }}
         >
