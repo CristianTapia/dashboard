@@ -10,10 +10,16 @@ import EditTable from "./Modals/EditTable";
 export default function Tables() {
   const [activeModal, setActiveModal] = useState<null | "addTable" | "confirmDelete" | "editTable">(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+  const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
 
   // Modal
-  function openModal(modalName: "addTable" | "confirmDelete" | "editTable") {
+  function openModal(modalName: "addTable" | "confirmDelete" | "editTable", tableId?: number) {
     setActiveModal(modalName);
+    if (tableId !== undefined) {
+      setSelectedTableId(tableId);
+    } else {
+      setSelectedTableId(null);
+    }
   }
 
   function closeModal() {
@@ -55,11 +61,11 @@ export default function Tables() {
                     isOpen={true}
                     onEditAction={() => {
                       setOpenDropdownId(null);
-                      openModal("editTable");
+                      openModal("editTable", option.id);
                     }}
                     onDeleteAction={() => {
                       setOpenDropdownId(null);
-                      openModal("confirmDelete");
+                      openModal("confirmDelete", option.id);
                     }}
                   />
                 )}
@@ -90,7 +96,7 @@ export default function Tables() {
       <Modal
         isOpen={activeModal === "editTable"}
         onCloseAction={closeModal}
-        title="Editar Mesa"
+        title={`Editar Mesa ${selectedTableId}`}
         body={<EditTable />}
         buttonAName="Confirmar"
         onButtonAClickAction={() => {
@@ -105,7 +111,7 @@ export default function Tables() {
       <Modal
         isOpen={activeModal === "confirmDelete"}
         onCloseAction={closeModal}
-        title="¿Estás seguro/a?"
+        title={`¿Estás seguro/a de eliminar la mesa ${selectedTableId}?`}
         body={<div className="text-gray-900">Esta acción es irreversible</div>}
         buttonAName="Eliminar"
         onButtonAClickAction={() => {

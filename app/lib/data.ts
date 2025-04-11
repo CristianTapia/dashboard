@@ -13,6 +13,6 @@ export const productArray = [
 
 export const tablesArray = Array.from({ length: 50 }, (_, i) => ({
   id: i + 1,
-  number: i + 1,
+  number: Math.floor(Math.random() * 100) + 1, // número aleatorio entre 1 y 100
   name: `Nombre ${i + 1}`,
 }));
