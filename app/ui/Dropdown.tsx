@@ -1,6 +1,14 @@
 "use client";
 
-export default function Dropdown({ isOpen, onDeleteAction }: { isOpen: boolean; onDeleteAction: () => void }) {
+export default function Dropdown({
+  isOpen,
+  onDeleteAction,
+  onEditAction,
+}: {
+  isOpen: boolean;
+  onDeleteAction: () => void;
+  onEditAction: () => void;
+}) {
   if (!isOpen) return null; // No renderiza el dropdown si está cerrado
 
   return (
@@ -10,7 +18,9 @@ export default function Dropdown({ isOpen, onDeleteAction }: { isOpen: boolean; 
           opacity-100 scale-100"
     >
       <ul className="py-1">
-        <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">Editar</li>
+        <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={onEditAction}>
+          Editar
+        </li>
         <li
           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
           onClick={() => {

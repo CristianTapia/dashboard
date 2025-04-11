@@ -5,13 +5,14 @@ import { useState } from "react";
 import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
 import AddTable from "./Modals/AddTable";
+import EditTable from "./Modals/EditTable";
 
 export default function Tables() {
-  const [activeModal, setActiveModal] = useState<null | "addTable" | "confirmDelete">(null);
+  const [activeModal, setActiveModal] = useState<null | "addTable" | "confirmDelete" | "editTable">(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
 
   // Modal
-  function openModal(modalName: "addTable" | "confirmDelete") {
+  function openModal(modalName: "addTable" | "confirmDelete" | "editTable") {
     setActiveModal(modalName);
   }
 
@@ -39,7 +40,7 @@ export default function Tables() {
         {tablesArray.map((option) => (
           <div key={option.id} className="relative box-border border p-4 rounded shadow-md bg-gray w-[200px]">
             <div className="flex justify-between items-center">
-              <div className="w-32">Mesa {option.id}</div>
+              <div className="w-32">Mesa {option.number}</div>
               {/* Contenedor con onBlur */}
               <div
                 tabIndex={0} // Permite que onBlur funcione
@@ -52,6 +53,10 @@ export default function Tables() {
                 {openDropdownId === option.id && (
                   <Dropdown
                     isOpen={true}
+                    onEditAction={() => {
+                      setOpenDropdownId(null);
+                      openModal("editTable");
+                    }}
                     onDeleteAction={() => {
                       setOpenDropdownId(null);
                       openModal("confirmDelete");
@@ -78,6 +83,21 @@ export default function Tables() {
         buttonAName="Agregar"
         buttonBName="Cerrar"
         onButtonAClickAction={closeModal}
+        onButtonBClickAction={closeModal}
+      />
+
+      {/* Modal para editar mesa */}
+      <Modal
+        isOpen={activeModal === "editTable"}
+        onCloseAction={closeModal}
+        title="Editar Mesa"
+        body={<EditTable />}
+        buttonAName="Confirmar"
+        onButtonAClickAction={() => {
+          // lógica de editar
+          closeModal();
+        }}
+        buttonBName="Cancelar"
         onButtonBClickAction={closeModal}
       />
 
