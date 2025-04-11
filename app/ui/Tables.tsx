@@ -10,6 +10,7 @@ export default function Tables() {
   const [activeModal, setActiveModal] = useState<null | "addTable" | "confirmDelete">(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
 
+  // Modal
   function openModal(modalName: "addTable" | "confirmDelete") {
     setActiveModal(modalName);
   }
@@ -17,7 +18,7 @@ export default function Tables() {
   function closeModal() {
     setActiveModal(null);
   }
-
+  // Dropdown
   function toggleDropdown(id: number) {
     setOpenDropdownId((prev) => (prev === id ? null : id));
   }
@@ -68,6 +69,7 @@ export default function Tables() {
         ))}
       </div>
 
+      {/* Modal para agregar mesa */}
       <Modal
         isOpen={activeModal === "addTable"}
         onCloseAction={closeModal}
@@ -79,6 +81,7 @@ export default function Tables() {
         onButtonBClickAction={closeModal}
       />
 
+      {/* Modal para confirmar eliminación */}
       <Modal
         isOpen={activeModal === "confirmDelete"}
         onCloseAction={closeModal}
