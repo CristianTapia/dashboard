@@ -21,12 +21,7 @@ export default function Dropdown({
         <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={onEditAction}>
           Editar
         </li>
-        <li
-          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-          onClick={() => {
-            onDeleteAction();
-          }}
-        >
+        <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={onDeleteAction}>
           Eliminar
         </li>
       </ul>

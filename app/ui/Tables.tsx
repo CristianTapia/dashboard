@@ -11,15 +11,12 @@ export default function Tables() {
   const [activeModal, setActiveModal] = useState<null | "addTable" | "confirmDelete" | "editTable">(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
+  const selectedTable = tablesArray.find((table) => table.id === selectedTableId);
 
   // Modal
   function openModal(modalName: "addTable" | "confirmDelete" | "editTable", tableId?: number) {
     setActiveModal(modalName);
-    if (tableId !== undefined) {
-      setSelectedTableId(tableId);
-    } else {
-      setSelectedTableId(null);
-    }
+    setSelectedTableId(tableId ?? null);
   }
 
   function closeModal() {
@@ -96,7 +93,7 @@ export default function Tables() {
       <Modal
         isOpen={activeModal === "editTable"}
         onCloseAction={closeModal}
-        title={`Editar Mesa ${selectedTableId}`}
+        title={`Editar Mesa ${selectedTable?.number ?? ""}`}
         body={<EditTable />}
         buttonAName="Confirmar"
         onButtonAClickAction={() => {
@@ -111,7 +108,7 @@ export default function Tables() {
       <Modal
         isOpen={activeModal === "confirmDelete"}
         onCloseAction={closeModal}
-        title={`¿Estás seguro/a de eliminar la mesa ${selectedTableId}?`}
+        title={`¿Estás seguro/a de eliminar la mesa ${selectedTable?.number ?? ""}?`}
         body={<div className="text-gray-900">Esta acción es irreversible</div>}
         buttonAName="Eliminar"
         onButtonAClickAction={() => {
