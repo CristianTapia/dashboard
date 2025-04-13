@@ -1,6 +1,6 @@
 "use client";
 
-import { productArray, tablesArray } from "../lib/data";
+import { productArray } from "../lib/data";
 import { useState } from "react";
 import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
@@ -10,13 +10,13 @@ import EditTable from "./Modals/EditTable";
 export default function Tables() {
   const [activeModal, setActiveModal] = useState<null | "addTable" | "confirmDelete" | "editTable">(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
-  const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
-  const selectedTable = tablesArray.find((table) => table.id === selectedTableId);
+  const [selectedProductId, setselectedProductId] = useState<number | null>(null);
+  const selectedProduct = productArray.find((product) => product.id === selectedProductId);
 
   // Modal
-  function openModal(modalName: "addTable" | "confirmDelete" | "editTable", tableId?: number) {
+  function openModal(modalName: "addTable" | "confirmDelete" | "editTable", productId?: number) {
     setActiveModal(modalName);
-    setSelectedTableId(tableId ?? null);
+    setselectedProductId(productId ?? null);
   }
 
   function closeModal() {
@@ -34,9 +34,9 @@ export default function Tables() {
           onClick={() => openModal("addTable")} // Aquí se corrige el nombre de la función
           className="bg-red-500 border-1 p-2 rounded cursor-pointer"
         >
-          Agregar Mesa
+          Agregar Producto
         </button>
-        <input className="border-1 p-2 rounded" type="search" placeholder="Buscar Mesa" />
+        <input className="border-1 p-2 rounded" type="search" placeholder="Buscar Producto" />
       </div>
 
       <div className="flex flex-wrap gap-8 justify-center">
@@ -77,6 +77,7 @@ export default function Tables() {
               }).format(option.price)}
             </div>
             <div className="w-32 pb-3">{option.category}</div>
+            <div className="w-32 pb-3">Stock: {option.stock}</div>
             <div className="p-12 box-border border rounded">Foto</div>
           </div>
         ))}
@@ -94,11 +95,11 @@ export default function Tables() {
         onButtonBClickAction={closeModal}
       />
 
-      {/* Modal para editar mesa */}
+      {/* Modal para editar producto */}
       <Modal
         isOpen={activeModal === "editTable"}
         onCloseAction={closeModal}
-        title={`Editar Mesa ${selectedTable?.number ?? ""}`}
+        title={`Editar Mesa ${selectedProduct?.id ?? ""}`}
         body={<EditTable />}
         buttonAName="Confirmar"
         onButtonAClickAction={() => {
@@ -113,7 +114,7 @@ export default function Tables() {
       <Modal
         isOpen={activeModal === "confirmDelete"}
         onCloseAction={closeModal}
-        title={`¿Estás seguro/a de eliminar la mesa ${selectedTable?.number ?? ""}?`}
+        title={`¿Estás seguro/a de eliminar el producto ${selectedProduct?.id ?? ""}?`}
         body={<div className="text-gray-900">Esta acción es irreversible</div>}
         buttonAName="Eliminar"
         onButtonAClickAction={() => {
