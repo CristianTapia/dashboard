@@ -5,16 +5,16 @@ import { useState } from "react";
 import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
 import AddProduct from "./Modals/AddProduct";
-import EditTable from "./Modals/EditTable";
+import EditProduct from "./Modals/EditProduct";
 
 export default function Tables() {
-  const [activeModal, setActiveModal] = useState<null | "addProduct" | "confirmDelete" | "editTable">(null);
+  const [activeModal, setActiveModal] = useState<null | "addProduct" | "confirmDelete" | "editProduct">(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedProductId, setselectedProductId] = useState<number | null>(null);
   const selectedProduct = productArray.find((product) => product.id === selectedProductId);
 
   // Modal
-  function openModal(modalName: "addProduct" | "confirmDelete" | "editTable", productId?: number) {
+  function openModal(modalName: "addProduct" | "confirmDelete" | "editProduct", productId?: number) {
     setActiveModal(modalName);
     setselectedProductId(productId ?? null);
   }
@@ -58,7 +58,7 @@ export default function Tables() {
                     isOpen={true}
                     onEditAction={() => {
                       setOpenDropdownId(null);
-                      openModal("editTable", option.id);
+                      openModal("editProduct", option.id);
                     }}
                     onDeleteAction={() => {
                       setOpenDropdownId(null);
@@ -97,10 +97,10 @@ export default function Tables() {
 
       {/* Modal para editar producto */}
       <Modal
-        isOpen={activeModal === "editTable"}
+        isOpen={activeModal === "editProduct"}
         onCloseAction={closeModal}
-        title={`Editar Mesa ${selectedProduct?.id ?? ""}`}
-        body={<EditTable />}
+        title={`Editar Producto ${selectedProduct?.id ?? ""}`}
+        body={<EditProduct />}
         buttonAName="Confirmar"
         onButtonAClickAction={() => {
           // lógica de editar

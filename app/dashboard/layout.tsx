@@ -14,12 +14,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <ul className="space-y-2">
             <li>
               <Link href="/dashboard/mesas-vista-bloques" className="block p-2 bg-gray-700 rounded hover:bg-gray-600">
-                Vista de Bloques
+                Mesas - Vista de Bloques
               </Link>
             </li>
             <li>
               <Link href="/dashboard/mesas-vista-planta" className="block p-2 bg-gray-700 rounded hover:bg-gray-600">
-                Vista de planta
+                Mesas - Vista de planta
               </Link>
             </li>
             <li>
