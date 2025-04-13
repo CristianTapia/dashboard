@@ -1,3 +1,5 @@
-export default function Products() {
-  return <div>Products</div>;
+import Products from "@/app/ui/Products";
+
+export default function ProductsView() {
+  return <Products />;
 }
