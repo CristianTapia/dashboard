@@ -4,17 +4,17 @@ import { productArray } from "../lib/data";
 import { useState } from "react";
 import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
-import AddTable from "./Modals/AddTable";
+import AddProduct from "./Modals/AddProduct";
 import EditTable from "./Modals/EditTable";
 
 export default function Tables() {
-  const [activeModal, setActiveModal] = useState<null | "addTable" | "confirmDelete" | "editTable">(null);
+  const [activeModal, setActiveModal] = useState<null | "addProduct" | "confirmDelete" | "editTable">(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedProductId, setselectedProductId] = useState<number | null>(null);
   const selectedProduct = productArray.find((product) => product.id === selectedProductId);
 
   // Modal
-  function openModal(modalName: "addTable" | "confirmDelete" | "editTable", productId?: number) {
+  function openModal(modalName: "addProduct" | "confirmDelete" | "editTable", productId?: number) {
     setActiveModal(modalName);
     setselectedProductId(productId ?? null);
   }
@@ -31,7 +31,7 @@ export default function Tables() {
     <div className="flex flex-col">
       <div className="text-white flex items-center gap-4 pb-8">
         <button
-          onClick={() => openModal("addTable")} // Aquí se corrige el nombre de la función
+          onClick={() => openModal("addProduct")} // Aquí se corrige el nombre de la función
           className="bg-red-500 border-1 p-2 rounded cursor-pointer"
         >
           Agregar Producto
@@ -85,12 +85,12 @@ export default function Tables() {
 
       {/* Modal para agregar producto */}
       <Modal
-        isOpen={activeModal === "addTable"}
+        isOpen={activeModal === "addProduct"}
         onCloseAction={closeModal}
-        title="Agregar Mesa"
-        body={<AddTable />}
+        title="Agregar Producto"
+        body={<AddProduct />}
         buttonAName="Agregar"
-        buttonBName="Cerrar"
+        buttonBName="Cancelar"
         onButtonAClickAction={closeModal}
         onButtonBClickAction={closeModal}
       />

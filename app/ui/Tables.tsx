@@ -84,7 +84,7 @@ export default function Tables() {
         title="Agregar Mesa"
         body={<AddTable />}
         buttonAName="Agregar"
-        buttonBName="Cerrar"
+        buttonBName="Cancelar"
         onButtonAClickAction={closeModal}
         onButtonBClickAction={closeModal}
       />
