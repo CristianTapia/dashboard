@@ -86,10 +86,10 @@ export default function Tables() {
               </div>
             </div>
             <div className="flex justify-center gap-4 p-4">
-              <div className="p-2 box-border border rounded bg-gray-200 text-black">
+              <button className="p-2 box-border border rounded bg-gray-200 text-black">
                 <ClipboardList size={16} />
                 Revisar Orden
-              </div>
+              </button>
             </div>
           </div>
         ))}
