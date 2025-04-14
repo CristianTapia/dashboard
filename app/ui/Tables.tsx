@@ -1,4 +1,5 @@
 "use client";
+import { Bell, DollarSign, ClipboardList } from "lucide-react";
 
 import { tablesArray } from "../lib/data";
 import { useState } from "react";
@@ -70,8 +71,25 @@ export default function Tables() {
             </div>
             <div className="w-32">{option.name}</div>
             <div className="flex justify-center gap-4 p-4">
-              <div className="p-2 box-border border rounded">Atención</div>
-              <div className="p-2 box-border border rounded">Cuenta</div>
+              {/* ALERTAS */}
+
+              {/* Alerta Atención */}
+              <div className="p-2 items-center gap-1 border rounded text-red-500 bg-red-100 animate-pulse">
+                <Bell size={16} />
+                <span className="text-sm">Atención</span>
+              </div>
+
+              {/* Alerta Cuenta */}
+              <div className="p-2 items-center gap-1 border rounded text-yellow-600 bg-yellow-100 animate-pulse">
+                <DollarSign size={16} />
+                <span className="text-sm">Cuenta</span>
+              </div>
+            </div>
+            <div className="flex justify-center gap-4 p-4">
+              <div className="p-2 box-border border rounded bg-gray-200 text-black">
+                <ClipboardList size={16} />
+                Revisar Orden
+              </div>
             </div>
           </div>
         ))}
