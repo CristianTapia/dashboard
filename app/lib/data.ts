@@ -16,8 +16,13 @@ export const productArray = [
   { id: 15, name: "Nachos con Queso", price: 7500, category: "Mexicana", stock: 16 },
 ];
 
-export const tablesArray = Array.from({ length: 50 }, (_, i) => ({
-  id: i + 1,
-  number: Math.floor(Math.random() * 100) + 1, // número aleatorio entre 1 y 100
-  name: `Nombre ${i + 1}`,
+const mesaNumbers = [
+  3, 5, 7, 10, 12, 14, 17, 19, 21, 24, 26, 28, 30, 33, 35, 38, 40, 43, 45, 48, 50, 53, 55, 58, 60, 63, 65, 68, 70, 72,
+  75, 78, 80, 83, 85, 88, 90, 93, 95, 98, 100, 103, 105, 108, 110, 113, 115, 118, 120, 123,
+];
+
+export const tablesArray = mesaNumbers.map((num, index) => ({
+  id: index + 1,
+  number: num,
+  name: `Mesa ${num}`,
 }));

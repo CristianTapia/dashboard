@@ -9,13 +9,15 @@ import AddTable from "./Modals/AddTable";
 import EditTable from "./Modals/EditTable";
 
 export default function Tables() {
-  const [activeModal, setActiveModal] = useState<null | "addTable" | "confirmDelete" | "editTable">(null);
+  const [activeModal, setActiveModal] = useState<null | "addTable" | "confirmDelete" | "editTable" | "reviewOrder">(
+    null
+  );
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
   const selectedTable = tablesArray.find((table) => table.id === selectedTableId);
 
   // Modal
-  function openModal(modalName: "addTable" | "confirmDelete" | "editTable", tableId?: number) {
+  function openModal(modalName: "addTable" | "confirmDelete" | "editTable" | "reviewOrder", tableId?: number) {
     setActiveModal(modalName);
     setSelectedTableId(tableId ?? null);
   }
@@ -86,7 +88,12 @@ export default function Tables() {
               </div>
             </div>
             <div className="flex justify-center gap-4 p-4">
-              <button className="p-2 box-border border rounded bg-gray-200 text-black">
+              <button
+                className="p-2 items-center box-border border rounded bg-gray-200 text-black"
+                onClick={() => {
+                  openModal("reviewOrder", option.id);
+                }}
+              >
                 <ClipboardList size={16} />
                 Revisar Orden
               </button>
@@ -134,6 +141,16 @@ export default function Tables() {
           closeModal();
         }}
         buttonBName="Cancelar"
+        onButtonBClickAction={closeModal}
+      />
+
+      {/* Modal para Revisar la orden */}
+      <Modal
+        isOpen={activeModal === "reviewOrder"}
+        onCloseAction={closeModal}
+        title={`Orden de la Mesa ${selectedTable?.number ?? ""}`}
+        body={<div className="text-gray-900">Esta acción es irreversible</div>}
+        buttonBName="Cerrar"
         onButtonBClickAction={closeModal}
       />
     </div>

@@ -16,8 +16,8 @@ export default function Modal({
   body?: React.ReactNode;
   buttonAName?: string;
   buttonBName?: string;
-  onButtonAClickAction: () => void;
-  onButtonBClickAction: () => void;
+  onButtonAClickAction?: () => void;
+  onButtonBClickAction?: () => void;
 }) {
   return (
     <>
