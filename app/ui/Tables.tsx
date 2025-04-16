@@ -16,9 +16,9 @@ export default function Tables() {
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
   const selectedTable = tablesArray.find((table) => table.id === selectedTableId);
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState({ term: "" });
   const filteredTables = tablesArray.filter((table) => {
-    const term = searchTerm.toLowerCase();
+    const term = filters.term.toLowerCase();
     return table.name.toLowerCase().includes(term) || table.number.toString().includes(term);
   });
 
@@ -49,9 +49,9 @@ export default function Tables() {
           className="border-1 p-2 rounded"
           type="text"
           placeholder="Buscar Mesa"
-          value={searchTerm}
+          value={filters.term}
           onChange={(e) => {
-            setSearchTerm(e.target.value);
+            setFilters((prev) => ({ ...prev, term: e.target.value }));
           }}
         />
 
