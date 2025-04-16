@@ -17,10 +17,13 @@ export default function Tables() {
   const selectedTable = tablesArray.find((table) => table.id === selectedTableId);
 
   const [filters, setFilters] = useState({ term: "" });
-  const filteredTables = tablesArray.filter((table) => {
-    const term = filters.term.toLowerCase();
-    return table.name.toLowerCase().includes(term) || table.number.toString().includes(term);
-  });
+  const showTables =
+    filters.term.trim() === ""
+      ? tablesArray
+      : tablesArray.filter((table) => {
+          const term = filters.term.toLowerCase();
+          return table.name.toLowerCase().includes(term) || table.number.toString().includes(term);
+        });
 
   // Modal
   function openModal(modalName: "addTable" | "confirmDelete" | "editTable" | "reviewOrder", tableId?: number) {
@@ -54,16 +57,10 @@ export default function Tables() {
             setFilters((prev) => ({ ...prev, term: e.target.value }));
           }}
         />
-
-        {filteredTables.map((table) => (
-          <div key={table.id}>
-            numero {table.number} - {table.name}
-          </div>
-        ))}
       </div>
 
       <div className="flex flex-wrap gap-8 justify-center">
-        {tablesArray.map((option) => (
+        {showTables.map((option) => (
           <div key={option.id} className="relative box-border border p-4 rounded shadow-md bg-gray w-[200px]">
             <div className="flex justify-between items-center">
               <div className="w-32">Mesa {option.number}</div>
