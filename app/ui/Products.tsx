@@ -12,6 +12,14 @@ export default function Tables() {
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedProductId, setselectedProductId] = useState<number | null>(null);
   const selectedProduct = productArray.find((product) => product.id === selectedProductId);
+  const [filters, setFilters] = useState({ term: "" });
+  const showTables =
+    filters.term.trim() === ""
+      ? productArray
+      : productArray.filter((table) => {
+          const term = filters.term.toLowerCase();
+          return table.name.toLowerCase().includes(term) || table.price.toString().includes(term);
+        });
 
   // Modal
   function openModal(modalName: "addProduct" | "confirmDelete" | "editProduct", productId?: number) {
@@ -36,11 +44,19 @@ export default function Tables() {
         >
           Agregar Producto
         </button>
-        <input className="border-1 p-2 rounded" type="search" placeholder="Buscar Producto" />
+        <input
+          className="border-1 p-2 rounded"
+          type="text"
+          placeholder="Buscar Mesa"
+          value={filters.term}
+          onChange={(e) => {
+            setFilters((prev) => ({ ...prev, term: e.target.value }));
+          }}
+        />
       </div>
 
       <div className="flex flex-wrap gap-8 justify-center">
-        {productArray.map((option) => (
+        {showTables.map((option) => (
           <div key={option.id} className="relative box-border border p-4 rounded shadow-md bg-gray w-[200px]">
             <div className="flex justify-between items-center">
               <div className="w-32">Producto {option.id}</div>
