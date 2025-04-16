@@ -16,6 +16,12 @@ export default function Tables() {
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
   const selectedTable = tablesArray.find((table) => table.id === selectedTableId);
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const filteredTables = tablesArray.filter((table) => {
+    const term = searchTerm.toLowerCase();
+    return table.name.toLowerCase().includes(term) || table.number.toString().includes(term);
+  });
+
   // Modal
   function openModal(modalName: "addTable" | "confirmDelete" | "editTable" | "reviewOrder", tableId?: number) {
     setActiveModal(modalName);
@@ -39,7 +45,21 @@ export default function Tables() {
         >
           Agregar Mesa
         </button>
-        <input className="border-1 p-2 rounded" type="search" placeholder="Buscar Mesa" />
+        <input
+          className="border-1 p-2 rounded"
+          type="text"
+          placeholder="Buscar Mesa"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+          }}
+        />
+
+        {filteredTables.map((table) => (
+          <div key={table.id}>
+            numero {table.number} - {table.name}
+          </div>
+        ))}
       </div>
 
       <div className="flex flex-wrap gap-8 justify-center">
@@ -87,7 +107,7 @@ export default function Tables() {
                 <span className="text-sm">Cuenta</span>
               </div>
             </div>
-            <div className="flex justify-center gap-4 p-4">
+            <div className="flex justify-center gap-4 p-4 animate-pulse">
               <button
                 className="p-2 items-center box-border border rounded bg-gray-200 text-black"
                 onClick={() => {
@@ -149,7 +169,11 @@ export default function Tables() {
         isOpen={activeModal === "reviewOrder"}
         onCloseAction={closeModal}
         title={`Orden de la Mesa ${selectedTable?.number ?? ""}`}
-        body={<div className="text-gray-900">Esta acción es irreversible</div>}
+        body={
+          <div className="text-gray-900">
+            Ordenes que vienen desde la API intermendia que almacena los datos de la app menu
+          </div>
+        }
         buttonBName="Cerrar"
         onButtonBClickAction={closeModal}
       />
