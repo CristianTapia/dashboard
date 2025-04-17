@@ -15,6 +15,7 @@ export default function Tables() {
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
   const selectedTable = tablesArray.find((table) => table.id === selectedTableId);
+  const [isOpen, setIsOpen] = useState(false);
 
   const [filters, setFilters] = useState({ term: "" });
   const showTables =
@@ -35,8 +36,13 @@ export default function Tables() {
     setActiveModal(null);
   }
   // Dropdown
-  function toggleDropdown(id: number) {
-    setOpenDropdownId((prev) => (prev === id ? null : id));
+  function toggleDropdown(id?: number) {
+    if (typeof id !== "number") {
+      setIsOpen((prev) => !prev);
+    } else {
+      setOpenDropdownId((prev) => (prev === id ? null : id));
+    }
+    return;
   }
 
   return (
@@ -60,21 +66,23 @@ export default function Tables() {
         <button
           type="button"
           className="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
-          onClick={() => toggleDropdown(0)}
+          onClick={() => toggleDropdown()}
         >
           Ordenar por ⬇️
         </button>
-        <Dropdown
-          isOpen={true}
-          optionA="Categoría"
-          onOptionAClickAction={() => {
-            setOpenDropdownId(null);
-          }}
-          optionB="Stock"
-          onOptionBClickAction={() => {
-            setOpenDropdownId(null);
-          }}
-        />
+        {isOpen && (
+          <Dropdown
+            isOpen={true}
+            optionA="Categoría"
+            onOptionAClickAction={() => {
+              setOpenDropdownId(null);
+            }}
+            optionB="Stock"
+            onOptionBClickAction={() => {
+              setOpenDropdownId(null);
+            }}
+          />
+        )}
       </div>
 
       <div className="flex flex-wrap gap-8 justify-center">
