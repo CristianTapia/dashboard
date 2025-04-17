@@ -2,12 +2,16 @@
 
 export default function Dropdown({
   isOpen,
-  onDeleteAction,
-  onEditAction,
+  optionA,
+  optionB,
+  onOptionAClickAction,
+  onOptionBClickAction,
 }: {
   isOpen: boolean;
-  onDeleteAction: () => void;
-  onEditAction: () => void;
+  optionA?: string;
+  optionB?: string;
+  onOptionAClickAction: () => void;
+  onOptionBClickAction: () => void;
 }) {
   if (!isOpen) return null; // No renderiza el dropdown si está cerrado
 
@@ -18,11 +22,17 @@ export default function Dropdown({
           opacity-100 scale-100"
     >
       <ul className="py-1">
-        <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={onEditAction}>
-          Editar
+        <li
+          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+          onClick={onOptionBClickAction}
+        >
+          {optionA}
         </li>
-        <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={onDeleteAction}>
-          Eliminar
+        <li
+          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+          onClick={onOptionAClickAction}
+        >
+          {optionB}
         </li>
       </ul>
     </div>

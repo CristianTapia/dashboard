@@ -60,12 +60,21 @@ export default function Tables() {
         <button
           type="button"
           className="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
-          id="menu-button"
-          aria-expanded="true"
-          aria-haspopup="true"
+          onClick={() => toggleDropdown(0)}
         >
           Ordenar por ⬇️
         </button>
+        <Dropdown
+          isOpen={true}
+          optionA="Categoría"
+          onOptionAClickAction={() => {
+            setOpenDropdownId(null);
+          }}
+          optionB="Stock"
+          onOptionBClickAction={() => {
+            setOpenDropdownId(null);
+          }}
+        />
       </div>
 
       <div className="flex flex-wrap gap-8 justify-center">
@@ -85,11 +94,13 @@ export default function Tables() {
                 {openDropdownId === option.id && (
                   <Dropdown
                     isOpen={true}
-                    onEditAction={() => {
+                    optionA="Editar"
+                    onOptionAClickAction={() => {
                       setOpenDropdownId(null);
                       openModal("editTable", option.id);
                     }}
-                    onDeleteAction={() => {
+                    optionB="Eliminar"
+                    onOptionBClickAction={() => {
                       setOpenDropdownId(null);
                       openModal("confirmDelete", option.id);
                     }}

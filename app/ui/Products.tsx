@@ -72,11 +72,13 @@ export default function Tables() {
                 {openDropdownId === option.id && (
                   <Dropdown
                     isOpen={true}
-                    onEditAction={() => {
+                    optionA="Editar"
+                    onOptionAClickAction={() => {
                       setOpenDropdownId(null);
                       openModal("editProduct", option.id);
                     }}
-                    onDeleteAction={() => {
+                    optionB="Eliminar"
+                    onOptionBClickAction={() => {
                       setOpenDropdownId(null);
                       openModal("confirmDelete", option.id);
                     }}
