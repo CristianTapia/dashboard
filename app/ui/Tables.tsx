@@ -48,10 +48,7 @@ export default function Tables() {
   return (
     <div className="flex flex-col">
       <div className="text-white flex items-center gap-4 pb-8">
-        <button
-          onClick={() => openModal("addTable")} // Aquí se corrige el nombre de la función
-          className="bg-red-500 border-1 p-2 rounded cursor-pointer"
-        >
+        <button onClick={() => openModal("addTable")} className="bg-red-500 border-1 p-2 rounded cursor-pointer">
           Agregar Mesa
         </button>
         <input
@@ -63,26 +60,28 @@ export default function Tables() {
             setFilters((prev) => ({ ...prev, term: e.target.value }));
           }}
         />
-        <button
-          type="button"
-          className="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
-          onClick={() => toggleDropdown()}
-        >
-          Ordenar por ⬇️
-        </button>
-        {isOpen && (
-          <Dropdown
-            isOpen={true}
-            optionA="Categoría"
-            onOptionAClickAction={() => {
-              setOpenDropdownId(null);
-            }}
-            optionB="Stock"
-            onOptionBClickAction={() => {
-              setOpenDropdownId(null);
-            }}
-          />
-        )}
+        <div tabIndex={0} onBlur={() => setTimeout(() => setIsOpen(false), 100)}>
+          <button
+            type="button"
+            className="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
+            onClick={() => toggleDropdown()}
+          >
+            Ordenar por ⬇️
+          </button>
+          {isOpen && (
+            <Dropdown
+              isOpen={true}
+              optionA="Categoría"
+              onOptionAClickAction={() => {
+                setOpenDropdownId(null);
+              }}
+              optionB="Stock"
+              onOptionBClickAction={() => {
+                setOpenDropdownId(null);
+              }}
+            />
+          )}
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-8 justify-center">
