@@ -60,7 +60,7 @@ export default function Tables() {
             setFilters((prev) => ({ ...prev, term: e.target.value }));
           }}
         />
-        <div tabIndex={0} onBlur={() => setTimeout(() => setIsOpen(false), 100)}>
+        <div className="relative inline-block" tabIndex={0} onBlur={() => setTimeout(() => setIsOpen(false), 100)}>
           <button
             type="button"
             className="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
@@ -70,6 +70,7 @@ export default function Tables() {
           </button>
           {isOpen && (
             <Dropdown
+              className="mt-2"
               isOpen={true}
               optionA="Categoría"
               onOptionAClickAction={() => {

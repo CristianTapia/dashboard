@@ -6,20 +6,22 @@ export default function Dropdown({
   optionB,
   onOptionAClickAction,
   onOptionBClickAction,
+  className,
 }: {
   isOpen: boolean;
   optionA?: string;
   optionB?: string;
   onOptionAClickAction: () => void;
   onOptionBClickAction: () => void;
+  className?: string;
 }) {
   if (!isOpen) return null; // No renderiza el dropdown si está cerrado
 
   return (
     <div
-      className="absolute right-0 top-[30px] z-10 mt-1 w-40 bg-white rounded-md shadow-lg border
-          transition-all duration-200 transform
-          opacity-100 scale-100"
+      className={`absolute right-0 top-[30px] z-10 mt-1 w-40 bg-white rounded-md shadow-lg border
+      transition-all duration-200 transform
+      opacity-100 scale-100 ${className ?? ""}`}
     >
       <ul className="py-1">
         <li
