@@ -26,13 +26,13 @@ export default function Dropdown({
       <ul className="py-1">
         <li
           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-          onClick={onOptionBClickAction}
+          onClick={onOptionAClickAction}
         >
           {optionA}
         </li>
         <li
           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-          onClick={onOptionAClickAction}
+          onClick={onOptionBClickAction}
         >
           {optionB}
         </li>
