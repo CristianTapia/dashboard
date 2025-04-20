@@ -70,7 +70,7 @@ export default function Tables() {
           </button>
           {isOpen && (
             <Dropdown
-              className="mt-2"
+              className="top-[40px]"
               isOpen={true}
               optionA="Categoría"
               onOptionAClickAction={() => {

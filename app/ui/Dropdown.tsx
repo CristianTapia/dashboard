@@ -19,9 +19,9 @@ export default function Dropdown({
 
   return (
     <div
-      className={`absolute right-0 top-[30px] z-10 mt-1 w-40 bg-white rounded-md shadow-lg border
-      transition-all duration-200 transform
-      opacity-100 scale-100 ${className ?? ""}`}
+      className={`absolute right-0 z-10 w-40 bg-white rounded-md shadow-lg border transition-all duration-200 transform opacity-100 scale-100 ${
+        className ?? "top-[30px] mt-1"
+      }`}
     >
       <ul className="py-1">
         <li
