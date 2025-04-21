@@ -6,17 +6,18 @@ import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
 import AddProduct from "./Modals/AddProduct";
 import EditProduct from "./Modals/EditProduct";
+import { useSidebar } from "../context/SidebarContext";
 
-export default function Tables() {
+export default function Products() {
   const [activeModal, setActiveModal] = useState<null | "addProduct" | "confirmDelete" | "editProduct">(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedProductId, setselectedProductId] = useState<number | null>(null);
   const selectedProduct = productArray.find((product) => product.id === selectedProductId);
   const [isOpen, setIsOpen] = useState(false);
+  const { toggleCategories } = useSidebar();
 
   // Búsqueda y Filtro
   const [filters, setFilters] = useState({ term: "" });
-  const [sortBy, setSortBy] = useState<null | "category">(null);
 
   // Búsqueda y Filtro
   let filtered = [...productArray];
@@ -26,10 +27,6 @@ export default function Tables() {
       const term = filters.term.toLowerCase();
       return product.name.toLowerCase().includes(term) || product.stock.toString().includes(term);
     });
-  }
-
-  if (sortBy === "category") {
-    filtered.sort((a, b) => a.category.localeCompare(b.category));
   }
 
   const showProducts = filtered;
@@ -65,7 +62,7 @@ export default function Tables() {
         <input
           className="border-1 p-2 rounded"
           type="text"
-          placeholder="Buscar Mesa"
+          placeholder="Buscar Prodcuto"
           value={filters.term}
           onChange={(e) => {
             setFilters((prev) => ({ ...prev, term: e.target.value }));
@@ -77,17 +74,14 @@ export default function Tables() {
             className="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
             onClick={() => toggleDropdown()}
           >
-            Ordenar por ⬇️
+            Ver filtros
           </button>
           {isOpen && (
             <Dropdown
               className="top-[40px]"
               isOpen={true}
               optionA="Categoría"
-              onOptionAClickAction={() => {
-                setSortBy("category");
-                setIsOpen(false);
-              }}
+              onOptionAClickAction={toggleCategories}
               optionB="Stock"
               onOptionBClickAction={() => {}}
             />
