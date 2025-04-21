@@ -17,14 +17,29 @@ export default function Tables() {
   const selectedTable = tablesArray.find((table) => table.id === selectedTableId);
   const [isOpen, setIsOpen] = useState(false);
 
+  // Búsqueda y Filtro
   const [filters, setFilters] = useState({ term: "" });
-  const showTables =
-    filters.term.trim() === ""
-      ? tablesArray
-      : tablesArray.filter((table) => {
-          const term = filters.term.toLowerCase();
-          return table.name.toLowerCase().includes(term) || table.number.toString().includes(term);
-        });
+  const [sortBy, setSortBy] = useState<null | "category" | "stock">(null);
+
+  // Búsqueda y Filtro
+  let filtered = [...tablesArray];
+
+  if (filters.term.trim() !== "") {
+    filtered = filtered.filter((table) => {
+      const term = filters.term.toLowerCase();
+      return table.name.toLowerCase().includes(term) || table.number.toString().includes(term);
+    });
+  }
+
+  if (sortBy === "category") {
+    filtered.sort((a, b) => a.category.localeCompare(b.category));
+  }
+
+  if (sortBy === "stock") {
+    filtered.sort((a, b) => a.stock.localeCompare(b.stock));
+  }
+
+  const showTables = filtered;
 
   // Modal
   function openModal(modalName: "addTable" | "confirmDelete" | "editTable" | "reviewOrder", tableId?: number) {
@@ -74,11 +89,13 @@ export default function Tables() {
               isOpen={true}
               optionA="Categoría"
               onOptionAClickAction={() => {
-                setOpenDropdownId(null);
+                setSortBy("category");
+                setIsOpen(false);
               }}
               optionB="Stock"
               onOptionBClickAction={() => {
-                setOpenDropdownId(null);
+                setSortBy("stock");
+                setIsOpen(false);
               }}
             />
           )}

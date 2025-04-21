@@ -12,14 +12,27 @@ export default function Tables() {
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedProductId, setselectedProductId] = useState<number | null>(null);
   const selectedProduct = productArray.find((product) => product.id === selectedProductId);
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Búsqueda y Filtro
   const [filters, setFilters] = useState({ term: "" });
-  const showTables =
-    filters.term.trim() === ""
-      ? productArray
-      : productArray.filter((table) => {
-          const term = filters.term.toLowerCase();
-          return table.name.toLowerCase().includes(term) || table.price.toString().includes(term);
-        });
+  const [sortBy, setSortBy] = useState<null | "category">(null);
+
+  // Búsqueda y Filtro
+  let filtered = [...productArray];
+
+  if (filters.term.trim() !== "") {
+    filtered = filtered.filter((product) => {
+      const term = filters.term.toLowerCase();
+      return product.name.toLowerCase().includes(term) || product.stock.toString().includes(term);
+    });
+  }
+
+  if (sortBy === "category") {
+    filtered.sort((a, b) => a.category.localeCompare(b.category));
+  }
+
+  const showProducts = filtered;
 
   // Modal
   function openModal(modalName: "addProduct" | "confirmDelete" | "editProduct", productId?: number) {
@@ -31,8 +44,13 @@ export default function Tables() {
     setActiveModal(null);
   }
   // Dropdown
-  function toggleDropdown(id: number) {
-    setOpenDropdownId((prev) => (prev === id ? null : id));
+  function toggleDropdown(id?: number) {
+    if (typeof id !== "number") {
+      setIsOpen((prev) => !prev);
+    } else {
+      setOpenDropdownId((prev) => (prev === id ? null : id));
+    }
+    return;
   }
 
   return (
@@ -53,10 +71,32 @@ export default function Tables() {
             setFilters((prev) => ({ ...prev, term: e.target.value }));
           }}
         />
+        <div className="relative inline-block" tabIndex={0} onBlur={() => setTimeout(() => setIsOpen(false), 100)}>
+          <button
+            type="button"
+            className="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
+            onClick={() => toggleDropdown()}
+          >
+            Ordenar por ⬇️
+          </button>
+          {isOpen && (
+            <Dropdown
+              className="top-[40px]"
+              isOpen={true}
+              optionA="Categoría"
+              onOptionAClickAction={() => {
+                setSortBy("category");
+                setIsOpen(false);
+              }}
+              optionB="Stock"
+              onOptionBClickAction={() => {}}
+            />
+          )}
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-8 justify-center">
-        {showTables.map((option) => (
+        {showProducts.map((option) => (
           <div key={option.id} className="relative box-border border p-4 rounded shadow-md bg-gray w-[200px]">
             <div className="flex justify-between items-center">
               <div className="w-32">Producto {option.id}</div>
