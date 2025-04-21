@@ -4,9 +4,16 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { useSidebar, SidebarProvider } from "../context/SidebarContext";
 import { productArray } from "../lib/data";
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
-  const { showCategories } = useSidebar();
+  const pathname = usePathname();
+  const { showCategories, setShowCategories } = useSidebar();
+
+  useEffect(() => {
+    setShowCategories(false); // Oculta las categorías al cambiar de ruta
+  }, [pathname, setShowCategories]); // Added setShowCategories to the dependency array
 
   // Categorías únicas desde productArray
   const uniqueCategories = useMemo(() => {

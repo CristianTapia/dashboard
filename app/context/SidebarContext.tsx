@@ -1,13 +1,13 @@
-"use client";
+import { createContext, useContext, useState, Dispatch, SetStateAction } from "react";
 
-import { createContext, useContext, useState } from "react";
-
+// Define the shape of the context
 interface SidebarContextType {
   showCategories: boolean;
   toggleCategories: () => void;
+  setShowCategories: Dispatch<SetStateAction<boolean>>;
 }
 
-const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
+const SidebarContext = createContext<SidebarContextType | null>(null);
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [showCategories, setShowCategories] = useState(false);
@@ -16,13 +16,17 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
     setShowCategories((prev) => !prev);
   };
 
-  return <SidebarContext.Provider value={{ showCategories, toggleCategories }}>{children}</SidebarContext.Provider>;
+  return (
+    <SidebarContext.Provider value={{ showCategories, toggleCategories, setShowCategories }}>
+      {children}
+    </SidebarContext.Provider>
+  );
 }
 
 export function useSidebar() {
   const context = useContext(SidebarContext);
   if (!context) {
-    throw new Error("useSidebar debe usarse dentro de un SidebarProvider");
+    throw new Error("useSidebar must be used within a SidebarProvider");
   }
   return context;
 }
