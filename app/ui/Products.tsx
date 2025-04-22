@@ -15,6 +15,8 @@ export default function Products() {
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedProductId, setselectedProductId] = useState<number | null>(null);
   const selectedProduct = productArray.find((product) => product.id === selectedProductId);
+  const [showCategories, setShowCategories] = useState(false);
+  const uniqueCategories = [...new Set(productArray.map((p) => p.category))];
 
   // Búsqueda y Filtro
   const [filters, setFilters] = useState({ term: "" });
@@ -167,7 +169,24 @@ export default function Products() {
         isOpen={activeModal === "useFilter"}
         onCloseAction={closeModal}
         title={"Filtrar"}
-        body={<div className="text-gray-900">test</div>}
+        body={
+          <div className="text-gray-900">
+            <button className="text-sm text-blue-600 underline mb-2" onClick={() => setShowCategories((prev) => !prev)}>
+              {showCategories ? "Ocultar categorías" : "Mostrar categorías"}
+            </button>
+
+            {showCategories && (
+              <ul className="mt-2 space-y-2">
+                {uniqueCategories.map((category) => (
+                  <li key={category} className="text-sm pl-2">
+                    <input type="checkbox" />
+                    <label className="ml-2">{category}</label>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        }
         buttonAName="OK"
         onButtonAClickAction={() => {
           // lógica de aceptar
@@ -178,20 +197,6 @@ export default function Products() {
       />
     </div>
   );
-}
-
-{
-  /* <li>
-  {showCategories && (
-    <ul className="mt-4 space-y-2">
-      {uniqueCategories.map((category) => (
-        <li key={category} className="text-sm pl-2">
-          {category}
-        </li>
-      ))}
-    </ul>
-  )}
-</li>; */
 }
 
 // export default function SeeFilters() {
