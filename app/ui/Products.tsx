@@ -1,7 +1,7 @@
 "use client";
 
 import { productArray } from "../lib/data";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
 import AddProduct from "./Modals/AddProduct";
@@ -17,6 +17,15 @@ export default function Products() {
   const selectedProduct = productArray.find((product) => product.id === selectedProductId);
   const [showCategories, setShowCategories] = useState(false);
   const uniqueCategories = [...new Set(productArray.map((p) => p.category))];
+  const [showStock, setShowStock] = useState(true);
+
+  // Este efecto escucha cuando el modal se cierra
+  useEffect(() => {
+    if (activeModal !== "useFilter") {
+      setShowStock(true);
+      setShowCategories(false);
+    }
+  }, [activeModal]);
 
   // Búsqueda y Filtro
   const [filters, setFilters] = useState({ term: "" });
@@ -45,11 +54,6 @@ export default function Products() {
   // Dropdown
   function toggleDropdown(id: number) {
     return setOpenDropdownId((prev) => (prev === id ? null : id));
-  }
-
-  //Filters
-  function toggleButton() {
-    setShowCategories((prev) => !prev);
   }
 
   return (
@@ -176,9 +180,9 @@ export default function Products() {
         title={"Filtrar"}
         body={
           <Filtering
-            onShowHideButtonClickAction={toggleButton}
-            showHideButton={showCategories ? "Ocultar categorías" : "Mostrar categorías"}
-            categories={
+            onShowHideCategoryClickAction={() => setShowCategories((prev) => !prev)}
+            showHideCategoryButton={showCategories ? "Ocultar categorías" : "Mostrar categorías"}
+            category={
               showCategories && (
                 <ul className="mt-2 space-y-2">
                   {uniqueCategories.map((category) => (
@@ -190,6 +194,9 @@ export default function Products() {
                 </ul>
               )
             }
+            onShowHideStockClickAction={() => setShowStock((prev) => !prev)}
+            showHideStockButton={showStock ? "Ocultar Stock" : "Mostrar Stock"}
+            stock={showStock && <div className="text-gray-900">Stock</div>}
           />
         }
         buttonAName="OK"
@@ -203,21 +210,3 @@ export default function Products() {
     </div>
   );
 }
-
-// export default function SeeFilters() {
-//   return (
-//     <div className="flex flex-col gap-2">
-//       <h2 className="text-lg font-semibold">Filtros</h2>
-//       <div className="flex flex-col gap-2">
-//         <div className="flex items-center gap-2">
-//           <input type="checkbox" id="filter1" />
-//           <label htmlFor="filter1">Filtro 1</label>
-//         </div>
-//         <div className="flex items-center gap-2">
-//           <input type="checkbox" id="filter2" />
-//           <label htmlFor="filter2">Filtro 2</label>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
