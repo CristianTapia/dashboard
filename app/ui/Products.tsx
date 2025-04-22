@@ -6,6 +6,7 @@ import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
 import AddProduct from "./Modals/AddProduct";
 import EditProduct from "./Modals/EditProduct";
+import SeeFilters from "./Modals/SeeFilters";
 
 export default function Products() {
   const [activeModal, setActiveModal] = useState<null | "addProduct" | "confirmDelete" | "editProduct">(null);
@@ -70,17 +71,16 @@ export default function Products() {
           <button
             type="button"
             className="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
-            onClick={() => toggleDropdown()}
+            onClick={toggleDropdown}
           >
-            Ver filtros
+            Filtrar
           </button>
           {isOpen && (
             <Dropdown
-              className="top-[40px]"
               isOpen={true}
-              optionA="Categoría"
+              optionA="Editar"
               onOptionAClickAction={() => {}}
-              optionB="Stock"
+              optionB="Eliminar"
               onOptionBClickAction={() => {}}
             />
           )}
@@ -166,6 +166,21 @@ export default function Products() {
         onCloseAction={closeModal}
         title={`¿Estás seguro/a de eliminar el producto ${selectedProduct?.id ?? ""}?`}
         body={<div className="text-gray-900">Esta acción es irreversible</div>}
+        buttonAName="Eliminar"
+        onButtonAClickAction={() => {
+          // lógica de eliminar
+          closeModal();
+        }}
+        buttonBName="Cancelar"
+        onButtonBClickAction={closeModal}
+      />
+
+      {/* Modal para usar filtros */}
+      <Modal
+        isOpen={genericModal === "useFilter"}
+        onCloseAction={closeGenericModal}
+        title={"Ver Filtros"}
+        body={<SeeFilters />}
         buttonAName="Eliminar"
         onButtonAClickAction={() => {
           // lógica de eliminar
