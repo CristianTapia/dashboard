@@ -6,6 +6,7 @@ import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
 import AddProduct from "./Modals/AddProduct";
 import EditProduct from "./Modals/EditProduct";
+// import { useSidebar } from "../context/SidebarContext";
 
 export default function Products() {
   const [activeModal, setActiveModal] = useState<null | "addProduct" | "confirmDelete" | "editProduct">(null);
@@ -13,9 +14,6 @@ export default function Products() {
   const [selectedProductId, setselectedProductId] = useState<number | null>(null);
   const selectedProduct = productArray.find((product) => product.id === selectedProductId);
   const [isOpen, setIsOpen] = useState(false);
-  const uniqueCategories = [...new Set(productArray.map((p) => p.category))];
-
-  const [showCategoryOptions, setShowCategoryOptions] = useState(false);
 
   // Búsqueda y Filtro
   const [filters, setFilters] = useState({ term: "" });
@@ -69,18 +67,7 @@ export default function Products() {
             setFilters((prev) => ({ ...prev, term: e.target.value }));
           }}
         />
-        <div
-          className="relative inline-block"
-          onClick={(e) => e.stopPropagation()}
-          onBlur={() => {
-            // Se cierra con un pequeño delay para permitir que otros elementos dentro del dropdown capten el click
-            setTimeout(() => {
-              setIsOpen(false);
-              setShowCategoryOptions(false);
-            }, 300);
-          }}
-          tabIndex={0}
-        >
+        <div className="relative inline-block" tabIndex={0} onBlur={() => setTimeout(() => setIsOpen(false), 100)}>
           <button
             type="button"
             className="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
@@ -89,46 +76,14 @@ export default function Products() {
             Filtrar
           </button>
           {isOpen && (
-            <div className="absolute right-0 top-[40px] z-10 w-48 bg-white border rounded shadow-md">
-              <ul className="py-1">
-                <li
-                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => {
-                    console.log("Filtrar por stock");
-                    setFilters((prev) => ({ ...prev, term: "stock" }));
-                    setIsOpen(false);
-                  }}
-                >
-                  Stock bajo
-                </li>
-
-                <li
-                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => setShowCategoryOptions((prev) => !prev)}
-                >
-                  Categorías
-                </li>
-
-                {/* Subcategorías */}
-                {showCategoryOptions && (
-                  <ul className="ml-2 mt-1 border-l pl-2">
-                    {uniqueCategories.map((cat) => (
-                      <li
-                        key={cat}
-                        className="px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => {
-                          setFilters((prev) => ({ ...prev, term: cat }));
-                          setIsOpen(false);
-                          setShowCategoryOptions(false);
-                        }}
-                      >
-                        {cat}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </ul>
-            </div>
+            <Dropdown
+              className="top-[40px]"
+              isOpen={true}
+              optionA="Categoría"
+              onOptionAClickAction={() => {}}
+              optionB="Stock"
+              onOptionBClickAction={() => {}}
+            />
           )}
         </div>
       </div>
