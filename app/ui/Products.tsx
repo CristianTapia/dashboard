@@ -16,16 +16,31 @@ export default function Products() {
   const [selectedProductId, setselectedProductId] = useState<number | null>(null);
   const selectedProduct = productArray.find((product) => product.id === selectedProductId);
   const [showCategories, setShowCategories] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]); // Estado para guardar las categorías seleccionadas
   const uniqueCategories = [...new Set(productArray.map((p) => p.category))];
   const [showStock, setShowStock] = useState(true);
+
+  // Función para manejar la selección de checkboxes
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategories((prevSelected) => {
+      if (prevSelected.includes(category)) {
+        return prevSelected.filter((item) => item !== category); // Si ya está seleccionada, deseleccionarla
+      } else {
+        return [...prevSelected, category]; // Si no está seleccionada, añadirla
+      }
+    });
+  };
 
   // Este efecto escucha cuando el modal se cierra
   useEffect(() => {
     if (activeModal !== "useFilter") {
       setShowStock(true);
       setShowCategories(false);
+      setSelectedCategories([]);
     }
   }, [activeModal]);
+
+  useEffect(() => {}, [showCategories]);
 
   // Búsqueda y Filtro
   const [filters, setFilters] = useState({ term: "" });
@@ -187,7 +202,11 @@ export default function Products() {
                 <ul className="mt-2 space-y-2">
                   {uniqueCategories.map((category) => (
                     <li key={category} className="text-sm pl-2">
-                      <input type="checkbox" />
+                      <input
+                        type="checkbox"
+                        checked={selectedCategories.includes(category)} // Marca el checkbox si está en el estado
+                        onChange={() => handleCategoryChange(category)} // Cambia el estado al hacer clic
+                      />
                       <label className="ml-2">{category}</label>
                     </li>
                   ))}
