@@ -1,5 +1,7 @@
 "use client";
 
+import { ReactNode } from "react";
+
 export default function Dropdown({
   isOpen,
   optionA,
@@ -7,6 +9,7 @@ export default function Dropdown({
   onOptionAClickAction,
   onOptionBClickAction,
   className,
+  submenu,
 }: {
   isOpen: boolean;
   optionA?: string;
@@ -14,8 +17,9 @@ export default function Dropdown({
   onOptionAClickAction: () => void;
   onOptionBClickAction: () => void;
   className?: string;
+  submenu?: ReactNode;
 }) {
-  if (!isOpen) return null; // No renderiza el dropdown si está cerrado
+  if (!isOpen) return null;
 
   return (
     <div
@@ -30,11 +34,22 @@ export default function Dropdown({
         >
           {optionA}
         </li>
-        <li
-          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-          onClick={onOptionBClickAction}
-        >
-          {optionB}
+
+        {/* Contenedor con submenu */}
+        <li className="relative group">
+          <div
+            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+            onClick={onOptionBClickAction}
+          >
+            {optionB}
+          </div>
+
+          {/* Submenú */}
+          {submenu && (
+            <div className="absolute left-full top-0 ml-1 w-40 bg-white border rounded-md shadow-lg hidden group-hover:block z-20">
+              {submenu}
+            </div>
+          )}
         </li>
       </ul>
     </div>
