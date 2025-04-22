@@ -9,11 +9,12 @@ import EditProduct from "./Modals/EditProduct";
 // import { useSidebar } from "../context/SidebarContext";
 
 export default function Products() {
-  const [activeModal, setActiveModal] = useState<null | "addProduct" | "confirmDelete" | "editProduct">(null);
+  const [activeModal, setActiveModal] = useState<null | "addProduct" | "confirmDelete" | "editProduct" | "useFilter">(
+    null
+  );
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedProductId, setselectedProductId] = useState<number | null>(null);
   const selectedProduct = productArray.find((product) => product.id === selectedProductId);
-  const [isOpen, setIsOpen] = useState(false);
 
   // Búsqueda y Filtro
   const [filters, setFilters] = useState({ term: "" });
@@ -31,7 +32,7 @@ export default function Products() {
   const showProducts = filtered;
 
   // Modal
-  function openModal(modalName: "addProduct" | "confirmDelete" | "editProduct", productId?: number) {
+  function openModal(modalName: "addProduct" | "confirmDelete" | "editProduct" | "useFilter", productId?: number) {
     setActiveModal(modalName);
     setselectedProductId(productId ?? null);
   }
@@ -40,13 +41,8 @@ export default function Products() {
     setActiveModal(null);
   }
   // Dropdown
-  function toggleDropdown(id?: number) {
-    if (typeof id !== "number") {
-      setIsOpen((prev) => !prev);
-    } else {
-      setOpenDropdownId((prev) => (prev === id ? null : id));
-    }
-    return;
+  function toggleDropdown(id: number) {
+    return setOpenDropdownId((prev) => (prev === id ? null : id));
   }
 
   return (
@@ -67,24 +63,14 @@ export default function Products() {
             setFilters((prev) => ({ ...prev, term: e.target.value }));
           }}
         />
-        <div className="relative inline-block" tabIndex={0} onBlur={() => setTimeout(() => setIsOpen(false), 100)}>
+        <div className="relative inline-block">
           <button
             type="button"
             className="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
-            onClick={() => toggleDropdown()}
+            onClick={() => openModal("useFilter")} // Aquí se corrige el nombre de la función}
           >
             Filtrar
           </button>
-          {isOpen && (
-            <Dropdown
-              className="top-[40px]"
-              isOpen={true}
-              optionA="Categoría"
-              onOptionAClickAction={() => {}}
-              optionB="Stock"
-              onOptionBClickAction={() => {}}
-            />
-          )}
         </div>
       </div>
 
@@ -170,6 +156,21 @@ export default function Products() {
         buttonAName="Eliminar"
         onButtonAClickAction={() => {
           // lógica de eliminar
+          closeModal();
+        }}
+        buttonBName="Cancelar"
+        onButtonBClickAction={closeModal}
+      />
+
+      {/* Modal para usar filtros */}
+      <Modal
+        isOpen={activeModal === "useFilter"}
+        onCloseAction={closeModal}
+        title={"Filtrar"}
+        body={<div className="text-gray-900">test</div>}
+        buttonAName="OK"
+        onButtonAClickAction={() => {
+          // lógica de aceptar
           closeModal();
         }}
         buttonBName="Cancelar"
