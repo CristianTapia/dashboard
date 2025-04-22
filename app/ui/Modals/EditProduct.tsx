@@ -1,6 +1,6 @@
 import ImageInput from "./ImageInput";
 
-export default function AddProduct() {
+export default function EditProduct() {
   return (
     <>
       <div className="sm:col-span-4 pb-4">

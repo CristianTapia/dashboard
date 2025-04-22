@@ -6,7 +6,7 @@ import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
 import AddProduct from "./Modals/AddProduct";
 import EditProduct from "./Modals/EditProduct";
-// import { useSidebar } from "../context/SidebarContext";
+import Filtering from "./Modals/Filtering";
 
 export default function Products() {
   const [activeModal, setActiveModal] = useState<null | "addProduct" | "confirmDelete" | "editProduct" | "useFilter">(
@@ -45,6 +45,11 @@ export default function Products() {
   // Dropdown
   function toggleDropdown(id: number) {
     return setOpenDropdownId((prev) => (prev === id ? null : id));
+  }
+
+  //Filters
+  function toggleButton() {
+    setShowCategories((prev) => !prev);
   }
 
   return (
@@ -170,22 +175,22 @@ export default function Products() {
         onCloseAction={closeModal}
         title={"Filtrar"}
         body={
-          <div className="text-gray-900">
-            <button className="text-sm text-blue-600 underline mb-2" onClick={() => setShowCategories((prev) => !prev)}>
-              {showCategories ? "Ocultar categorías" : "Mostrar categorías"}
-            </button>
-
-            {showCategories && (
-              <ul className="mt-2 space-y-2">
-                {uniqueCategories.map((category) => (
-                  <li key={category} className="text-sm pl-2">
-                    <input type="checkbox" />
-                    <label className="ml-2">{category}</label>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <Filtering
+            onShowHideButtonClickAction={toggleButton}
+            showHideButton={showCategories ? "Ocultar categorías" : "Mostrar categorías"}
+            categories={
+              showCategories && (
+                <ul className="mt-2 space-y-2">
+                  {uniqueCategories.map((category) => (
+                    <li key={category} className="text-sm pl-2">
+                      <input type="checkbox" />
+                      <label className="ml-2">{category}</label>
+                    </li>
+                  ))}
+                </ul>
+              )
+            }
+          />
         }
         buttonAName="OK"
         onButtonAClickAction={() => {
