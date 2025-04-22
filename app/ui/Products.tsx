@@ -6,7 +6,6 @@ import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
 import AddProduct from "./Modals/AddProduct";
 import EditProduct from "./Modals/EditProduct";
-import { useSidebar } from "../context/SidebarContext";
 
 export default function Products() {
   const [activeModal, setActiveModal] = useState<null | "addProduct" | "confirmDelete" | "editProduct">(null);
@@ -14,7 +13,6 @@ export default function Products() {
   const [selectedProductId, setselectedProductId] = useState<number | null>(null);
   const selectedProduct = productArray.find((product) => product.id === selectedProductId);
   const [isOpen, setIsOpen] = useState(false);
-  const { toggleCategories } = useSidebar();
 
   // Búsqueda y Filtro
   const [filters, setFilters] = useState({ term: "" });
@@ -81,7 +79,7 @@ export default function Products() {
               className="top-[40px]"
               isOpen={true}
               optionA="Categoría"
-              onOptionAClickAction={toggleCategories}
+              onOptionAClickAction={() => {}}
               optionB="Stock"
               onOptionBClickAction={() => {}}
             />

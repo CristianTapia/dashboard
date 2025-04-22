@@ -1,25 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
-import { useSidebar, SidebarProvider } from "../context/SidebarContext";
-import { productArray } from "../lib/data";
-import { usePathname } from "next/navigation";
-import { useEffect } from "react";
 
-function LayoutContent({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const { showCategories, setShowCategories } = useSidebar();
-
-  useEffect(() => {
-    setShowCategories(false); // Oculta las categorías al cambiar de ruta
-  }, [pathname, setShowCategories]); // Added setShowCategories to the dependency array
-
-  // Categorías únicas desde productArray
-  const uniqueCategories = useMemo(() => {
-    return [...new Set(productArray.map((p) => p.category))];
-  }, []);
-
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid grid-cols-[250px_1fr] grid-rows-[60px_1fr] h-screen">
       {/* Header */}
@@ -51,17 +34,6 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                 Configuración
               </Link>
             </li>
-            <li>
-              {showCategories && (
-                <ul className="mt-4 space-y-2">
-                  {uniqueCategories.map((category) => (
-                    <li key={category} className="text-sm pl-2">
-                      {category}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
           </ul>
         </nav>
       </aside>
@@ -69,13 +41,5 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       {/* Contenido dinámico */}
       <main className="flex flex-wrap gap-2 items-start content-start p-3">{children}</main>
     </div>
-  );
-}
-
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <SidebarProvider>
-      <LayoutContent>{children}</LayoutContent>
-    </SidebarProvider>
   );
 }
