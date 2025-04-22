@@ -196,7 +196,14 @@ export default function Products() {
             }
             onShowHideStockClickAction={() => setShowStock((prev) => !prev)}
             showHideStockButton={showStock ? "Ocultar Stock" : "Mostrar Stock"}
-            stock={showStock && <div className="text-gray-900">Stock</div>}
+            stock={
+              showStock && (
+                <div className="text-gray-900 flex text-sm gap-1">
+                  <button className="p-1 border-1 rounded">Mayor Stock</button>
+                  <button className="p-1 border-1 rounded">Menor Stock</button>
+                </div>
+              )
+            }
           />
         }
         buttonAName="OK"
