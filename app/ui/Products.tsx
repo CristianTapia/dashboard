@@ -198,7 +198,7 @@ export default function Products() {
         body={
           <Filtering
             onShowHideCategoryClickAction={() => setShowCategories((prev) => !prev)}
-            showHideCategoryButton={showCategories ? "Ocultar categorías" : "Mostrar categorías"}
+            showHideCategoryButton={showCategories ? "Ocultar Categorías" : "Mostrar Categorías"}
             category={
               showCategories && (
                 <ul className="mt-2 space-y-2">
