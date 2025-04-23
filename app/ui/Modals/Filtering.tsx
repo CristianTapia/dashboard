@@ -8,6 +8,9 @@ type FilteringProps = {
   price?: React.ReactNode;
   showHidePriceButton: string;
   onShowHidePriceClickAction: () => void;
+  alphabetical?: React.ReactNode;
+  showHideAlphabeticalButton: string;
+  onShowHideAlphabeticalClickAction: () => void;
 };
 
 export default function Filtering({
@@ -20,6 +23,9 @@ export default function Filtering({
   price,
   showHidePriceButton,
   onShowHidePriceClickAction,
+  alphabetical,
+  showHideAlphabeticalButton,
+  onShowHideAlphabeticalClickAction,
 }: FilteringProps) {
   return (
     <>
@@ -40,6 +46,12 @@ export default function Filtering({
           {showHidePriceButton}
         </button>
         {price}
+      </div>
+      <div className="text-gray-900 mt-2 mb-2">
+        <button className="text-sm text-blue-600 underline mb-2" onClick={onShowHideAlphabeticalClickAction}>
+          {showHideAlphabeticalButton}
+        </button>
+        {alphabetical}
       </div>
     </>
   );

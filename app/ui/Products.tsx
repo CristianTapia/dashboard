@@ -20,6 +20,7 @@ export default function Products() {
   const uniqueCategories = [...new Set(productArray.map((p) => p.category))];
   const [showStock, setShowStock] = useState(true);
   const [showPrice, setShowPrice] = useState(true);
+  const [showAlphabetical, setShowAlphabetical] = useState(true);
 
   // Función para manejar la selección de checkboxes
   const handleCategoryChange = (category: string) => {
@@ -39,6 +40,7 @@ export default function Products() {
       setShowPrice(true);
       setShowCategories(false);
       setSelectedCategories([]);
+      setShowAlphabetical(true);
     }
   }, [activeModal]);
 
@@ -232,6 +234,16 @@ export default function Products() {
                 <div className="text-gray-900 flex text-sm gap-1">
                   <button className="p-1 border-1 rounded">Mayor Precio</button>
                   <button className="p-1 border-1 rounded">Menor Precio</button>
+                </div>
+              )
+            }
+            onShowHideAlphabeticalClickAction={() => setShowAlphabetical((prev) => !prev)}
+            showHideAlphabeticalButton={showAlphabetical ? "Ocultar Orden Alfabético " : "Mostrar Orden Alfabético"}
+            alphabetical={
+              showAlphabetical && (
+                <div className="text-gray-900 flex text-sm gap-1">
+                  <button className="p-1 border-1 rounded">A-Z</button>
+                  <button className="p-1 border-1 rounded">Z-A</button>
                 </div>
               )
             }
