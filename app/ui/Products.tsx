@@ -19,6 +19,7 @@ export default function Products() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]); // Estado para guardar las categorías seleccionadas
   const uniqueCategories = [...new Set(productArray.map((p) => p.category))];
   const [showStock, setShowStock] = useState(true);
+  const [showPrice, setShowPrice] = useState(true);
 
   // Función para manejar la selección de checkboxes
   const handleCategoryChange = (category: string) => {
@@ -35,6 +36,7 @@ export default function Products() {
   useEffect(() => {
     if (activeModal !== "useFilter") {
       setShowStock(true);
+      setShowPrice(true);
       setShowCategories(false);
       setSelectedCategories([]);
     }
@@ -83,7 +85,7 @@ export default function Products() {
         <input
           className="border-1 p-2 rounded"
           type="text"
-          placeholder="Buscar Prodcuto"
+          placeholder="Buscar Producto"
           value={filters.term}
           onChange={(e) => {
             setFilters((prev) => ({ ...prev, term: e.target.value }));
@@ -220,6 +222,16 @@ export default function Products() {
                 <div className="text-gray-900 flex text-sm gap-1">
                   <button className="p-1 border-1 rounded">Mayor Stock</button>
                   <button className="p-1 border-1 rounded">Menor Stock</button>
+                </div>
+              )
+            }
+            onShowHidePriceClickAction={() => setShowPrice((prev) => !prev)}
+            showHidePriceButton={showPrice ? "Ocultar Precio" : "Mostrar Precio"}
+            price={
+              showPrice && (
+                <div className="text-gray-900 flex text-sm gap-1">
+                  <button className="p-1 border-1 rounded">Mayor Precio</button>
+                  <button className="p-1 border-1 rounded">Menor Precio</button>
                 </div>
               )
             }

@@ -5,15 +5,21 @@ type FilteringProps = {
   onShowHideStockClickAction: () => void;
   showHideStockButton: string;
   stock?: React.ReactNode;
+  onShowHidePriceClickAction: () => void;
+  showHidePriceButton: string;
+  price?: React.ReactNode;
 };
 
 export default function Filtering({
   showHideCategoryButton,
   onShowHideCategoryClickAction,
-  onShowHideStockClickAction,
   category,
   showHideStockButton,
+  onShowHideStockClickAction,
   stock,
+  showHidePriceButton,
+  onShowHidePriceClickAction,
+  price,
 }: FilteringProps) {
   return (
     <>
@@ -28,6 +34,12 @@ export default function Filtering({
           {showHideStockButton}
         </button>
         {stock}
+      </div>
+      <div className="text-gray-900">
+        <button className="text-sm text-blue-600 underline mb-2" onClick={onShowHidePriceClickAction}>
+          {showHidePriceButton}
+        </button>
+        {price}
       </div>
     </>
   );
