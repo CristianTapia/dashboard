@@ -1,41 +1,41 @@
 type FilteringProps = {
-  onShowHideCategoryClickAction: () => void;
-  showHideCategoryButton: string;
   category?: React.ReactNode;
-  onShowHideStockClickAction: () => void;
-  showHideStockButton: string;
+  showHideCategoryButton: string;
+  onShowHideCategoryClickAction: () => void;
   stock?: React.ReactNode;
-  onShowHidePriceClickAction: () => void;
-  showHidePriceButton: string;
+  showHideStockButton: string;
+  onShowHideStockClickAction: () => void;
   price?: React.ReactNode;
+  showHidePriceButton: string;
+  onShowHidePriceClickAction: () => void;
 };
 
 export default function Filtering({
+  category,
   showHideCategoryButton,
   onShowHideCategoryClickAction,
-  category,
+  stock,
   showHideStockButton,
   onShowHideStockClickAction,
-  stock,
+  price,
   showHidePriceButton,
   onShowHidePriceClickAction,
-  price,
 }: FilteringProps) {
   return (
     <>
-      <div className="text-gray-900">
+      <div className="text-gray-900 mb-2">
         <button className="text-sm text-blue-600 underline mb-2" onClick={onShowHideCategoryClickAction}>
           {showHideCategoryButton}
         </button>
         {category}
       </div>
-      <div className="text-gray-900">
+      <div className="text-gray-900 mt-2 mb-2">
         <button className="text-sm text-blue-600 underline mb-2" onClick={onShowHideStockClickAction}>
           {showHideStockButton}
         </button>
         {stock}
       </div>
-      <div className="text-gray-900">
+      <div className="text-gray-900 mt-2 mb-2">
         <button className="text-sm text-blue-600 underline mb-2" onClick={onShowHidePriceClickAction}>
           {showHidePriceButton}
         </button>
