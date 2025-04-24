@@ -16,24 +16,63 @@ export default function Products() {
   const [selectedProductId, setselectedProductId] = useState<number | null>(null);
   const selectedProduct = productArray.find((product) => product.id === selectedProductId);
   const [showCategories, setShowCategories] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]); // Estado para guardar las categorías seleccionadas
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const uniqueCategories = [...new Set(productArray.map((p) => p.category))];
   const [showStock, setShowStock] = useState(true);
   const [showPrice, setShowPrice] = useState(true);
   const [showAlphabetical, setShowAlphabetical] = useState(true);
+  const [sortedProducts, setSortedProducts] = useState(productArray);
+  const [filters, setFilters] = useState({ term: "" });
 
-  // Función para manejar la selección de checkboxes
+  // SORT FUNCTIONS
+  const sortByPrice = () => {
+    setSortedProducts((prev) => [...prev].sort((a, b) => a.price - b.price));
+  };
+
+  const sortByStock = () => {
+    setSortedProducts((prev) => [...prev].sort((a, b) => a.stock - b.stock));
+  };
+
+  const sortAlphabetically = () => {
+    setSortedProducts((prev) => [...prev].sort((a, b) => a.name.localeCompare(b.name)));
+  };
+
+  // Filtrado dinámico
+  useEffect(() => {
+    let filtered = [...productArray];
+
+    if (filters.term.trim() !== "") {
+      const term = filters.term.toLowerCase();
+      filtered = filtered.filter(
+        (product) => product.name.toLowerCase().includes(term) || product.stock.toString().includes(term)
+      );
+    }
+
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter((product) => selectedCategories.includes(product.category));
+    }
+
+    if (!showPrice && showStock) {
+      filtered.sort((a, b) => a.stock - b.stock);
+    } else if (showPrice && !showStock) {
+      filtered.sort((a, b) => a.price - b.price);
+    } else if (showAlphabetical && !showPrice && !showStock) {
+      filtered.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    setSortedProducts(filtered);
+  }, [filters.term, selectedCategories, showStock, showPrice, showAlphabetical]);
+
   const handleCategoryChange = (category: string) => {
     setSelectedCategories((prevSelected) => {
       if (prevSelected.includes(category)) {
-        return prevSelected.filter((item) => item !== category); // Si ya está seleccionada, deseleccionarla
+        return prevSelected.filter((item) => item !== category);
       } else {
-        return [...prevSelected, category]; // Si no está seleccionada, añadirla
+        return [...prevSelected, category];
       }
     });
   };
 
-  // Este efecto escucha cuando el modal se cierra
   useEffect(() => {
     if (activeModal !== "useFilter") {
       setShowStock(true);
@@ -44,24 +83,7 @@ export default function Products() {
     }
   }, [activeModal]);
 
-  useEffect(() => {}, [showCategories]);
-
-  // Búsqueda y Filtro
-  const [filters, setFilters] = useState({ term: "" });
-
-  // Búsqueda y Filtro
-  let filtered = [...productArray];
-
-  if (filters.term.trim() !== "") {
-    filtered = filtered.filter((product) => {
-      const term = filters.term.toLowerCase();
-      return product.name.toLowerCase().includes(term) || product.stock.toString().includes(term);
-    });
-  }
-
-  const showProducts = filtered;
-
-  // Modal
+  // Modal functions
   function openModal(modalName: "addProduct" | "confirmDelete" | "editProduct" | "useFilter", productId?: number) {
     setActiveModal(modalName);
     setselectedProductId(productId ?? null);
@@ -70,7 +92,8 @@ export default function Products() {
   function closeModal() {
     setActiveModal(null);
   }
-  // Dropdown
+
+  // Dropdown functions
   function toggleDropdown(id: number) {
     return setOpenDropdownId((prev) => (prev === id ? null : id));
   }
@@ -78,10 +101,7 @@ export default function Products() {
   return (
     <div className="flex flex-col">
       <div className="text-white flex items-center gap-4 pb-8">
-        <button
-          onClick={() => openModal("addProduct")} // Aquí se corrige el nombre de la función
-          className="bg-red-500 border-1 p-2 rounded cursor-pointer"
-        >
+        <button onClick={() => openModal("addProduct")} className="bg-red-500 border-1 p-2 rounded cursor-pointer">
           Agregar Producto
         </button>
         <input
@@ -89,15 +109,13 @@ export default function Products() {
           type="text"
           placeholder="Buscar Producto"
           value={filters.term}
-          onChange={(e) => {
-            setFilters((prev) => ({ ...prev, term: e.target.value }));
-          }}
+          onChange={(e) => setFilters((prev) => ({ ...prev, term: e.target.value }))}
         />
         <div className="relative inline-block">
           <button
             type="button"
             className="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
-            onClick={() => openModal("useFilter")} // Aquí se corrige el nombre de la función}
+            onClick={() => openModal("useFilter")}
           >
             Filtrar
           </button>
@@ -105,16 +123,11 @@ export default function Products() {
       </div>
 
       <div className="flex flex-wrap gap-8 justify-center">
-        {showProducts.map((option) => (
+        {sortedProducts.map((option) => (
           <div key={option.id} className="relative box-border border p-4 rounded shadow-md bg-gray w-[200px]">
             <div className="flex justify-between items-center">
               <div className="w-32">Producto {option.id}</div>
-              {/* Contenedor con onBlur */}
-              <div
-                tabIndex={0} // Permite que onBlur funcione
-                onBlur={() => setTimeout(() => setOpenDropdownId(null), 100)} // Se cierra si pierdo el foco
-                className="relative"
-              >
+              <div tabIndex={0} onBlur={() => setTimeout(() => setOpenDropdownId(null), 100)} className="relative">
                 <button onClick={() => toggleDropdown(option.id)} className="text-white p-2 py-1 rounded">
                   ⋮
                 </button>
@@ -150,7 +163,7 @@ export default function Products() {
         ))}
       </div>
 
-      {/* Modal para agregar producto */}
+      {/* Add product modal */}
       <Modal
         isOpen={activeModal === "addProduct"}
         onCloseAction={closeModal}
@@ -162,37 +175,31 @@ export default function Products() {
         onButtonBClickAction={closeModal}
       />
 
-      {/* Modal para editar producto */}
+      {/* Edit product modal */}
       <Modal
         isOpen={activeModal === "editProduct"}
         onCloseAction={closeModal}
         title={`Editar Producto ${selectedProduct?.id ?? ""}`}
         body={<EditProduct />}
         buttonAName="Confirmar"
-        onButtonAClickAction={() => {
-          // lógica de editar
-          closeModal();
-        }}
+        onButtonAClickAction={closeModal}
         buttonBName="Cancelar"
         onButtonBClickAction={closeModal}
       />
 
-      {/* Modal para confirmar eliminación */}
+      {/* Confirmation after delete modal */}
       <Modal
         isOpen={activeModal === "confirmDelete"}
         onCloseAction={closeModal}
         title={`¿Estás seguro/a de eliminar el producto ${selectedProduct?.id ?? ""}?`}
         body={<div className="text-gray-900">Esta acción es irreversible</div>}
         buttonAName="Eliminar"
-        onButtonAClickAction={() => {
-          // lógica de eliminar
-          closeModal();
-        }}
+        onButtonAClickAction={closeModal}
         buttonBName="Cancelar"
         onButtonBClickAction={closeModal}
       />
 
-      {/* Modal para usar filtros */}
+      {/* Modal for filters */}
       <Modal
         isOpen={activeModal === "useFilter"}
         onCloseAction={closeModal}
@@ -208,8 +215,8 @@ export default function Products() {
                     <li key={category} className="text-sm pl-2">
                       <input
                         type="checkbox"
-                        checked={selectedCategories.includes(category)} // Marca el checkbox si está en el estado
-                        onChange={() => handleCategoryChange(category)} // Cambia el estado al hacer clic
+                        checked={selectedCategories.includes(category)}
+                        onChange={() => handleCategoryChange(category)}
                       />
                       <label className="ml-2">{category}</label>
                     </li>
@@ -223,7 +230,9 @@ export default function Products() {
               showStock && (
                 <div className="text-gray-900 flex text-sm gap-1">
                   <button className="p-1 border-1 rounded">Mayor Stock</button>
-                  <button className="p-1 border-1 rounded">Menor Stock</button>
+                  <button onClick={sortByStock} className="p-1 border-1 rounded">
+                    Menor Stock
+                  </button>
                 </div>
               )
             }
@@ -232,7 +241,9 @@ export default function Products() {
             price={
               showPrice && (
                 <div className="text-gray-900 flex text-sm gap-1">
-                  <button className="p-1 border-1 rounded">Mayor Precio</button>
+                  <button onClick={sortByPrice} className="p-1 border-1 rounded">
+                    Mayor Precio
+                  </button>
                   <button className="p-1 border-1 rounded">Menor Precio</button>
                 </div>
               )
@@ -242,7 +253,9 @@ export default function Products() {
             alphabetical={
               showAlphabetical && (
                 <div className="text-gray-900 flex text-sm gap-1">
-                  <button className="p-1 border-1 rounded">A-Z</button>
+                  <button onClick={sortAlphabetically} className="p-1 border-1 rounded">
+                    A-Z
+                  </button>
                   <button className="p-1 border-1 rounded">Z-A</button>
                 </div>
               )
@@ -250,10 +263,7 @@ export default function Products() {
           />
         }
         buttonAName="OK"
-        onButtonAClickAction={() => {
-          // lógica de aceptar
-          closeModal();
-        }}
+        onButtonAClickAction={closeModal}
         buttonBName="Cancelar"
         onButtonBClickAction={closeModal}
       />
