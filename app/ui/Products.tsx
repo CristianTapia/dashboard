@@ -241,10 +241,10 @@ export default function Products() {
             price={
               showPrice && (
                 <div className="text-gray-900 flex text-sm gap-1">
+                  <button className="p-1 border-1 rounded">Mayor Precio</button>
                   <button onClick={sortByPrice} className="p-1 border-1 rounded">
-                    Mayor Precio
+                    Menor Precio
                   </button>
-                  <button className="p-1 border-1 rounded">Menor Precio</button>
                 </div>
               )
             }
