@@ -9,22 +9,35 @@ import EditProduct from "./Modals/EditProduct";
 import Filtering from "./Modals/Filtering";
 
 export default function Products() {
+  // Estados principales
+  const [products] = useState(productArray);
+  const [sortedProducts, setSortedProducts] = useState(productArray);
+  const [filters, setFilters] = useState({ term: "" });
+
   const [activeModal, setActiveModal] = useState<null | "addProduct" | "confirmDelete" | "editProduct" | "useFilter">(
     null
   );
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
-  const [selectedProductId, setselectedProductId] = useState<number | null>(null);
-  const selectedProduct = productArray.find((product) => product.id === selectedProductId);
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
+  const selectedProduct = products.find((product) => product.id === selectedProductId);
+
+  // Filtros aplicados
   const [showCategories, setShowCategories] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const uniqueCategories = [...new Set(productArray.map((p) => p.category))];
   const [showStock, setShowStock] = useState(true);
   const [showPrice, setShowPrice] = useState(true);
   const [showAlphabetical, setShowAlphabetical] = useState(true);
-  const [sortedProducts, setSortedProducts] = useState(productArray);
-  const [filters, setFilters] = useState({ term: "" });
 
-  // SORT FUNCTIONS
+  const uniqueCategories = [...new Set(products.map((p) => p.category))];
+
+  // Filtros temporales (para el modal)
+  const [tempShowCategories, setTempShowCategories] = useState(false);
+  const [tempSelectedCategories, setTempSelectedCategories] = useState<string[]>([]);
+  const [tempShowStock, setTempShowStock] = useState(true);
+  const [tempShowPrice, setTempShowPrice] = useState(true);
+  const [tempShowAlphabetical, setTempShowAlphabetical] = useState(true);
+
+  // Funciones de ordenamiento
   const sortByPrice = () => {
     setSortedProducts((prev) => [...prev].sort((a, b) => a.price - b.price));
   };
@@ -37,10 +50,11 @@ export default function Products() {
     setSortedProducts((prev) => [...prev].sort((a, b) => a.name.localeCompare(b.name)));
   };
 
-  // Filtrado dinámico
+  // Aplicar filtros
   useEffect(() => {
-    let filtered = [...productArray];
+    let filtered = [...products];
 
+    // Filtro por búsqueda
     if (filters.term.trim() !== "") {
       const term = filters.term.toLowerCase();
       filtered = filtered.filter(
@@ -48,10 +62,12 @@ export default function Products() {
       );
     }
 
+    // Filtro por categoría
     if (selectedCategories.length > 0) {
       filtered = filtered.filter((product) => selectedCategories.includes(product.category));
     }
 
+    // Ordenamientos
     if (!showPrice && showStock) {
       filtered.sort((a, b) => a.stock - b.stock);
     } else if (showPrice && !showStock) {
@@ -61,49 +77,46 @@ export default function Products() {
     }
 
     setSortedProducts(filtered);
-  }, [filters.term, selectedCategories, showStock, showPrice, showAlphabetical]);
+  }, [filters.term, selectedCategories, showStock, showPrice, showAlphabetical, products]);
 
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategories((prevSelected) => {
-      if (prevSelected.includes(category)) {
-        return prevSelected.filter((item) => item !== category);
-      } else {
-        return [...prevSelected, category];
-      }
-    });
-  };
-
-  useEffect(() => {
-    if (activeModal !== "useFilter") {
-      setShowStock(true);
-      setShowPrice(true);
-      setShowCategories(false);
-      setSelectedCategories([]);
-      setShowAlphabetical(true);
-    }
-  }, [activeModal]);
-
-  // Modal functions
+  // Handlers
   function openModal(modalName: "addProduct" | "confirmDelete" | "editProduct" | "useFilter", productId?: number) {
     setActiveModal(modalName);
-    setselectedProductId(productId ?? null);
+    setSelectedProductId(productId ?? null);
+
+    if (modalName === "useFilter") {
+      // Copiamos los filtros actuales al temporal
+      setTempShowCategories(showCategories);
+      setTempSelectedCategories(selectedCategories);
+      setTempShowStock(showStock);
+      setTempShowPrice(showPrice);
+      setTempShowAlphabetical(showAlphabetical);
+    }
   }
 
   function closeModal() {
     setActiveModal(null);
   }
 
-  // Dropdown functions
   function toggleDropdown(id: number) {
-    return setOpenDropdownId((prev) => (prev === id ? null : id));
+    setOpenDropdownId((prev) => (prev === id ? null : id));
   }
 
+  const handleTempCategoryChange = (category: string) => {
+    setTempSelectedCategories((prevSelected) =>
+      prevSelected.includes(category) ? prevSelected.filter((item) => item !== category) : [...prevSelected, category]
+    );
+  };
+
+  // Renderizado
   return (
     <div className="flex flex-col">
+      {/* Botonera */}
       <div className="text-white flex items-center gap-4 pb-8">
         <button onClick={() => openModal("addProduct")} className="bg-red-500 border-1 p-2 rounded cursor-pointer">
           Agregar Producto
         </button>
+
         <input
           className="border-1 p-2 rounded"
           type="text"
@@ -111,6 +124,7 @@ export default function Products() {
           value={filters.term}
           onChange={(e) => setFilters((prev) => ({ ...prev, term: e.target.value }))}
         />
+
         <div className="relative inline-block">
           <button
             type="button"
@@ -122,6 +136,7 @@ export default function Products() {
         </div>
       </div>
 
+      {/* Lista de productos */}
       <div className="flex flex-wrap gap-8 justify-center">
         {sortedProducts.map((option) => (
           <div key={option.id} className="relative box-border border p-4 rounded shadow-md bg-gray w-[200px]">
@@ -148,6 +163,7 @@ export default function Products() {
                 )}
               </div>
             </div>
+
             <div className="w-32 pb-1 pt-3">{option.name}</div>
             <div className="w-32 pb-1">
               {new Intl.NumberFormat("es-CL", {
@@ -156,14 +172,14 @@ export default function Products() {
                 minimumFractionDigits: 0,
               }).format(option.price)}
             </div>
-            <div className="w-32 pb-3">{option.category}</div>
+            <div className="w-32 pb-1">{option.category}</div>
             <div className="w-32 pb-3">Stock: {option.stock}</div>
             <div className="p-12 box-border border rounded">Foto</div>
           </div>
         ))}
       </div>
 
-      {/* Add product modal */}
+      {/* Modals */}
       <Modal
         isOpen={activeModal === "addProduct"}
         onCloseAction={closeModal}
@@ -175,7 +191,6 @@ export default function Products() {
         onButtonBClickAction={closeModal}
       />
 
-      {/* Edit product modal */}
       <Modal
         isOpen={activeModal === "editProduct"}
         onCloseAction={closeModal}
@@ -187,11 +202,10 @@ export default function Products() {
         onButtonBClickAction={closeModal}
       />
 
-      {/* Confirmation after delete modal */}
       <Modal
         isOpen={activeModal === "confirmDelete"}
         onCloseAction={closeModal}
-        title={`¿Estás seguro/a de eliminar el producto ${selectedProduct?.id ?? ""}?`}
+        title={`¿Eliminar producto ${selectedProduct?.id ?? ""}?`}
         body={<div className="text-gray-900">Esta acción es irreversible</div>}
         buttonAName="Eliminar"
         onButtonAClickAction={closeModal}
@@ -199,24 +213,23 @@ export default function Products() {
         onButtonBClickAction={closeModal}
       />
 
-      {/* Modal for filters */}
       <Modal
         isOpen={activeModal === "useFilter"}
         onCloseAction={closeModal}
-        title={"Filtrar"}
+        title="Filtrar"
         body={
           <Filtering
-            onShowHideCategoryClickAction={() => setShowCategories((prev) => !prev)}
-            showHideCategoryButton={showCategories ? "Ocultar Categorías" : "Mostrar Categorías"}
+            onShowHideCategoryClickAction={() => setTempShowCategories((prev) => !prev)}
+            showHideCategoryButton={tempShowCategories ? "Ocultar Categorías" : "Mostrar Categorías"}
             category={
-              showCategories && (
+              tempShowCategories && (
                 <ul className="mt-2 space-y-2">
                   {uniqueCategories.map((category) => (
                     <li key={category} className="text-sm pl-2">
                       <input
                         type="checkbox"
-                        checked={selectedCategories.includes(category)}
-                        onChange={() => handleCategoryChange(category)}
+                        checked={tempSelectedCategories.includes(category)}
+                        onChange={() => handleTempCategoryChange(category)}
                       />
                       <label className="ml-2">{category}</label>
                     </li>
@@ -224,10 +237,10 @@ export default function Products() {
                 </ul>
               )
             }
-            onShowHideStockClickAction={() => setShowStock((prev) => !prev)}
-            showHideStockButton={showStock ? "Ocultar Stock" : "Mostrar Stock"}
+            onShowHideStockClickAction={() => setTempShowStock((prev) => !prev)}
+            showHideStockButton={tempShowStock ? "Ocultar Stock" : "Mostrar Stock"}
             stock={
-              showStock && (
+              tempShowStock && (
                 <div className="text-gray-900 flex text-sm gap-1">
                   <button className="p-1 border-1 rounded">Mayor Stock</button>
                   <button onClick={sortByStock} className="p-1 border-1 rounded">
@@ -236,22 +249,22 @@ export default function Products() {
                 </div>
               )
             }
-            onShowHidePriceClickAction={() => setShowPrice((prev) => !prev)}
-            showHidePriceButton={showPrice ? "Ocultar Precio" : "Mostrar Precio"}
+            onShowHidePriceClickAction={() => setTempShowPrice((prev) => !prev)}
+            showHidePriceButton={tempShowPrice ? "Ocultar Precio" : "Mostrar Precio"}
             price={
-              showPrice && (
+              tempShowPrice && (
                 <div className="text-gray-900 flex text-sm gap-1">
-                  <button className="p-1 border-1 rounded">Mayor Precio</button>
                   <button onClick={sortByPrice} className="p-1 border-1 rounded">
                     Menor Precio
                   </button>
+                  <button className="p-1 border-1 rounded">Mayor Precio</button>
                 </div>
               )
             }
-            onShowHideAlphabeticalClickAction={() => setShowAlphabetical((prev) => !prev)}
-            showHideAlphabeticalButton={showAlphabetical ? "Ocultar Orden Alfabético " : "Mostrar Orden Alfabético"}
+            onShowHideAlphabeticalClickAction={() => setTempShowAlphabetical((prev) => !prev)}
+            showHideAlphabeticalButton={tempShowAlphabetical ? "Ocultar Orden Alfabético" : "Mostrar Orden Alfabético"}
             alphabetical={
-              showAlphabetical && (
+              tempShowAlphabetical && (
                 <div className="text-gray-900 flex text-sm gap-1">
                   <button onClick={sortAlphabetically} className="p-1 border-1 rounded">
                     A-Z
@@ -263,7 +276,15 @@ export default function Products() {
           />
         }
         buttonAName="OK"
-        onButtonAClickAction={closeModal}
+        onButtonAClickAction={() => {
+          // Aplicar cambios desde temporales
+          setShowCategories(tempShowCategories);
+          setSelectedCategories(tempSelectedCategories);
+          setShowStock(tempShowStock);
+          setShowPrice(tempShowPrice);
+          setShowAlphabetical(tempShowAlphabetical);
+          closeModal();
+        }}
         buttonBName="Cancelar"
         onButtonBClickAction={closeModal}
       />
