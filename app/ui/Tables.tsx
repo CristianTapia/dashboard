@@ -1,6 +1,5 @@
 "use client";
 import { Bell, DollarSign, ClipboardList } from "lucide-react";
-
 import { tablesArray } from "../lib/data";
 import { useState } from "react";
 import Modal from "./Modals/Modal";
@@ -15,11 +14,9 @@ export default function Tables() {
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
   const selectedTable = tablesArray.find((table) => table.id === selectedTableId);
-  const [isOpen, setIsOpen] = useState(false);
 
   // Búsqueda y Filtro
   const [filters, setFilters] = useState({ term: "" });
-  // const [sortBy, setSortBy] = useState<null | "category" | "stock">(null);
 
   // Búsqueda y Filtro
   let filtered = [...tablesArray];
@@ -70,7 +67,7 @@ export default function Tables() {
             setFilters((prev) => ({ ...prev, term: e.target.value }));
           }}
         />
-        <div className="relative inline-block" tabIndex={0} onBlur={() => setTimeout(() => setIsOpen(false), 100)}>
+        <div className="relative inline-block">
           <div className="relative inline-block">
             <button
               type="button"
@@ -206,11 +203,7 @@ export default function Tables() {
         isOpen={activeModal === "useFilter"}
         onCloseAction={closeModal}
         title="Filtrar"
-        body={
-          <div className="text-gray-900">
-            Ordenes que vienen desde la API intermendia que almacena los datos de la app menu
-          </div>
-        }
+        body={<div className="text-gray-900">Falta colocar los filtros</div>}
         buttonAName="Aplicar"
         onButtonAClickAction={() => {}}
         buttonBName="Cancelar"
