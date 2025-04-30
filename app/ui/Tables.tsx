@@ -9,9 +9,9 @@ import AddTable from "./Modals/AddTable";
 import EditTable from "./Modals/EditTable";
 
 export default function Tables() {
-  const [activeModal, setActiveModal] = useState<null | "addTable" | "confirmDelete" | "editTable" | "reviewOrder">(
-    null
-  );
+  const [activeModal, setActiveModal] = useState<
+    null | "addTable" | "confirmDelete" | "editTable" | "reviewOrder" | "useFilter"
+  >(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
   const selectedTable = tablesArray.find((table) => table.id === selectedTableId);
@@ -19,7 +19,7 @@ export default function Tables() {
 
   // Búsqueda y Filtro
   const [filters, setFilters] = useState({ term: "" });
-  const [sortBy, setSortBy] = useState<null | "category" | "stock">(null);
+  // const [sortBy, setSortBy] = useState<null | "category" | "stock">(null);
 
   // Búsqueda y Filtro
   let filtered = [...tablesArray];
@@ -31,18 +31,13 @@ export default function Tables() {
     });
   }
 
-  if (sortBy === "category") {
-    filtered.sort((a, b) => a.category.localeCompare(b.category));
-  }
-
-  if (sortBy === "stock") {
-    filtered.sort((a, b) => a.stock.localeCompare(b.stock));
-  }
-
   const showTables = filtered;
 
   // Modal
-  function openModal(modalName: "addTable" | "confirmDelete" | "editTable" | "reviewOrder", tableId?: number) {
+  function openModal(
+    modalName: "addTable" | "confirmDelete" | "editTable" | "reviewOrder" | "useFilter",
+    tableId?: number
+  ) {
     setActiveModal(modalName);
     setSelectedTableId(tableId ?? null);
   }
@@ -53,7 +48,7 @@ export default function Tables() {
   // Dropdown
   function toggleDropdown(id?: number) {
     if (typeof id !== "number") {
-      setIsOpen((prev) => !prev);
+      // setIsOpen((prev) => !prev);
     } else {
       setOpenDropdownId((prev) => (prev === id ? null : id));
     }
@@ -76,29 +71,15 @@ export default function Tables() {
           }}
         />
         <div className="relative inline-block" tabIndex={0} onBlur={() => setTimeout(() => setIsOpen(false), 100)}>
-          <button
-            type="button"
-            className="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
-            onClick={() => toggleDropdown()}
-          >
-            Ordenar por ⬇️
-          </button>
-          {isOpen && (
-            <Dropdown
-              className="top-[40px]"
-              isOpen={true}
-              optionA="Categoría"
-              onOptionAClickAction={() => {
-                setSortBy("category");
-                setIsOpen(false);
-              }}
-              optionB="Stock"
-              onOptionBClickAction={() => {
-                setSortBy("stock");
-                setIsOpen(false);
-              }}
-            />
-          )}
+          <div className="relative inline-block">
+            <button
+              type="button"
+              className="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
+              onClick={() => openModal("useFilter")}
+            >
+              Filtrar
+            </button>
+          </div>
         </div>
       </div>
 
@@ -217,6 +198,22 @@ export default function Tables() {
           </div>
         }
         buttonBName="Cerrar"
+        onButtonBClickAction={closeModal}
+      />
+
+      {/* Modal para filtrar */}
+      <Modal
+        isOpen={activeModal === "useFilter"}
+        onCloseAction={closeModal}
+        title="Filtrar"
+        body={
+          <div className="text-gray-900">
+            Ordenes que vienen desde la API intermendia que almacena los datos de la app menu
+          </div>
+        }
+        buttonAName="Aplicar"
+        onButtonAClickAction={() => {}}
+        buttonBName="Cancelar"
         onButtonBClickAction={closeModal}
       />
     </div>
