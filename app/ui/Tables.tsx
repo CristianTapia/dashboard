@@ -127,7 +127,7 @@ export default function Tables() {
                 <span className="text-sm">Cuenta</span>
               </div>
             </div>
-            <div className="flex justify-center gap-4 p-4 animate-pulse">
+            <div className="relative flex justify-center gap-4 p-4">
               <button
                 className="p-2 items-center box-border border rounded bg-gray-200 text-black"
                 onClick={() => {
@@ -137,6 +137,10 @@ export default function Tables() {
                 <ClipboardList size={16} />
                 Revisar Orden
               </button>
+              {/* Circulito rojo de notificación */}
+              <span className="absolute text-center top-3 right-5 block h-6 w-6 rounded-full ring-1 ring-white bg-red-500">
+                1
+              </span>
             </div>
           </div>
         ))}
