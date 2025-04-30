@@ -142,6 +142,11 @@ export default function Tables() {
                 1
               </span>
             </div>
+            <div className="relative flex justify-center pt-4">
+              <button className="p-2 items-center box-border border rounded bg-green-200 text-black">
+                Confirmar Atención
+              </button>
+            </div>
           </div>
         ))}
       </div>
