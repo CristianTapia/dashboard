@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import DashboardButton from "../ui/DashboardButton";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,26 +14,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <aside className="bg-blue-900 text-white p-4">
         <nav>
           <ul className="space-y-2">
-            <li>
-              <Link href="/dashboard/mesas-vista-bloques" className="block p-2 bg-gray-700 rounded hover:bg-gray-600">
-                Mesas - Vista de Bloques
-              </Link>
-            </li>
-            <li>
-              <Link href="/dashboard/mesas-vista-planta" className="block p-2 bg-gray-700 rounded hover:bg-gray-600">
-                Mesas - Vista de planta
-              </Link>
-            </li>
-            <li>
-              <Link href="/dashboard/productos" className="block p-2 bg-gray-700 rounded hover:bg-gray-600">
-                Productos
-              </Link>
-            </li>
-            <li>
-              <Link href="/dashboard/configuracion" className="block p-2 bg-gray-700 rounded hover:bg-gray-600">
-                Configuración
-              </Link>
-            </li>
+            <DashboardButton name="Resumen" href="/dashboard" />
+            <DashboardButton name="Mesa - Vista bloques" href="/dashboard/mesas-vista-bloques" />
+            <DashboardButton name="Mesa - Vista planta" href="/dashboard/mesas-vista-planta" />
+            <DashboardButton name="Productos" href="/dashboard/productos" />
+            <DashboardButton name="Configuración" href="/dashboard/configuracion" />
           </ul>
         </nav>
       </aside>
