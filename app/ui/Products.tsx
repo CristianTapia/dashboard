@@ -54,8 +54,12 @@ export default function Products() {
     }
   };
 
-  const sortAlphabetically = () => {
-    setSortedProducts((prev) => [...prev].sort((a, b) => a.name.localeCompare(b.name)));
+  const sortAlphabetically = (order: "asc" | "desc") => {
+    if (order === "asc") {
+      setSortedProducts((prev) => [...prev].sort((a, b) => a.name.localeCompare(b.name)));
+    } else {
+      setSortedProducts((prev) => [...prev].sort((a, b) => b.name.localeCompare(a.name)));
+    }
   };
 
   // Aplicar filtros
@@ -278,10 +282,12 @@ export default function Products() {
             alphabetical={
               tempShowAlphabetical && (
                 <div className="text-gray-900 flex text-sm gap-1">
-                  <button onClick={sortAlphabetically} className="p-1 border-1 rounded">
+                  <button onClick={() => sortAlphabetically("asc")} className="p-1 border-1 rounded">
                     A-Z
                   </button>
-                  <button className="p-1 border-1 rounded">Z-A</button>
+                  <button onClick={() => sortAlphabetically("desc")} className="p-1 border-1 rounded">
+                    Z-A
+                  </button>
                 </div>
               )
             }
