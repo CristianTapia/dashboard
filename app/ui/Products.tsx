@@ -7,6 +7,7 @@ import Dropdown from "./Dropdown";
 import AddProduct from "./Modals/AddProduct";
 import EditProduct from "./Modals/EditProduct";
 import Filtering from "./Modals/Filtering";
+import Buttons from "./Modals/Buttons";
 
 export default function Products() {
   // Estados principales
@@ -94,6 +95,7 @@ export default function Products() {
     setSortedProducts(filtered);
   }, [filters.term, selectedCategories, showStock, showPrice, showAlphabetical, products]);
 
+  // Reseto de botones de filtro al cerrar el modal
   useEffect(() => {
     if (!activeModal) {
       setActiveAlphabeticalOrder(null);
@@ -302,7 +304,7 @@ export default function Products() {
                   >
                     A-Z
                   </button>
-                  <button
+                  <Buttons
                     onClick={() => {
                       sortAlphabetically("desc");
                       setActiveAlphabeticalOrder("desc");
@@ -310,9 +312,8 @@ export default function Products() {
                     className={`"p-2 border-1 rounded hover:bg-blue-300" ${
                       activeAlphabeticalOrder === "desc" ? "bg-blue-300" : "bg-white"
                     }`}
-                  >
-                    Z-A
-                  </button>
+                    text="Z-A"
+                  />
                 </div>
               )
             }
