@@ -21,6 +21,9 @@ export default function Products() {
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const selectedProduct = products.find((product) => product.id === selectedProductId);
 
+  //Estado de cambio al clickear botones
+  const [activeAlphabeticalOrder, setActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
+
   // Filtros aplicados
   const [showCategories, setShowCategories] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -90,6 +93,12 @@ export default function Products() {
 
     setSortedProducts(filtered);
   }, [filters.term, selectedCategories, showStock, showPrice, showAlphabetical, products]);
+
+  useEffect(() => {
+    if (!activeModal) {
+      setActiveAlphabeticalOrder(null);
+    }
+  }, [activeModal]);
 
   // Handlers
   function openModal(modalName: "addProduct" | "confirmDelete" | "editProduct" | "useFilter", productId?: number) {
@@ -282,10 +291,26 @@ export default function Products() {
             alphabetical={
               tempShowAlphabetical && (
                 <div className="text-gray-900 flex text-sm gap-1">
-                  <button onClick={() => sortAlphabetically("asc")} className="p-1 border-1 rounded">
+                  <button
+                    onClick={() => {
+                      sortAlphabetically("asc");
+                      setActiveAlphabeticalOrder("asc");
+                    }}
+                    className={`"p-2 border-1 rounded hover:bg-blue-300" ${
+                      activeAlphabeticalOrder === "asc" ? "bg-blue-300" : "bg-white"
+                    }`}
+                  >
                     A-Z
                   </button>
-                  <button onClick={() => sortAlphabetically("desc")} className="p-1 border-1 rounded">
+                  <button
+                    onClick={() => {
+                      sortAlphabetically("desc");
+                      setActiveAlphabeticalOrder("desc");
+                    }}
+                    className={`"p-2 border-1 rounded hover:bg-blue-300" ${
+                      activeAlphabeticalOrder === "desc" ? "bg-blue-300" : "bg-white"
+                    }`}
+                  >
                     Z-A
                   </button>
                 </div>
