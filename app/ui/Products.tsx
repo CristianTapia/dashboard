@@ -38,17 +38,13 @@ export default function Products() {
   const [tempShowAlphabetical, setTempShowAlphabetical] = useState(true);
 
   // Funciones de ordenamiento
-  const sortByPrice = () => {
-    setSortedProducts((prev) => [...prev].sort((a, b) => a.price - b.price));
+  const sortByPrice = (order: "asc" | "desc") => {
+    if (order === "asc") {
+      setSortedProducts((prev) => [...prev].sort((a, b) => a.price - b.price));
+    } else {
+      setSortedProducts((prev) => [...prev].sort((a, b) => b.price - a.price));
+    }
   };
-
-  // const sortByLessStock = () => {
-  //   setSortedProducts((prev) => [...prev].sort((a, b) => a.stock - b.stock));
-  // };
-
-  // const sortByMostStock = () => {
-  //   setSortedProducts((prev) => [...prev].sort((a, b) => b.stock - a.stock));
-  // };
 
   const sortByStock = (order: "asc" | "desc") => {
     if (order === "asc") {
@@ -56,8 +52,6 @@ export default function Products() {
     } else {
       setSortedProducts((prev) => [...prev].sort((a, b) => b.stock - a.stock));
     }
-    // setSortedProducts((prev) => [...prev].sort((a, b) => a.stock - b.stock));
-    // setSortedProducts((prev) => [...prev].sort((a, b) => b.stock - a.stock));
   };
 
   const sortAlphabetically = () => {
@@ -270,9 +264,11 @@ export default function Products() {
             price={
               tempShowPrice && (
                 <div className="text-gray-900 flex text-sm gap-1">
-                  <button className="p-1 border-1 rounded">Mayor Precio</button>
-                  <button onClick={sortByPrice} className="p-1 border-1 rounded">
+                  <button onClick={() => sortByPrice("asc")} className="p-1 border-1 rounded">
                     Menor Precio
+                  </button>
+                  <button onClick={() => sortByPrice("desc")} className="p-1 border-1 rounded">
+                    Mayor Precio
                   </button>
                 </div>
               )
