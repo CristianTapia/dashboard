@@ -14,5 +14,3 @@ export default function DashboardButton({ href, name }: DashboardButtonProps) {
     </li>
   );
 }
-
-// "/dashboard/mesas-vista-bloques"
