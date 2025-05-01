@@ -42,8 +42,22 @@ export default function Products() {
     setSortedProducts((prev) => [...prev].sort((a, b) => a.price - b.price));
   };
 
-  const sortByStock = () => {
-    setSortedProducts((prev) => [...prev].sort((a, b) => a.stock - b.stock));
+  // const sortByLessStock = () => {
+  //   setSortedProducts((prev) => [...prev].sort((a, b) => a.stock - b.stock));
+  // };
+
+  // const sortByMostStock = () => {
+  //   setSortedProducts((prev) => [...prev].sort((a, b) => b.stock - a.stock));
+  // };
+
+  const sortByStock = (order: "asc" | "desc") => {
+    if (order === "asc") {
+      setSortedProducts((prev) => [...prev].sort((a, b) => a.stock - b.stock));
+    } else {
+      setSortedProducts((prev) => [...prev].sort((a, b) => b.stock - a.stock));
+    }
+    // setSortedProducts((prev) => [...prev].sort((a, b) => a.stock - b.stock));
+    // setSortedProducts((prev) => [...prev].sort((a, b) => b.stock - a.stock));
   };
 
   const sortAlphabetically = () => {
@@ -242,9 +256,11 @@ export default function Products() {
             stock={
               tempShowStock && (
                 <div className="text-gray-900 flex text-sm gap-1">
-                  <button className="p-1 border-1 rounded">Mayor Stock</button>
-                  <button onClick={sortByStock} className="p-1 border-1 rounded">
+                  <button onClick={() => sortByStock("asc")} className="p-1 border-1 rounded">
                     Menor Stock
+                  </button>
+                  <button onClick={() => sortByStock("desc")} className="p-1 border-1 rounded">
+                    Mayor Stock
                   </button>
                 </div>
               )
@@ -254,10 +270,10 @@ export default function Products() {
             price={
               tempShowPrice && (
                 <div className="text-gray-900 flex text-sm gap-1">
+                  <button className="p-1 border-1 rounded">Mayor Precio</button>
                   <button onClick={sortByPrice} className="p-1 border-1 rounded">
                     Menor Precio
                   </button>
-                  <button className="p-1 border-1 rounded">Mayor Precio</button>
                 </div>
               )
             }
