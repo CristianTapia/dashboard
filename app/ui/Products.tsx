@@ -7,7 +7,7 @@ import Dropdown from "./Dropdown";
 import AddProduct from "./Modals/AddProduct";
 import EditProduct from "./Modals/EditProduct";
 import Filtering from "./Modals/Filtering";
-import Buttons from "./Modals/Buttons";
+import FilteringButton from "./FilteringButton";
 
 export default function Products() {
   // Estados principales
@@ -24,6 +24,8 @@ export default function Products() {
 
   //Estado de cambio al clickear botones
   const [activeAlphabeticalOrder, setActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
+  const [activePriceOrder, setActivePriceOrder] = useState<"asc" | "desc" | null>(null);
+  const [activeStockOrder, setActiveStockOrder] = useState<"asc" | "desc" | null>(null);
 
   // Filtros aplicados
   const [showCategories, setShowCategories] = useState(false);
@@ -66,7 +68,7 @@ export default function Products() {
     }
   };
 
-  // Aplicar filtros
+  // FILTROS
   useEffect(() => {
     let filtered = [...products];
 
@@ -95,10 +97,12 @@ export default function Products() {
     setSortedProducts(filtered);
   }, [filters.term, selectedCategories, showStock, showPrice, showAlphabetical, products]);
 
-  // Reseto de botones de filtro al cerrar el modal
+  // RESETO DE FILTROS AL CERRAR MODAL
   useEffect(() => {
     if (!activeModal) {
       setActiveAlphabeticalOrder(null);
+      setActivePriceOrder(null);
+      setActiveStockOrder(null);
     }
   }, [activeModal]);
 
@@ -108,7 +112,7 @@ export default function Products() {
     setSelectedProductId(productId ?? null);
 
     if (modalName === "useFilter") {
-      // Copiamos los filtros actuales al temporal
+      // Copiar los filtros actuales al temporal
       setTempShowCategories(showCategories);
       setTempSelectedCategories(selectedCategories);
       setTempShowStock(showStock);
@@ -265,12 +269,22 @@ export default function Products() {
             stock={
               tempShowStock && (
                 <div className="text-gray-900 flex text-sm gap-1">
-                  <button onClick={() => sortByStock("asc")} className="p-1 border-1 rounded">
-                    Menor Stock
-                  </button>
-                  <button onClick={() => sortByStock("desc")} className="p-1 border-1 rounded">
-                    Mayor Stock
-                  </button>
+                  <FilteringButton
+                    onClick={() => {
+                      sortByStock("asc");
+                      setActiveStockOrder("asc");
+                    }}
+                    variantClassName={activeStockOrder === "asc" ? "bg-blue-300" : "bg-white"}
+                    text="Menor stock"
+                  />
+                  <FilteringButton
+                    onClick={() => {
+                      sortByStock("desc");
+                      setActiveStockOrder("desc");
+                    }}
+                    variantClassName={activeStockOrder === "desc" ? "bg-blue-300" : "bg-white"}
+                    text="Mayor stock"
+                  />
                 </div>
               )
             }
@@ -279,12 +293,22 @@ export default function Products() {
             price={
               tempShowPrice && (
                 <div className="text-gray-900 flex text-sm gap-1">
-                  <button onClick={() => sortByPrice("asc")} className="p-1 border-1 rounded">
-                    Menor Precio
-                  </button>
-                  <button onClick={() => sortByPrice("desc")} className="p-1 border-1 rounded">
-                    Mayor Precio
-                  </button>
+                  <FilteringButton
+                    onClick={() => {
+                      sortByPrice("asc");
+                      setActivePriceOrder("asc");
+                    }}
+                    variantClassName={activePriceOrder === "asc" ? "bg-blue-300" : "bg-white"}
+                    text="Menor precio"
+                  />
+                  <FilteringButton
+                    onClick={() => {
+                      sortByPrice("desc");
+                      setActivePriceOrder("desc");
+                    }}
+                    variantClassName={activePriceOrder === "desc" ? "bg-blue-300" : "bg-white"}
+                    text="Mayor precio"
+                  />
                 </div>
               )
             }
@@ -293,26 +317,21 @@ export default function Products() {
             alphabetical={
               tempShowAlphabetical && (
                 <div className="text-gray-900 flex text-sm gap-1">
-                  <button
+                  <FilteringButton
                     onClick={() => {
                       sortAlphabetically("asc");
                       setActiveAlphabeticalOrder("asc");
                     }}
-                    className={`"p-2 border-1 rounded hover:bg-blue-300" ${
-                      activeAlphabeticalOrder === "asc" ? "bg-blue-300" : "bg-white"
-                    }`}
-                  >
-                    A-Z
-                  </button>
-                  <Buttons
+                    variantClassName={activeAlphabeticalOrder === "asc" ? "bg-blue-300" : "bg-white"}
+                    text="A - Z"
+                  />
+                  <FilteringButton
                     onClick={() => {
                       sortAlphabetically("desc");
                       setActiveAlphabeticalOrder("desc");
                     }}
-                    className={`"p-2 border-1 rounded hover:bg-blue-300" ${
-                      activeAlphabeticalOrder === "desc" ? "bg-blue-300" : "bg-white"
-                    }`}
-                    text="Z-A"
+                    variantClassName={activeAlphabeticalOrder === "desc" ? "bg-blue-300" : "bg-white"}
+                    text="Z - A"
                   />
                 </div>
               )
