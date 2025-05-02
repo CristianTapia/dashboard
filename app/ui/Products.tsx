@@ -28,7 +28,7 @@ export default function Products() {
   const [activeStockOrder, setActiveStockOrder] = useState<"asc" | "desc" | null>(null);
 
   // Filtros aplicados
-  const [showCategories, setShowCategories] = useState(false);
+  const [showCategories, setShowCategories] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [showStock, setShowStock] = useState(true);
   const [showPrice, setShowPrice] = useState(true);
@@ -42,31 +42,6 @@ export default function Products() {
   const [tempShowStock, setTempShowStock] = useState(true);
   const [tempShowPrice, setTempShowPrice] = useState(true);
   const [tempShowAlphabetical, setTempShowAlphabetical] = useState(true);
-
-  // Funciones de ordenamiento
-  const sortByPrice = (order: "asc" | "desc") => {
-    if (order === "asc") {
-      setSortedProducts((prev) => [...prev].sort((a, b) => a.price - b.price));
-    } else {
-      setSortedProducts((prev) => [...prev].sort((a, b) => b.price - a.price));
-    }
-  };
-
-  const sortByStock = (order: "asc" | "desc") => {
-    if (order === "asc") {
-      setSortedProducts((prev) => [...prev].sort((a, b) => a.stock - b.stock));
-    } else {
-      setSortedProducts((prev) => [...prev].sort((a, b) => b.stock - a.stock));
-    }
-  };
-
-  const sortAlphabetically = (order: "asc" | "desc") => {
-    if (order === "asc") {
-      setSortedProducts((prev) => [...prev].sort((a, b) => a.name.localeCompare(b.name)));
-    } else {
-      setSortedProducts((prev) => [...prev].sort((a, b) => b.name.localeCompare(a.name)));
-    }
-  };
 
   // FILTROS
   useEffect(() => {
@@ -97,7 +72,32 @@ export default function Products() {
     setSortedProducts(filtered);
   }, [filters.term, selectedCategories, showStock, showPrice, showAlphabetical, products]);
 
-  // RESETO DE FILTROS AL CERRAR MODAL
+  // Funciones de ordenamiento
+  const sortByPrice = (order: "asc" | "desc") => {
+    if (order === "asc") {
+      setSortedProducts((prev) => [...prev].sort((a, b) => a.price - b.price));
+    } else {
+      setSortedProducts((prev) => [...prev].sort((a, b) => b.price - a.price));
+    }
+  };
+
+  const sortByStock = (order: "asc" | "desc") => {
+    if (order === "asc") {
+      setSortedProducts((prev) => [...prev].sort((a, b) => a.stock - b.stock));
+    } else {
+      setSortedProducts((prev) => [...prev].sort((a, b) => b.stock - a.stock));
+    }
+  };
+
+  const sortAlphabetically = (order: "asc" | "desc") => {
+    if (order === "asc") {
+      setSortedProducts((prev) => [...prev].sort((a, b) => a.name.localeCompare(b.name)));
+    } else {
+      setSortedProducts((prev) => [...prev].sort((a, b) => b.name.localeCompare(a.name)));
+    }
+  };
+
+  // Reseteo de filtros al cerrar el modal
   useEffect(() => {
     if (!activeModal) {
       setActiveAlphabeticalOrder(null);
@@ -106,7 +106,7 @@ export default function Products() {
     }
   }, [activeModal]);
 
-  // Handlers
+  // MODALES
   function openModal(modalName: "addProduct" | "confirmDelete" | "editProduct" | "useFilter", productId?: number) {
     setActiveModal(modalName);
     setSelectedProductId(productId ?? null);
