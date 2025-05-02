@@ -7,7 +7,7 @@ import Dropdown from "./Dropdown";
 import AddProduct from "./Modals/AddProduct";
 import EditProduct from "./Modals/EditProduct";
 import Filtering from "./Modals/Filtering";
-import FilteringButton from "./FilteringButton";
+import FilteringButton from "./Modals/FilteringButton";
 
 export default function Products() {
   // Estados principales
@@ -22,26 +22,20 @@ export default function Products() {
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const selectedProduct = products.find((product) => product.id === selectedProductId);
 
-  //Estado de cambio al clickear botones
+  //Ordenamientos
   const [activeAlphabeticalOrder, setActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
   const [activePriceOrder, setActivePriceOrder] = useState<"asc" | "desc" | null>(null);
   const [activeStockOrder, setActiveStockOrder] = useState<"asc" | "desc" | null>(null);
 
   // Filtros aplicados
-  const [showCategories, setShowCategories] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [showStock, setShowStock] = useState(true);
-  const [showPrice, setShowPrice] = useState(true);
-  const [showAlphabetical, setShowAlphabetical] = useState(true);
+  const [showCategories, setShowCategories] = useState(true);
 
   const uniqueCategories = [...new Set(products.map((p) => p.category))];
 
-  // Filtros temporales (para el modal)
-  const [tempShowCategories, setTempShowCategories] = useState(false);
+  // Modal temporal
   const [tempSelectedCategories, setTempSelectedCategories] = useState<string[]>([]);
-  const [tempShowStock, setTempShowStock] = useState(true);
-  const [tempShowPrice, setTempShowPrice] = useState(true);
-  const [tempShowAlphabetical, setTempShowAlphabetical] = useState(true);
+  const [tempShowCategories, setTempShowCategories] = useState(true);
 
   // FILTROS
   useEffect(() => {
@@ -60,42 +54,31 @@ export default function Products() {
       filtered = filtered.filter((product) => selectedCategories.includes(product.category));
     }
 
-    // Ordenamientos
-    if (!showPrice && showStock) {
-      filtered.sort((a, b) => a.stock - b.stock);
-    } else if (showPrice && !showStock) {
-      filtered.sort((a, b) => a.price - b.price);
-    } else if (showAlphabetical && !showPrice && !showStock) {
-      filtered.sort((a, b) => a.name.localeCompare(b.name));
-    }
+    // Ordenamiento combinado según prioridad
+    filtered.sort((a, b) => {
+      // 1. Orden alfabético
+      if (activeAlphabeticalOrder) {
+        const result = a.name.localeCompare(b.name);
+        if (result !== 0) return activeAlphabeticalOrder === "asc" ? result : -result;
+      }
+
+      // 2. Orden por stock
+      if (activeStockOrder) {
+        const result = a.stock - b.stock;
+        if (result !== 0) return activeStockOrder === "asc" ? result : -result;
+      }
+
+      // 3. Orden por precio
+      if (activePriceOrder) {
+        const result = a.price - b.price;
+        if (result !== 0) return activePriceOrder === "asc" ? result : -result;
+      }
+
+      return 0;
+    });
 
     setSortedProducts(filtered);
-  }, [filters.term, selectedCategories, showStock, showPrice, showAlphabetical, products]);
-
-  // Funciones de ordenamiento
-  const sortByPrice = (order: "asc" | "desc") => {
-    if (order === "asc") {
-      setSortedProducts((prev) => [...prev].sort((a, b) => a.price - b.price));
-    } else {
-      setSortedProducts((prev) => [...prev].sort((a, b) => b.price - a.price));
-    }
-  };
-
-  const sortByStock = (order: "asc" | "desc") => {
-    if (order === "asc") {
-      setSortedProducts((prev) => [...prev].sort((a, b) => a.stock - b.stock));
-    } else {
-      setSortedProducts((prev) => [...prev].sort((a, b) => b.stock - a.stock));
-    }
-  };
-
-  const sortAlphabetically = (order: "asc" | "desc") => {
-    if (order === "asc") {
-      setSortedProducts((prev) => [...prev].sort((a, b) => a.name.localeCompare(b.name)));
-    } else {
-      setSortedProducts((prev) => [...prev].sort((a, b) => b.name.localeCompare(a.name)));
-    }
-  };
+  }, [filters.term, selectedCategories, products, activePriceOrder, activeStockOrder, activeAlphabeticalOrder]);
 
   // Reseteo de filtros al cerrar el modal
   useEffect(() => {
@@ -115,9 +98,6 @@ export default function Products() {
       // Copiar los filtros actuales al temporal
       setTempShowCategories(showCategories);
       setTempSelectedCategories(selectedCategories);
-      setTempShowStock(showStock);
-      setTempShowPrice(showPrice);
-      setTempShowAlphabetical(showAlphabetical);
     }
   }
 
@@ -240,7 +220,7 @@ export default function Products() {
         onButtonBClickAction={closeModal}
       />
 
-      <Modal
+      {/* <Modal
         isOpen={activeModal === "useFilter"}
         onCloseAction={closeModal}
         title="Filtrar"
@@ -346,6 +326,93 @@ export default function Products() {
           setShowStock(tempShowStock);
           setShowPrice(tempShowPrice);
           setShowAlphabetical(tempShowAlphabetical);
+          closeModal();
+        }}
+        buttonBName="Cancelar"
+        onButtonBClickAction={closeModal}
+      /> */}
+      <Modal
+        isOpen={activeModal === "useFilter"}
+        onCloseAction={closeModal}
+        title="Filtrar"
+        body={
+          <Filtering
+            // CATEGORÍAS
+            onShowHideCategoryClickAction={() => setTempShowCategories((prev) => !prev)}
+            showHideCategoryButton={tempShowCategories ? "Ocultar Categorías" : "Mostrar Categorías"}
+            category={
+              tempShowCategories && (
+                <ul className="mt-2 space-y-2">
+                  {uniqueCategories.map((category) => (
+                    <li key={category} className="text-sm pl-2">
+                      <input
+                        type="checkbox"
+                        checked={tempSelectedCategories.includes(category)}
+                        onChange={() => handleTempCategoryChange(category)}
+                      />
+                      <label className="ml-2">{category}</label>
+                    </li>
+                  ))}
+                </ul>
+              )
+            }
+            // ORDEN POR STOCK
+            onShowHideStockClickAction={() => null}
+            showHideStockButton="Ordenar por Stock"
+            stock={
+              <div className="text-gray-900 flex text-sm gap-1">
+                <FilteringButton
+                  onClick={() => setActiveStockOrder("asc")}
+                  variantClassName={activeStockOrder === "asc" ? "bg-blue-300" : "bg-white"}
+                  text="Menor stock"
+                />
+                <FilteringButton
+                  onClick={() => setActiveStockOrder("desc")}
+                  variantClassName={activeStockOrder === "desc" ? "bg-blue-300" : "bg-white"}
+                  text="Mayor stock"
+                />
+              </div>
+            }
+            // ORDEN POR PRECIO
+            onShowHidePriceClickAction={() => null}
+            showHidePriceButton="Ordenar por Precio"
+            price={
+              <div className="text-gray-900 flex text-sm gap-1">
+                <FilteringButton
+                  onClick={() => setActivePriceOrder("asc")}
+                  variantClassName={activePriceOrder === "asc" ? "bg-blue-300" : "bg-white"}
+                  text="Menor precio"
+                />
+                <FilteringButton
+                  onClick={() => setActivePriceOrder("desc")}
+                  variantClassName={activePriceOrder === "desc" ? "bg-blue-300" : "bg-white"}
+                  text="Mayor precio"
+                />
+              </div>
+            }
+            // ORDEN ALFABÉTICO
+            onShowHideAlphabeticalClickAction={() => null}
+            showHideAlphabeticalButton="Ordenar Alfabéticamente"
+            alphabetical={
+              <div className="text-gray-900 flex text-sm gap-1">
+                <FilteringButton
+                  onClick={() => setActiveAlphabeticalOrder("asc")}
+                  variantClassName={activeAlphabeticalOrder === "asc" ? "bg-blue-300" : "bg-white"}
+                  text="A - Z"
+                />
+                <FilteringButton
+                  onClick={() => setActiveAlphabeticalOrder("desc")}
+                  variantClassName={activeAlphabeticalOrder === "desc" ? "bg-blue-300" : "bg-white"}
+                  text="Z - A"
+                />
+              </div>
+            }
+          />
+        }
+        buttonAName="OK"
+        onButtonAClickAction={() => {
+          setShowCategories(tempShowCategories);
+          setSelectedCategories(tempSelectedCategories);
           closeModal();
         }}
         buttonBName="Cancelar"
