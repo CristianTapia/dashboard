@@ -89,6 +89,19 @@ export default function Products() {
     }
   }, [activeModal, confirmFilters]);
 
+  // Botones toggle de filtros
+  function toggleActivePriceOrder(value: "asc" | "desc") {
+    setActivePriceOrder((prev) => (prev === value ? null : value));
+  }
+
+  function toggleActiveStockOrder(value: "asc" | "desc") {
+    setActiveStockOrder((prev) => (prev === value ? null : value));
+  }
+
+  function toggleActiveAlphabeticalOrder(value: "asc" | "desc") {
+    setActiveAlphabeticalOrder((prev) => (prev === value ? null : value));
+  }
+
   // MODALES
   function openModal(modalName: "addProduct" | "confirmDelete" | "editProduct" | "useFilter", productId?: number) {
     setActiveModal(modalName);
@@ -253,12 +266,12 @@ export default function Products() {
             stock={
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
-                  onClick={() => setActiveStockOrder("asc")}
+                  onClick={() => toggleActiveStockOrder("asc")}
                   variantClassName={activeStockOrder === "asc" ? "bg-blue-300" : "bg-white"}
                   text="Menor stock"
                 />
                 <FilteringButton
-                  onClick={() => setActiveStockOrder("desc")}
+                  onClick={() => toggleActiveStockOrder("desc")}
                   variantClassName={activeStockOrder === "desc" ? "bg-blue-300" : "bg-white"}
                   text="Mayor stock"
                 />
@@ -270,12 +283,12 @@ export default function Products() {
             price={
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
-                  onClick={() => setActivePriceOrder("asc")}
+                  onClick={() => toggleActivePriceOrder("asc")}
                   variantClassName={activePriceOrder === "asc" ? "bg-blue-300" : "bg-white"}
                   text="Menor precio"
                 />
                 <FilteringButton
-                  onClick={() => setActivePriceOrder("desc")}
+                  onClick={() => toggleActivePriceOrder("desc")}
                   variantClassName={activePriceOrder === "desc" ? "bg-blue-300" : "bg-white"}
                   text="Mayor precio"
                 />
@@ -287,12 +300,12 @@ export default function Products() {
             alphabetical={
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
-                  onClick={() => setActiveAlphabeticalOrder("asc")}
+                  onClick={() => toggleActiveAlphabeticalOrder("asc")}
                   variantClassName={activeAlphabeticalOrder === "asc" ? "bg-blue-300" : "bg-white"}
                   text="A - Z"
                 />
                 <FilteringButton
-                  onClick={() => setActiveAlphabeticalOrder("desc")}
+                  onClick={() => toggleActiveAlphabeticalOrder("desc")}
                   variantClassName={activeAlphabeticalOrder === "desc" ? "bg-blue-300" : "bg-white"}
                   text="Z - A"
                 />
