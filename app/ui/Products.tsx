@@ -27,12 +27,15 @@ export default function Products() {
   const [activePriceOrder, setActivePriceOrder] = useState<"asc" | "desc" | null>(null);
   const [activeStockOrder, setActiveStockOrder] = useState<"asc" | "desc" | null>(null);
 
+  // Estados temporales para los filtros
+  const [tempSelectedCategories, setTempSelectedCategories] = useState<string[]>([]);
+  const [tempActivePriceOrder, setTempActivePriceOrder] = useState<"asc" | "desc" | null>(null);
+  const [tempActiveStockOrder, setTempActiveStockOrder] = useState<"asc" | "desc" | null>(null);
+  const [tempActiveAlphabeticalOrder, setTempActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
+
   // Filtros aplicados
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [showCategories, setShowCategories] = useState(true);
-
-  //Confirmación de filtros aplicados
-  const [confirmFilters, setConfirmFilters] = useState(false);
 
   const uniqueCategories = [...new Set(products.map((p) => p.category))];
 
@@ -81,33 +84,32 @@ export default function Products() {
 
   // Reseteo de filtros si el modal se cierra y "Aplicar Filtros" no fue presionado
   // useEffect(() => {
-  //   if (!activeModal && !confirmFilters) {
+  //   if (!activeModal) {
   //     setActivePriceOrder(null);
   //     setActiveStockOrder(null);
   //     setActiveAlphabeticalOrder(null);
   //     setSelectedCategories([]);
   //   }
-  // }, [activeModal, confirmFilters]);
+  // }, [activeModal]);
 
   function resetFilters() {
     setActivePriceOrder(null);
     setActiveStockOrder(null);
     setActiveAlphabeticalOrder(null);
     setSelectedCategories([]);
-    setConfirmFilters(false);
   }
 
   // Botones toggle de filtros
-  function toggleActivePriceOrder(value: "asc" | "desc") {
-    setActivePriceOrder((prev) => (prev === value ? null : value));
+  function toggleTempActivePriceOrder(value: "asc" | "desc") {
+    setTempActivePriceOrder((prev) => (prev === value ? null : value));
   }
 
-  function toggleActiveStockOrder(value: "asc" | "desc") {
-    setActiveStockOrder((prev) => (prev === value ? null : value));
+  function toggleTempActiveStockOrder(value: "asc" | "desc") {
+    setTempActiveStockOrder((prev) => (prev === value ? null : value));
   }
 
-  function toggleActiveAlphabeticalOrder(value: "asc" | "desc") {
-    setActiveAlphabeticalOrder((prev) => (prev === value ? null : value));
+  function toggleTempActiveAlphabeticalOrder(value: "asc" | "desc") {
+    setTempActiveAlphabeticalOrder((prev) => (prev === value ? null : value));
   }
 
   // MODALES
@@ -116,11 +118,10 @@ export default function Products() {
     setSelectedProductId(productId ?? null);
 
     if (modalName === "useFilter") {
-      setSelectedCategories(selectedCategories);
-      setActivePriceOrder(activePriceOrder);
-      setActiveStockOrder(activeStockOrder);
-      setActiveAlphabeticalOrder(activeAlphabeticalOrder);
-      setConfirmFilters(false);
+      setTempSelectedCategories([...selectedCategories]);
+      setTempActivePriceOrder(activePriceOrder);
+      setTempActiveStockOrder(activeStockOrder);
+      setTempActiveAlphabeticalOrder(activeAlphabeticalOrder);
     }
   }
 
@@ -275,13 +276,13 @@ export default function Products() {
             stock={
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
-                  onClick={() => toggleActiveStockOrder("asc")}
-                  variantClassName={activeStockOrder === "asc" ? "bg-blue-300" : "bg-white"}
+                  onClick={() => toggleTempActiveStockOrder("asc")}
+                  variantClassName={tempActiveStockOrder === "asc" ? "bg-blue-300" : "bg-white"}
                   text="Menor stock"
                 />
                 <FilteringButton
-                  onClick={() => toggleActiveStockOrder("desc")}
-                  variantClassName={activeStockOrder === "desc" ? "bg-blue-300" : "bg-white"}
+                  onClick={() => toggleTempActiveStockOrder("desc")}
+                  variantClassName={tempActiveStockOrder === "desc" ? "bg-blue-300" : "bg-white"}
                   text="Mayor stock"
                 />
               </div>
@@ -292,13 +293,13 @@ export default function Products() {
             price={
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
-                  onClick={() => toggleActivePriceOrder("asc")}
-                  variantClassName={activePriceOrder === "asc" ? "bg-blue-300" : "bg-white"}
+                  onClick={() => toggleTempActivePriceOrder("asc")}
+                  variantClassName={tempActivePriceOrder === "asc" ? "bg-blue-300" : "bg-white"}
                   text="Menor precio"
                 />
                 <FilteringButton
-                  onClick={() => toggleActivePriceOrder("desc")}
-                  variantClassName={activePriceOrder === "desc" ? "bg-blue-300" : "bg-white"}
+                  onClick={() => toggleTempActivePriceOrder("desc")}
+                  variantClassName={tempActivePriceOrder === "desc" ? "bg-blue-300" : "bg-white"}
                   text="Mayor precio"
                 />
               </div>
@@ -309,13 +310,13 @@ export default function Products() {
             alphabetical={
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
-                  onClick={() => toggleActiveAlphabeticalOrder("asc")}
-                  variantClassName={activeAlphabeticalOrder === "asc" ? "bg-blue-300" : "bg-white"}
+                  onClick={() => toggleTempActiveAlphabeticalOrder("asc")}
+                  variantClassName={tempActiveAlphabeticalOrder === "asc" ? "bg-blue-300" : "bg-white"}
                   text="A - Z"
                 />
                 <FilteringButton
-                  onClick={() => toggleActiveAlphabeticalOrder("desc")}
-                  variantClassName={activeAlphabeticalOrder === "desc" ? "bg-blue-300" : "bg-white"}
+                  onClick={() => toggleTempActiveAlphabeticalOrder("desc")}
+                  variantClassName={tempActiveAlphabeticalOrder === "desc" ? "bg-blue-300" : "bg-white"}
                   text="Z - A"
                 />
               </div>
@@ -325,18 +326,15 @@ export default function Products() {
         buttonAName="Aplicar Filtros"
         onButtonAClickAction={() => {
           setShowCategories(showCategories);
-          setActivePriceOrder(activePriceOrder);
-          setActiveStockOrder(activeStockOrder);
-          setActiveAlphabeticalOrder(activeAlphabeticalOrder);
+          setActivePriceOrder(tempActivePriceOrder);
+          setActiveStockOrder(tempActiveStockOrder);
+          setActiveAlphabeticalOrder(tempActiveAlphabeticalOrder);
           setSelectedCategories(selectedCategories);
-          setConfirmFilters(true);
           closeModal();
         }}
         buttonBName="Cancelar"
         onButtonBClickAction={() => {
           closeModal();
-          resetFilters();
-          setConfirmFilters(false);
         }}
       />
     </div>
