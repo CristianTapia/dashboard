@@ -31,6 +31,9 @@ export default function Products() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [showCategories, setShowCategories] = useState(true);
 
+  //Confirmación de filtros aplicados
+  const [confirmFilters, setConfirmFilters] = useState(false);
+
   const uniqueCategories = [...new Set(products.map((p) => p.category))];
 
   // FILTROS
@@ -76,15 +79,15 @@ export default function Products() {
     setSortedProducts(filtered);
   }, [search.term, selectedCategories, products, activePriceOrder, activeStockOrder, activeAlphabeticalOrder]);
 
-  // Reseteo de filtros al cerrar el modal
+  // Reseteo de filtros si el modal se cierra y "Aplicar Filtros" no fue presionado
   useEffect(() => {
-    if (!activeModal) {
+    if (!activeModal && !confirmFilters) {
       setActivePriceOrder(null);
       setActiveStockOrder(null);
       setActiveAlphabeticalOrder(null);
       setSelectedCategories([]);
     }
-  }, [activeModal]);
+  }, [activeModal, confirmFilters]);
 
   // MODALES
   function openModal(modalName: "addProduct" | "confirmDelete" | "editProduct" | "useFilter", productId?: number) {
@@ -96,6 +99,7 @@ export default function Products() {
       setActivePriceOrder(activePriceOrder);
       setActiveStockOrder(activeStockOrder);
       setActiveAlphabeticalOrder(activeAlphabeticalOrder);
+      setConfirmFilters(false);
     }
   }
 
@@ -296,13 +300,14 @@ export default function Products() {
             }
           />
         }
-        buttonAName="OK"
+        buttonAName="Aplicar Filtros"
         onButtonAClickAction={() => {
           setShowCategories(showCategories);
           setActivePriceOrder(activePriceOrder);
           setActiveStockOrder(activeStockOrder);
           setActiveAlphabeticalOrder(activeAlphabeticalOrder);
           setSelectedCategories(selectedCategories);
+          setConfirmFilters(true);
           closeModal();
         }}
         buttonBName="Cancelar"
