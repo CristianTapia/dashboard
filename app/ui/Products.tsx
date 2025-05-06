@@ -13,7 +13,7 @@ export default function Products() {
   // Estados principales
   const [products] = useState(productArray);
   const [sortedProducts, setSortedProducts] = useState(productArray);
-  const [filters, setFilters] = useState({ term: "" });
+  const [search, setSearch] = useState({ term: "" });
 
   const [activeModal, setActiveModal] = useState<null | "addProduct" | "confirmDelete" | "editProduct" | "useFilter">(
     null
@@ -38,8 +38,8 @@ export default function Products() {
     let filtered = [...products];
 
     // Filtro por búsqueda
-    if (filters.term.trim() !== "") {
-      const term = filters.term.toLowerCase();
+    if (search.term.trim() !== "") {
+      const term = search.term.toLowerCase();
       filtered = filtered.filter(
         (product) => product.name.toLowerCase().includes(term) || product.stock.toString().includes(term)
       );
@@ -74,14 +74,15 @@ export default function Products() {
     });
 
     setSortedProducts(filtered);
-  }, [filters.term, selectedCategories, products, activePriceOrder, activeStockOrder, activeAlphabeticalOrder]);
+  }, [search.term, selectedCategories, products, activePriceOrder, activeStockOrder, activeAlphabeticalOrder]);
 
   // Reseteo de filtros al cerrar el modal
   useEffect(() => {
     if (!activeModal) {
-      setActiveAlphabeticalOrder(null);
       setActivePriceOrder(null);
       setActiveStockOrder(null);
+      setActiveAlphabeticalOrder(null);
+      setSelectedCategories([]);
     }
   }, [activeModal]);
 
@@ -91,9 +92,10 @@ export default function Products() {
     setSelectedProductId(productId ?? null);
 
     if (modalName === "useFilter") {
-      // Copiar los filtros actuales al temporal
-      setShowCategories(showCategories);
       setSelectedCategories(selectedCategories);
+      setActivePriceOrder(activePriceOrder);
+      setActiveStockOrder(activeStockOrder);
+      setActiveAlphabeticalOrder(activeAlphabeticalOrder);
     }
   }
 
@@ -124,8 +126,8 @@ export default function Products() {
           className="border-1 p-2 rounded"
           type="text"
           placeholder="Buscar Producto"
-          value={filters.term}
-          onChange={(e) => setFilters((prev) => ({ ...prev, term: e.target.value }))}
+          value={search.term}
+          onChange={(e) => setSearch((prev) => ({ ...prev, term: e.target.value }))}
         />
 
         <div className="relative inline-block">
@@ -297,6 +299,9 @@ export default function Products() {
         buttonAName="OK"
         onButtonAClickAction={() => {
           setShowCategories(showCategories);
+          setActivePriceOrder(activePriceOrder);
+          setActiveStockOrder(activeStockOrder);
+          setActiveAlphabeticalOrder(activeAlphabeticalOrder);
           setSelectedCategories(selectedCategories);
           closeModal();
         }}
