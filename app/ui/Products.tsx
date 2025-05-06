@@ -33,10 +33,6 @@ export default function Products() {
 
   const uniqueCategories = [...new Set(products.map((p) => p.category))];
 
-  // Modal temporal
-  const [tempSelectedCategories, setTempSelectedCategories] = useState<string[]>([]);
-  const [tempShowCategories, setTempShowCategories] = useState(true);
-
   // FILTROS
   useEffect(() => {
     let filtered = [...products];
@@ -96,8 +92,8 @@ export default function Products() {
 
     if (modalName === "useFilter") {
       // Copiar los filtros actuales al temporal
-      setTempShowCategories(showCategories);
-      setTempSelectedCategories(selectedCategories);
+      setShowCategories(showCategories);
+      setSelectedCategories(selectedCategories);
     }
   }
 
@@ -110,7 +106,7 @@ export default function Products() {
   }
 
   const handleTempCategoryChange = (category: string) => {
-    setTempSelectedCategories((prevSelected) =>
+    setSelectedCategories((prevSelected) =>
       prevSelected.includes(category) ? prevSelected.filter((item) => item !== category) : [...prevSelected, category]
     );
   };
@@ -186,7 +182,7 @@ export default function Products() {
         ))}
       </div>
 
-      {/* Modals */}
+      {/* Modales */}
       <Modal
         isOpen={activeModal === "addProduct"}
         onCloseAction={closeModal}
@@ -220,117 +216,6 @@ export default function Products() {
         onButtonBClickAction={closeModal}
       />
 
-      {/* <Modal
-        isOpen={activeModal === "useFilter"}
-        onCloseAction={closeModal}
-        title="Filtrar"
-        body={
-          <Filtering
-            onShowHideCategoryClickAction={() => setTempShowCategories((prev) => !prev)}
-            showHideCategoryButton={tempShowCategories ? "Ocultar Categorías" : "Mostrar Categorías"}
-            category={
-              tempShowCategories && (
-                <ul className="mt-2 space-y-2">
-                  {uniqueCategories.map((category) => (
-                    <li key={category} className="text-sm pl-2">
-                      <input
-                        type="checkbox"
-                        checked={tempSelectedCategories.includes(category)}
-                        onChange={() => handleTempCategoryChange(category)}
-                      />
-                      <label className="ml-2">{category}</label>
-                    </li>
-                  ))}
-                </ul>
-              )
-            }
-            onShowHideStockClickAction={() => setTempShowStock((prev) => !prev)}
-            showHideStockButton={tempShowStock ? "Ocultar Stock" : "Mostrar Stock"}
-            stock={
-              tempShowStock && (
-                <div className="text-gray-900 flex text-sm gap-1">
-                  <FilteringButton
-                    onClick={() => {
-                      sortByStock("asc");
-                      setActiveStockOrder("asc");
-                    }}
-                    variantClassName={activeStockOrder === "asc" ? "bg-blue-300" : "bg-white"}
-                    text="Menor stock"
-                  />
-                  <FilteringButton
-                    onClick={() => {
-                      sortByStock("desc");
-                      setActiveStockOrder("desc");
-                    }}
-                    variantClassName={activeStockOrder === "desc" ? "bg-blue-300" : "bg-white"}
-                    text="Mayor stock"
-                  />
-                </div>
-              )
-            }
-            onShowHidePriceClickAction={() => setTempShowPrice((prev) => !prev)}
-            showHidePriceButton={tempShowPrice ? "Ocultar Precio" : "Mostrar Precio"}
-            price={
-              tempShowPrice && (
-                <div className="text-gray-900 flex text-sm gap-1">
-                  <FilteringButton
-                    onClick={() => {
-                      sortByPrice("asc");
-                      setActivePriceOrder("asc");
-                    }}
-                    variantClassName={activePriceOrder === "asc" ? "bg-blue-300" : "bg-white"}
-                    text="Menor precio"
-                  />
-                  <FilteringButton
-                    onClick={() => {
-                      sortByPrice("desc");
-                      setActivePriceOrder("desc");
-                    }}
-                    variantClassName={activePriceOrder === "desc" ? "bg-blue-300" : "bg-white"}
-                    text="Mayor precio"
-                  />
-                </div>
-              )
-            }
-            onShowHideAlphabeticalClickAction={() => setTempShowAlphabetical((prev) => !prev)}
-            showHideAlphabeticalButton={tempShowAlphabetical ? "Ocultar Orden Alfabético" : "Mostrar Orden Alfabético"}
-            alphabetical={
-              tempShowAlphabetical && (
-                <div className="text-gray-900 flex text-sm gap-1">
-                  <FilteringButton
-                    onClick={() => {
-                      sortAlphabetically("asc");
-                      setActiveAlphabeticalOrder("asc");
-                    }}
-                    variantClassName={activeAlphabeticalOrder === "asc" ? "bg-blue-300" : "bg-white"}
-                    text="A - Z"
-                  />
-                  <FilteringButton
-                    onClick={() => {
-                      sortAlphabetically("desc");
-                      setActiveAlphabeticalOrder("desc");
-                    }}
-                    variantClassName={activeAlphabeticalOrder === "desc" ? "bg-blue-300" : "bg-white"}
-                    text="Z - A"
-                  />
-                </div>
-              )
-            }
-          />
-        }
-        buttonAName="OK"
-        onButtonAClickAction={() => {
-          // Aplicar cambios desde temporales
-          setShowCategories(tempShowCategories);
-          setSelectedCategories(tempSelectedCategories);
-          setShowStock(tempShowStock);
-          setShowPrice(tempShowPrice);
-          setShowAlphabetical(tempShowAlphabetical);
-          closeModal();
-        }}
-        buttonBName="Cancelar"
-        onButtonBClickAction={closeModal}
-      /> */}
       <Modal
         isOpen={activeModal === "useFilter"}
         onCloseAction={closeModal}
@@ -338,16 +223,16 @@ export default function Products() {
         body={
           <Filtering
             // CATEGORÍAS
-            onShowHideCategoryClickAction={() => setTempShowCategories((prev) => !prev)}
-            showHideCategoryButton={tempShowCategories ? "Ocultar Categorías" : "Mostrar Categorías"}
+            onShowHideCategoryClickAction={() => setShowCategories((prev) => !prev)}
+            showHideCategoryButton={showCategories ? "Ocultar Categorías" : "Mostrar Categorías"}
             category={
-              tempShowCategories && (
+              showCategories && (
                 <ul className="mt-2 space-y-2">
                   {uniqueCategories.map((category) => (
                     <li key={category} className="text-sm pl-2">
                       <input
                         type="checkbox"
-                        checked={tempSelectedCategories.includes(category)}
+                        checked={selectedCategories.includes(category)}
                         onChange={() => handleTempCategoryChange(category)}
                       />
                       <label className="ml-2">{category}</label>
@@ -411,8 +296,8 @@ export default function Products() {
         }
         buttonAName="OK"
         onButtonAClickAction={() => {
-          setShowCategories(tempShowCategories);
-          setSelectedCategories(tempSelectedCategories);
+          setShowCategories(showCategories);
+          setSelectedCategories(selectedCategories);
           closeModal();
         }}
         buttonBName="Cancelar"
