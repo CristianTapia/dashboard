@@ -11,6 +11,7 @@ type FilteringProps = {
   alphabetical?: React.ReactNode;
   showHideAlphabeticalButton: string;
   onShowHideAlphabeticalClickAction: () => void;
+  onResetFiltersClickAction: () => void;
 };
 
 export default function Filtering({
@@ -26,9 +27,13 @@ export default function Filtering({
   alphabetical,
   showHideAlphabeticalButton,
   onShowHideAlphabeticalClickAction,
+  onResetFiltersClickAction,
 }: FilteringProps) {
   return (
     <>
+      <button className="text-gray-900 mt-2 mb-2 border-2 p-2" onClick={onResetFiltersClickAction}>
+        Restear filtros
+      </button>
       <div className="text-gray-900 mb-2">
         <button className="text-sm text-blue-600 underline mb-2" onClick={onShowHideCategoryClickAction}>
           {showHideCategoryButton}

@@ -80,14 +80,22 @@ export default function Products() {
   }, [search.term, selectedCategories, products, activePriceOrder, activeStockOrder, activeAlphabeticalOrder]);
 
   // Reseteo de filtros si el modal se cierra y "Aplicar Filtros" no fue presionado
-  useEffect(() => {
-    if (!activeModal && !confirmFilters) {
-      setActivePriceOrder(null);
-      setActiveStockOrder(null);
-      setActiveAlphabeticalOrder(null);
-      setSelectedCategories([]);
-    }
-  }, [activeModal, confirmFilters]);
+  // useEffect(() => {
+  //   if (!activeModal && !confirmFilters) {
+  //     setActivePriceOrder(null);
+  //     setActiveStockOrder(null);
+  //     setActiveAlphabeticalOrder(null);
+  //     setSelectedCategories([]);
+  //   }
+  // }, [activeModal, confirmFilters]);
+
+  function resetFilters() {
+    setActivePriceOrder(null);
+    setActiveStockOrder(null);
+    setActiveAlphabeticalOrder(null);
+    setSelectedCategories([]);
+    setConfirmFilters(false);
+  }
 
   // Botones toggle de filtros
   function toggleActivePriceOrder(value: "asc" | "desc") {
@@ -241,6 +249,7 @@ export default function Products() {
         title="Filtrar"
         body={
           <Filtering
+            onResetFiltersClickAction={resetFilters}
             // CATEGORÍAS
             onShowHideCategoryClickAction={() => setShowCategories((prev) => !prev)}
             showHideCategoryButton={showCategories ? "Ocultar Categorías" : "Mostrar Categorías"}
@@ -324,7 +333,11 @@ export default function Products() {
           closeModal();
         }}
         buttonBName="Cancelar"
-        onButtonBClickAction={closeModal}
+        onButtonBClickAction={() => {
+          closeModal();
+          resetFilters();
+          setConfirmFilters(false);
+        }}
       />
     </div>
   );
