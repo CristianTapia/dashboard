@@ -22,7 +22,9 @@ export default function Products() {
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const selectedProduct = products.find((product) => product.id === selectedProductId);
 
-  //Ordenamientos
+  // Filtros
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [showCategories, setShowCategories] = useState(true);
   const [activeAlphabeticalOrder, setActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
   const [activePriceOrder, setActivePriceOrder] = useState<"asc" | "desc" | null>(null);
   const [activeStockOrder, setActiveStockOrder] = useState<"asc" | "desc" | null>(null);
@@ -32,10 +34,6 @@ export default function Products() {
   const [tempActivePriceOrder, setTempActivePriceOrder] = useState<"asc" | "desc" | null>(null);
   const [tempActiveStockOrder, setTempActiveStockOrder] = useState<"asc" | "desc" | null>(null);
   const [tempActiveAlphabeticalOrder, setTempActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
-
-  // Filtros aplicados
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [showCategories, setShowCategories] = useState(true);
 
   const uniqueCategories = [...new Set(products.map((p) => p.category))];
 
@@ -93,10 +91,10 @@ export default function Products() {
   // }, [activeModal]);
 
   function resetFilters() {
-    setActivePriceOrder(null);
-    setActiveStockOrder(null);
-    setActiveAlphabeticalOrder(null);
-    setSelectedCategories([]);
+    setTempActivePriceOrder(null);
+    setTempActiveStockOrder(null);
+    setTempActiveAlphabeticalOrder(null);
+    setTempSelectedCategories([]);
   }
 
   // Botones toggle de filtros
@@ -134,7 +132,7 @@ export default function Products() {
   }
 
   const handleTempCategoryChange = (category: string) => {
-    setSelectedCategories((prevSelected) =>
+    setTempSelectedCategories((prevSelected) =>
       prevSelected.includes(category) ? prevSelected.filter((item) => item !== category) : [...prevSelected, category]
     );
   };
@@ -261,7 +259,7 @@ export default function Products() {
                     <li key={category} className="text-sm pl-2">
                       <input
                         type="checkbox"
-                        checked={selectedCategories.includes(category)}
+                        checked={tempSelectedCategories.includes(category)}
                         onChange={() => handleTempCategoryChange(category)}
                       />
                       <label className="ml-2">{category}</label>
@@ -329,7 +327,7 @@ export default function Products() {
           setActivePriceOrder(tempActivePriceOrder);
           setActiveStockOrder(tempActiveStockOrder);
           setActiveAlphabeticalOrder(tempActiveAlphabeticalOrder);
-          setSelectedCategories(selectedCategories);
+          setSelectedCategories(tempSelectedCategories);
           closeModal();
         }}
         buttonBName="Cancelar"
