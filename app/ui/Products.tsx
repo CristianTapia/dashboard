@@ -1,7 +1,7 @@
 "use client";
 
 import { productArray } from "../lib/data";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
 import AddProduct from "./Modals/AddProduct";
@@ -36,6 +36,25 @@ export default function Products() {
   const [tempActiveAlphabeticalOrder, setTempActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
 
   const uniqueCategories = [...new Set(products.map((p) => p.category))];
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Manejo de clics fuera del dropdown
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpenDropdownId(null);
+      }
+    }
+
+    if (openDropdownId !== null) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openDropdownId]);
 
   // FILTROS
   useEffect(() => {
@@ -171,24 +190,26 @@ export default function Products() {
           <div key={option.id} className="relative box-border border p-4 rounded shadow-md bg-gray w-[200px]">
             <div className="flex justify-between items-center">
               <div className="w-32">Producto {option.id}</div>
-              <div tabIndex={0} onBlur={() => setTimeout(() => setOpenDropdownId(null), 100)} className="relative">
+              <div className="relative">
                 <button onClick={() => toggleDropdown(option.id)} className="text-white p-2 py-1 rounded">
                   ⋮
                 </button>
                 {openDropdownId === option.id && (
-                  <Dropdown
-                    isOpen={true}
-                    optionA="Editar"
-                    onOptionAClickAction={() => {
-                      setOpenDropdownId(null);
-                      openModal("editProduct", option.id);
-                    }}
-                    optionB="Eliminar"
-                    onOptionBClickAction={() => {
-                      setOpenDropdownId(null);
-                      openModal("confirmDelete", option.id);
-                    }}
-                  />
+                  <div ref={dropdownRef}>
+                    <Dropdown
+                      isOpen={true}
+                      optionA="Editar"
+                      onOptionAClickAction={() => {
+                        setOpenDropdownId(null);
+                        openModal("editProduct", option.id);
+                      }}
+                      optionB="Eliminar"
+                      onOptionBClickAction={() => {
+                        setOpenDropdownId(null);
+                        openModal("confirmDelete", option.id);
+                      }}
+                    />
+                  </div>
                 )}
               </div>
             </div>
