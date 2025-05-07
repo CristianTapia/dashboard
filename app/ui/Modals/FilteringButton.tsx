@@ -3,12 +3,13 @@ type Props = {
   text: string;
   icon?: string;
   variantClassName?: string;
+  disabled?: boolean;
 };
 
-export default function Buttons({ onClick, text, variantClassName }: Props) {
+export default function Buttons({ onClick, text, variantClassName, disabled }: Props) {
   const baseClass = "p-1 border-1 rounded hover:bg-blue-300";
   return (
-    <button className={`${baseClass} ${variantClassName}`} onClick={onClick}>
+    <button className={`${baseClass} ${variantClassName}`} onClick={onClick} disabled={disabled}>
       {text}
     </button>
   );

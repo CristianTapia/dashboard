@@ -60,14 +60,13 @@ export default function Products() {
     if (openDropdownId !== null) {
       document.addEventListener("mousedown", handleClickOutside);
       document.addEventListener("keydown", handleEscape);
-      window.addEventListener("scroll", handleScroll);
       window.addEventListener("scroll", handleScroll, true);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleEscape);
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", handleScroll, true);
     };
   }, [openDropdownId]);
 
