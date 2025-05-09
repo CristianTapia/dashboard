@@ -76,9 +76,15 @@ export default function Products() {
 
     // Filtro por búsqueda
     if (search.term.trim() !== "") {
-      const term = search.term.toLowerCase();
+      const normalize = (str: string) =>
+        str
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase();
+
+      const term = normalize(search.term);
       filtered = filtered.filter(
-        (product) => product.name.toLowerCase().includes(term) || product.stock.toString().includes(term)
+        (product) => normalize(product.name).includes(term) || product.stock.toString().includes(term)
       );
     }
 
