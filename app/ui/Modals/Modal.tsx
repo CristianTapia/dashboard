@@ -32,7 +32,7 @@ export default function Modal({
             {/* Modal header */}
             <div className="flex pl-4 pb-6 justify-between text-xl">
               <h2 className="text-gray-900">{title}</h2>
-              <button className="pr-4 text-gray-900" onClick={onCloseAction}>
+              <button className="pr-4 text-gray-900 cursor-pointer" onClick={onCloseAction}>
                 X
               </button>
             </div>
@@ -41,13 +41,16 @@ export default function Modal({
             {/* Modal footer */}
             <div className="pt-4 pl-4">
               {buttonAName && (
-                <button onClick={onButtonAClickAction} className="p-2 bg-green-600 text-white rounded">
+                <button onClick={onButtonAClickAction} className="p-2 bg-green-600 text-white rounded cursor-pointer">
                   {buttonAName}
                 </button>
               )}
 
               {buttonBName && (
-                <button onClick={onButtonBClickAction} className="p-2 bg-red-600 text-white rounded ml-2">
+                <button
+                  onClick={onButtonBClickAction}
+                  className="p-2 bg-red-600 text-white rounded ml-2 cursor-pointer"
+                >
                   {buttonBName}
                 </button>
               )}

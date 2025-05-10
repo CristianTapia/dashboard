@@ -196,7 +196,7 @@ export default function Products() {
         <div className="relative inline-block">
           <button
             type="button"
-            className="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
+            className="cursor-pointer inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
             onClick={() => openModal("useFilter")}
           >
             Filtrar
@@ -211,7 +211,10 @@ export default function Products() {
             <div className="flex justify-between items-center">
               <div className="w-32">Producto {option.id}</div>
               <div className="relative">
-                <button onClick={() => toggleDropdown(option.id)} className="text-white p-2 py-1 rounded">
+                <button
+                  onClick={() => toggleDropdown(option.id)}
+                  className="text-white p-2 py-1 rounded cursor-pointer"
+                >
                   ⋮
                 </button>
                 {openDropdownId === option.id && (
