@@ -7,7 +7,7 @@ type Props = {
 };
 
 export default function Buttons({ onClick, text, variantClassName, disabled }: Props) {
-  const baseClass = "p-1 border-1 rounded hover:bg-blue-300";
+  const baseClass = "p-1 border-1 rounded hover:bg-blue-300 cursor-pointer";
   return (
     <button className={`${baseClass} ${variantClassName}`} onClick={onClick} disabled={disabled}>
       {text}
