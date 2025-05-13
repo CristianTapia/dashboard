@@ -119,16 +119,6 @@ export default function Products() {
     setSortedProducts(filtered);
   }, [search.term, selectedCategories, products, activePriceOrder, activeStockOrder, activeAlphabeticalOrder]);
 
-  // Reseteo de filtros si el modal se cierra y "Aplicar Filtros" no fue presionado
-  // useEffect(() => {
-  //   if (!activeModal) {
-  //     setActivePriceOrder(null);
-  //     setActiveStockOrder(null);
-  //     setActiveAlphabeticalOrder(null);
-  //     setSelectedCategories([]);
-  //   }
-  // }, [activeModal]);
-
   function resetFilters() {
     setTempActivePriceOrder(null);
     setTempActiveStockOrder(null);
