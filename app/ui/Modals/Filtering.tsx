@@ -31,28 +31,28 @@ export default function Filtering({
 }: FilteringProps) {
   return (
     <>
-      <button className="text-gray-900 mt-2 mb-2 border-2 p-2" onClick={onResetFiltersClickAction}>
+      <button className="text-gray-900 mt-2 mb-2 border-2 p-2 cursor-pointer" onClick={onResetFiltersClickAction}>
         Restear filtros
       </button>
       <div className="text-gray-900 mb-2">
-        <button className="text-sm text-blue-600 underline mb-2" onClick={onShowHideCategoryClickAction}>
+        <button className="text-sm text-blue-600 underline mb-2 cursor-pointer" onClick={onShowHideCategoryClickAction}>
           {showHideCategoryButton}
         </button>
         {category}
       </div>
       <div className="text-gray-900 mt-2 mb-2">
-        <button className="text-sm text-blue-600 underline mb-2" onClick={onShowHideStockClickAction}>
+        <button className="text-sm text-blue-600 underline mb-2 cursor-pointer" onClick={onShowHideStockClickAction}>
           {showHideStockButton}
         </button>
         {stock}
       </div>
       <div className="text-gray-900 mt-2 mb-2">
-        <button className="text-sm text-blue-600 underline mb-2" onClick={onShowHidePriceClickAction}>
+        <button className="text-sm text-blue-600 underline mb-2 cursor-pointer" onClick={onShowHidePriceClickAction}>
           {showHidePriceButton}
         </button>
         {price}
       </div>
-      <div className="text-gray-900 mt-2 mb-2">
+      <div className="text-gray-900 mt-2 mb-2 cursor-pointer">
         <button className="text-sm text-blue-600 underline mb-2" onClick={onShowHideAlphabeticalClickAction}>
           {showHideAlphabeticalButton}
         </button>
