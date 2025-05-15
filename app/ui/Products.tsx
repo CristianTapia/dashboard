@@ -325,7 +325,9 @@ export default function Products() {
                   onClick={() => toggleTempActiveStockOrder("desc")}
                   variantClassName={clsx({
                     "bg-blue-300": tempActiveStockOrder === "desc",
-                    "bg-gray-300 text-white ": tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null,
+                    "bg-gray-300 text-white cursor-not-allowed":
+                      tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null,
+                    "cursor-pointer": tempActivePriceOrder === null && tempActiveAlphabeticalOrder === null,
                   })}
                   text="Mayor stock"
                   disabled={tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null}
@@ -341,7 +343,9 @@ export default function Products() {
                   onClick={() => toggleTempActivePriceOrder("asc")}
                   variantClassName={clsx({
                     "bg-blue-300": tempActivePriceOrder === "asc",
-                    "bg-red-300 text-white": tempActiveStockOrder !== null || tempActiveAlphabeticalOrder !== null,
+                    "bg-gray-300 text-white cursor-not-allowed":
+                      tempActiveStockOrder !== null || tempActiveAlphabeticalOrder !== null,
+                    "cursor-pointer": tempActiveStockOrder === null && tempActiveAlphabeticalOrder === null,
                   })}
                   text="Menor precio"
                   disabled={tempActiveStockOrder !== null || tempActiveAlphabeticalOrder !== null}
@@ -350,7 +354,9 @@ export default function Products() {
                   onClick={() => toggleTempActivePriceOrder("desc")}
                   variantClassName={clsx({
                     "bg-blue-300": tempActivePriceOrder === "desc",
-                    "bg-red-300 text-white": tempActiveStockOrder !== null || tempActiveAlphabeticalOrder !== null,
+                    "bg-gray-300 text-white cursor-not-allowed":
+                      tempActiveStockOrder !== null || tempActiveAlphabeticalOrder !== null,
+                    "cursor-pointer": tempActiveStockOrder === null && tempActiveAlphabeticalOrder === null,
                   })}
                   text="Mayor precio"
                   disabled={tempActiveStockOrder !== null || tempActiveAlphabeticalOrder !== null}
@@ -364,13 +370,23 @@ export default function Products() {
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
                   onClick={() => toggleTempActiveAlphabeticalOrder("asc")}
-                  variantClassName={tempActiveAlphabeticalOrder === "asc" ? "bg-blue-300" : "bg-white"}
+                  variantClassName={clsx({
+                    "bg-blue-300": tempActiveAlphabeticalOrder === "asc",
+                    "bg-gray-300 text-white cursor-not-allowed":
+                      tempActiveStockOrder !== null || tempActivePriceOrder !== null,
+                    "cursor-pointer": tempActiveStockOrder === null && tempActivePriceOrder === null,
+                  })}
                   text="A - Z"
                   disabled={tempActiveStockOrder !== null || tempActivePriceOrder !== null}
                 />
                 <FilteringButton
                   onClick={() => toggleTempActiveAlphabeticalOrder("desc")}
-                  variantClassName={tempActiveAlphabeticalOrder === "desc" ? "bg-blue-300" : "bg-white"}
+                  variantClassName={clsx({
+                    "bg-blue-300": tempActiveAlphabeticalOrder === "desc",
+                    "bg-gray-300 text-white cursor-not-allowed":
+                      tempActiveStockOrder !== null || tempActivePriceOrder !== null,
+                    "cursor-pointer": tempActiveStockOrder === null && tempActivePriceOrder === null,
+                  })}
                   text="Z - A"
                   disabled={tempActiveStockOrder !== null || tempActivePriceOrder !== null}
                 />
