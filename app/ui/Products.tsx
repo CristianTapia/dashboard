@@ -316,7 +316,8 @@ export default function Products() {
                     "bg-blue-300": tempActiveStockOrder === "asc",
                     "bg-gray-300 text-white cursor-not-allowed":
                       tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null,
-                    "cursor-pointer": tempActivePriceOrder === null && tempActiveAlphabeticalOrder === null,
+                    "cursor-pointer hover:bg-blue-300":
+                      tempActivePriceOrder === null && tempActiveAlphabeticalOrder === null,
                   })}
                   text="Menor stock"
                   disabled={tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null}
@@ -327,7 +328,8 @@ export default function Products() {
                     "bg-blue-300": tempActiveStockOrder === "desc",
                     "bg-gray-300 text-white cursor-not-allowed":
                       tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null,
-                    "cursor-pointer": tempActivePriceOrder === null && tempActiveAlphabeticalOrder === null,
+                    "cursor-pointer hover:bg-blue-300":
+                      tempActivePriceOrder === null && tempActiveAlphabeticalOrder === null,
                   })}
                   text="Mayor stock"
                   disabled={tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null}
@@ -345,7 +347,8 @@ export default function Products() {
                     "bg-blue-300": tempActivePriceOrder === "asc",
                     "bg-gray-300 text-white cursor-not-allowed":
                       tempActiveStockOrder !== null || tempActiveAlphabeticalOrder !== null,
-                    "cursor-pointer": tempActiveStockOrder === null && tempActiveAlphabeticalOrder === null,
+                    "cursor-pointer hover:bg-blue-300":
+                      tempActiveStockOrder === null && tempActiveAlphabeticalOrder === null,
                   })}
                   text="Menor precio"
                   disabled={tempActiveStockOrder !== null || tempActiveAlphabeticalOrder !== null}
@@ -356,7 +359,8 @@ export default function Products() {
                     "bg-blue-300": tempActivePriceOrder === "desc",
                     "bg-gray-300 text-white cursor-not-allowed":
                       tempActiveStockOrder !== null || tempActiveAlphabeticalOrder !== null,
-                    "cursor-pointer": tempActiveStockOrder === null && tempActiveAlphabeticalOrder === null,
+                    "cursor-pointer hover:bg-blue-300":
+                      tempActiveStockOrder === null && tempActiveAlphabeticalOrder === null,
                   })}
                   text="Mayor precio"
                   disabled={tempActiveStockOrder !== null || tempActiveAlphabeticalOrder !== null}
@@ -374,7 +378,7 @@ export default function Products() {
                     "bg-blue-300": tempActiveAlphabeticalOrder === "asc",
                     "bg-gray-300 text-white cursor-not-allowed":
                       tempActiveStockOrder !== null || tempActivePriceOrder !== null,
-                    "cursor-pointer": tempActiveStockOrder === null && tempActivePriceOrder === null,
+                    "cursor-pointer hover:bg-blue-300": tempActiveStockOrder === null && tempActivePriceOrder === null,
                   })}
                   text="A - Z"
                   disabled={tempActiveStockOrder !== null || tempActivePriceOrder !== null}
@@ -382,10 +386,10 @@ export default function Products() {
                 <FilteringButton
                   onClick={() => toggleTempActiveAlphabeticalOrder("desc")}
                   variantClassName={clsx({
-                    "bg-blue-300": tempActiveAlphabeticalOrder === "desc",
+                    "bg-blue-300 ": tempActiveAlphabeticalOrder === "desc",
                     "bg-gray-300 text-white cursor-not-allowed":
                       tempActiveStockOrder !== null || tempActivePriceOrder !== null,
-                    "cursor-pointer": tempActiveStockOrder === null && tempActivePriceOrder === null,
+                    "cursor-pointer hover:bg-blue-300": tempActiveStockOrder === null && tempActivePriceOrder === null,
                   })}
                   text="Z - A"
                   disabled={tempActiveStockOrder !== null || tempActivePriceOrder !== null}
