@@ -1,5 +1,7 @@
 "use client";
 
+import clsx from "clsx";
+
 import { productArray } from "../lib/data";
 import { useState, useEffect, useRef } from "react";
 import Modal from "./Modals/Modal";
@@ -310,13 +312,21 @@ export default function Products() {
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
                   onClick={() => toggleTempActiveStockOrder("asc")}
-                  variantClassName={tempActiveStockOrder === "asc" ? "bg-blue-300" : "bg-white"}
+                  variantClassName={clsx({
+                    "bg-blue-300": tempActiveStockOrder === "asc",
+                    "bg-gray-300 text-white cursor-not-allowed":
+                      tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null,
+                    "cursor-pointer": tempActivePriceOrder === null && tempActiveAlphabeticalOrder === null,
+                  })}
                   text="Menor stock"
                   disabled={tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null}
                 />
                 <FilteringButton
                   onClick={() => toggleTempActiveStockOrder("desc")}
-                  variantClassName={tempActiveStockOrder === "desc" ? "bg-blue-300" : "bg-white"}
+                  variantClassName={clsx({
+                    "bg-blue-300": tempActiveStockOrder === "desc",
+                    "bg-gray-300 text-white ": tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null,
+                  })}
                   text="Mayor stock"
                   disabled={tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null}
                 />
@@ -329,13 +339,19 @@ export default function Products() {
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
                   onClick={() => toggleTempActivePriceOrder("asc")}
-                  variantClassName={tempActivePriceOrder === "asc" ? "bg-blue-300" : "bg-white"}
+                  variantClassName={clsx({
+                    "bg-blue-300": tempActivePriceOrder === "asc",
+                    "bg-red-300 text-white": tempActiveStockOrder !== null || tempActiveAlphabeticalOrder !== null,
+                  })}
                   text="Menor precio"
                   disabled={tempActiveStockOrder !== null || tempActiveAlphabeticalOrder !== null}
                 />
                 <FilteringButton
                   onClick={() => toggleTempActivePriceOrder("desc")}
-                  variantClassName={tempActivePriceOrder === "desc" ? "bg-blue-300" : "bg-white"}
+                  variantClassName={clsx({
+                    "bg-blue-300": tempActivePriceOrder === "desc",
+                    "bg-red-300 text-white": tempActiveStockOrder !== null || tempActiveAlphabeticalOrder !== null,
+                  })}
                   text="Mayor precio"
                   disabled={tempActiveStockOrder !== null || tempActiveAlphabeticalOrder !== null}
                 />
