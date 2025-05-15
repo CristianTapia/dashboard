@@ -124,6 +124,7 @@ export default function Products() {
     setTempActiveStockOrder(null);
     setTempActiveAlphabeticalOrder(null);
     setTempSelectedCategories([]);
+    setShowCategories(true);
   }
 
   // Botones toggle de filtros
@@ -311,11 +312,13 @@ export default function Products() {
                   onClick={() => toggleTempActiveStockOrder("asc")}
                   variantClassName={tempActiveStockOrder === "asc" ? "bg-blue-300" : "bg-white"}
                   text="Menor stock"
+                  disabled={tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null}
                 />
                 <FilteringButton
                   onClick={() => toggleTempActiveStockOrder("desc")}
                   variantClassName={tempActiveStockOrder === "desc" ? "bg-blue-300" : "bg-white"}
                   text="Mayor stock"
+                  disabled={tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null}
                 />
               </div>
             }
@@ -328,11 +331,13 @@ export default function Products() {
                   onClick={() => toggleTempActivePriceOrder("asc")}
                   variantClassName={tempActivePriceOrder === "asc" ? "bg-blue-300" : "bg-white"}
                   text="Menor precio"
+                  disabled={tempActiveStockOrder !== null || tempActiveAlphabeticalOrder !== null}
                 />
                 <FilteringButton
                   onClick={() => toggleTempActivePriceOrder("desc")}
                   variantClassName={tempActivePriceOrder === "desc" ? "bg-blue-300" : "bg-white"}
                   text="Mayor precio"
+                  disabled={tempActiveStockOrder !== null || tempActiveAlphabeticalOrder !== null}
                 />
               </div>
             }
@@ -345,11 +350,13 @@ export default function Products() {
                   onClick={() => toggleTempActiveAlphabeticalOrder("asc")}
                   variantClassName={tempActiveAlphabeticalOrder === "asc" ? "bg-blue-300" : "bg-white"}
                   text="A - Z"
+                  disabled={tempActiveStockOrder !== null || tempActivePriceOrder !== null}
                 />
                 <FilteringButton
                   onClick={() => toggleTempActiveAlphabeticalOrder("desc")}
                   variantClassName={tempActiveAlphabeticalOrder === "desc" ? "bg-blue-300" : "bg-white"}
                   text="Z - A"
+                  disabled={tempActiveStockOrder !== null || tempActivePriceOrder !== null}
                 />
               </div>
             }
