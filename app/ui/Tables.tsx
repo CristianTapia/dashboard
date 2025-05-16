@@ -71,7 +71,7 @@ export default function Tables() {
           <div className="relative inline-block">
             <button
               type="button"
-              className="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
+              className=" cursor-pointer inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
               onClick={() => openModal("useFilter")}
             >
               Filtrar
