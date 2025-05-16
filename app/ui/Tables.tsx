@@ -202,8 +202,19 @@ export default function Tables() {
         onCloseAction={closeModal}
         title={`Orden de la Mesa ${selectedTable?.number ?? ""}`}
         body={
-          <div className="text-gray-900">
-            Ordenes que vienen desde la API intermendia que almacena los datos de la app menu
+          <div className="text-gray-900 flex flex-col">
+            <div className="flex items-center w-full">
+              <div className="w-1/3 p-2 flex box-border border rounded justify-center">Foto</div>
+              <div className="w-2/3">
+                <div className="text-sm ml-2">Ceviche</div>
+                <div className="text-sm ml-2">$5.000</div>
+              </div>
+              <div className="w-1/3 h-5 flex justify-center items-center text-sm ml-2 border rounded">1</div>
+            </div>
+            <div className="flex items-center w-full mt-5">
+              <div className="w-1/2">Total</div>
+              <div className="w-1/2 flex justify-end">$5.000</div>
+            </div>
           </div>
         }
         buttonBName="Cerrar"
