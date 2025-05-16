@@ -91,7 +91,10 @@ export default function Tables() {
                 onBlur={() => setTimeout(() => setOpenDropdownId(null), 100)} // Se cierra si pierdo el foco
                 className="relative"
               >
-                <button onClick={() => toggleDropdown(option.id)} className="text-white p-2 py-1 rounded">
+                <button
+                  onClick={() => toggleDropdown(option.id)}
+                  className="text-white p-2 py-1 rounded cursor-pointer"
+                >
                   ⋮
                 </button>
                 {openDropdownId === option.id && (
@@ -116,20 +119,20 @@ export default function Tables() {
               {/* ALERTAS */}
 
               {/* Alerta Atención */}
-              <div className="p-2 items-center gap-1 border rounded text-red-500 bg-red-100 animate-pulse">
+              <div className="p-2 items-center gap-1 border rounded text-red-500 bg-red-100 animate-pulse cursor-pointer">
                 <Bell size={16} />
                 <span className="text-sm">Atención</span>
               </div>
 
               {/* Alerta Cuenta */}
-              <div className="p-2 items-center gap-1 border rounded text-yellow-600 bg-yellow-100 animate-pulse">
+              <div className="p-2 items-center gap-1 border rounded text-yellow-600 bg-yellow-100 animate-pulse cursor-pointer">
                 <DollarSign size={16} />
                 <span className="text-sm">Cuenta</span>
               </div>
             </div>
             <div className="relative flex justify-center gap-4 p-4">
               <button
-                className="p-2 items-center box-border border rounded bg-gray-200 text-black"
+                className="p-2 items-center box-border border rounded bg-gray-200 text-black cursor-pointer"
                 onClick={() => {
                   openModal("reviewOrder", option.id);
                 }}
@@ -143,8 +146,8 @@ export default function Tables() {
               </span>
             </div>
             <div className="relative flex justify-center pt-4">
-              <button className="p-2 items-center box-border border rounded bg-green-200 text-black">
-                Confirmar Atención
+              <button className="p-2 items-center box-border border rounded bg-green-200 text-black cursor-pointer">
+                Liberar Mesa
               </button>
             </div>
           </div>
