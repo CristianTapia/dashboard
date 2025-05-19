@@ -1,6 +1,6 @@
 "use client";
 import { Bell, DollarSign, ClipboardList } from "lucide-react";
-import { tablesArray } from "../lib/data";
+import { tablesArray, productsInCart } from "../lib/data";
 import { useState } from "react";
 import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
