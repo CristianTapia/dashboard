@@ -207,13 +207,27 @@ export default function Tables() {
               <div className="w-1/3 p-2 flex box-border border rounded justify-center">Foto</div>
               <div className="w-2/3">
                 <div className="text-sm ml-2">{product.name}</div>
-                <div className="text-sm ml-2">{product.price}</div>
+                <div className="text-sm ml-2">
+                  {new Intl.NumberFormat("es-CL", {
+                    style: "currency",
+                    currency: "CLP",
+                    minimumFractionDigits: 0,
+                  }).format(product.price)}
+                </div>
               </div>
-              <div className="w-1/3 h-5 flex justify-center items-center text-sm ml-2 border rounded">1</div>
+              <div className="w-1/3 h-5 flex justify-center items-center text-sm ml-2 border rounded">
+                {product.quantity}
+              </div>
             </div>
             <div className="flex items-center w-full mt-5">
-              <div className="w-1/2">Total</div>
-              <div className="w-1/2 flex justify-end">$5.000</div>
+              <div className="w-1/2">Subtotal</div>
+              <div className="w-1/2 flex justify-end">
+                {new Intl.NumberFormat("es-CL", {
+                  style: "currency",
+                  currency: "CLP",
+                  minimumFractionDigits: 0,
+                }).format(product.price * product.quantity)}
+              </div>
             </div>
           </div>
         ))}

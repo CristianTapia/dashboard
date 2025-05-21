@@ -17,21 +17,21 @@ export const productArray = [
 ];
 
 export const productsInCart = [
-  { id: 1, name: "Ceviche Mixto", quantity: 10, price: 8500 },
-  { id: 2, name: "Lomo Saltado", quantity: 8, price: 9500 },
-  { id: 3, name: "Pollo a la Brasa", quantity: 12, price: 7500 },
+  { id: 1, name: "Ceviche Mixto", quantity: 2, price: 8500 },
+  { id: 2, name: "Lomo Saltado", quantity: 3, price: 9500 },
+  { id: 3, name: "Pollo a la Brasa", quantity: 4, price: 7500 },
   { id: 4, name: "Tallarines Verdes", quantity: 5, price: 6800 },
-  { id: 5, name: "Arroz Chaufa", quantity: 9, price: 7000 },
-  { id: 6, name: "Anticuchos", quantity: 7, price: 6200 },
-  { id: 7, name: "Pescado Frito", quantity: 6, price: 8000 },
-  { id: 8, name: "Papa a la Huancaína", quantity: 10, price: 4500 },
-  { id: 9, name: "Ocopa Arequipeña", quantity: 4, price: 4200 },
-  { id: 10, name: "Ají de Gallina", quantity: 11, price: 7200 },
-  { id: 11, name: "Causa Limeña", quantity: 8, price: 5000 },
-  { id: 12, name: "Chicharrón de Calamar", quantity: 5, price: 8700 },
+  { id: 5, name: "Arroz Chaufa", quantity: 1, price: 7000 },
+  { id: 6, name: "Anticuchos", quantity: 1, price: 6200 },
+  { id: 7, name: "Pescado Frito", quantity: 1, price: 8000 },
+  { id: 8, name: "Papa a la Huancaína", quantity: 3, price: 4500 },
+  { id: 9, name: "Ocopa Arequipeña", quantity: 1, price: 4200 },
+  { id: 10, name: "Ají de Gallina", quantity: 1, price: 7200 },
+  { id: 11, name: "Causa Limeña", quantity: 2, price: 5000 },
+  { id: 12, name: "Chicharrón de Calamar", quantity: 4, price: 8700 },
   { id: 13, name: "Tiradito", quantity: 3, price: 9000 },
-  { id: 14, name: "Seco de Res", quantity: 6, price: 7900 },
-  { id: 15, name: "Jalea Mixta", quantity: 4, price: 9900 },
+  { id: 14, name: "Seco de Res", quantity: 1, price: 7900 },
+  { id: 15, name: "Jalea Mixta", quantity: 2, price: 9900 },
 ];
 
 const mesaNumbers = [
