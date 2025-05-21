@@ -201,13 +201,13 @@ export default function Tables() {
         isOpen={activeModal === "reviewOrder"}
         onCloseAction={closeModal}
         title={`Orden de la Mesa ${selectedTable?.number ?? ""}`}
-        body={
-          <div className="text-gray-900 flex flex-col">
+        body={productsInCart.map((product) => (
+          <div key={product.id} className="text-gray-900 flex flex-col">
             <div className="flex items-center w-full">
               <div className="w-1/3 p-2 flex box-border border rounded justify-center">Foto</div>
               <div className="w-2/3">
-                <div className="text-sm ml-2">Ceviche</div>
-                <div className="text-sm ml-2">$5.000</div>
+                <div className="text-sm ml-2">{product.name}</div>
+                <div className="text-sm ml-2">{product.price}</div>
               </div>
               <div className="w-1/3 h-5 flex justify-center items-center text-sm ml-2 border rounded">1</div>
             </div>
@@ -216,7 +216,7 @@ export default function Tables() {
               <div className="w-1/2 flex justify-end">$5.000</div>
             </div>
           </div>
-        }
+        ))}
         buttonBName="Cerrar"
         onButtonBClickAction={closeModal}
       />
