@@ -37,7 +37,7 @@ export default function Modal({
               </button>
             </div>
             {/* Modal body */}
-            <div className="p-4">{body}</div>
+            <div className="p-4 max-h-[70vh] overflow-y-auto">{body}</div>
             {/* Modal footer */}
             <div className="pt-4 pl-4">
               {buttonAName && (

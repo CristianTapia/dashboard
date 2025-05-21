@@ -219,8 +219,18 @@ export default function Tables() {
                 {product.quantity}
               </div>
             </div>
-            <div className="flex items-center w-full mt-5">
+            <div className="flex items-center w-full mb-3 text-sm">
               <div className="w-1/2">Subtotal</div>
+              <div className="w-1/2 flex justify-end">
+                {new Intl.NumberFormat("es-CL", {
+                  style: "currency",
+                  currency: "CLP",
+                  minimumFractionDigits: 0,
+                }).format(product.price * product.quantity)}
+              </div>
+            </div>
+            <div className="flex items-center w-full mb-3 text-sm">
+              <div className="w-1/2">Total</div>
               <div className="w-1/2 flex justify-end">
                 {new Intl.NumberFormat("es-CL", {
                   style: "currency",
