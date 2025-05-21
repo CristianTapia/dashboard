@@ -17,7 +17,7 @@ export const productArray = [
 ];
 
 export const productsInCart = [
-  { id: 1, name: "Ceviche Mixto", quantity: 2, price: 8500 },
+  { id: 1, name: "Ceviche Mixto Con Tallarines", quantity: 2, price: 8500 },
   { id: 2, name: "Lomo Saltado", quantity: 3, price: 9500 },
   { id: 3, name: "Pollo a la Brasa", quantity: 4, price: 7500 },
   { id: 4, name: "Tallarines Verdes", quantity: 5, price: 6800 },

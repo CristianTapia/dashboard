@@ -215,11 +215,11 @@ export default function Tables() {
                   }).format(product.price)}
                 </div>
               </div>
-              <div className="w-1/3 h-5 flex justify-center items-center text-sm ml-2 border rounded">
+              <div className="w-1/3 h-5 flex justify-center items-center text-sm border rounded">
                 {product.quantity}
               </div>
             </div>
-            <div className="flex items-center w-full mb-3 text-sm">
+            <div className="flex items-center w-full text-sm">
               <div className="w-1/2">Subtotal</div>
               <div className="w-1/2 flex justify-end">
                 {new Intl.NumberFormat("es-CL", {
@@ -229,7 +229,8 @@ export default function Tables() {
                 }).format(product.price * product.quantity)}
               </div>
             </div>
-            <div className="flex items-center w-full mb-3 text-sm">
+            <div className="mb-2">------------------------------------------------------</div>
+            {/* <div className="flex items-center w-full mb-3 text-sm">
               <div className="w-1/2">Total</div>
               <div className="w-1/2 flex justify-end">
                 {new Intl.NumberFormat("es-CL", {
@@ -238,7 +239,7 @@ export default function Tables() {
                   minimumFractionDigits: 0,
                 }).format(product.price * product.quantity)}
               </div>
-            </div>
+            </div> */}
           </div>
         ))}
         buttonBName="Cerrar"
