@@ -5,6 +5,7 @@ export default function Modal({
   onCloseAction,
   title,
   body,
+  fixedBody,
   buttonAName,
   onButtonAClickAction,
   buttonBName,
@@ -14,6 +15,7 @@ export default function Modal({
   onCloseAction: () => void;
   title?: string;
   body?: React.ReactNode;
+  fixedBody?: React.ReactNode;
   buttonAName?: string;
   buttonBName?: string;
   onButtonAClickAction?: () => void;
@@ -38,6 +40,8 @@ export default function Modal({
             </div>
             {/* Modal body */}
             <div className="p-4 max-h-[70vh] overflow-y-auto">{body}</div>
+            {/* Body fijo */}
+            <div className="p-4">{fixedBody}</div>
             {/* Modal footer */}
             <div className="pt-4 pl-4">
               {buttonAName && (

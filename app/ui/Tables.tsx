@@ -201,47 +201,53 @@ export default function Tables() {
         isOpen={activeModal === "reviewOrder"}
         onCloseAction={closeModal}
         title={`Orden de la Mesa ${selectedTable?.number ?? ""}`}
-        body={productsInCart.map((product) => (
-          <div key={product.id} className="text-gray-900 flex flex-col">
-            <div className="flex items-center w-full">
-              <div className="w-1/3 p-2 flex box-border border rounded justify-center">Foto</div>
-              <div className="w-2/3">
-                <div className="text-sm ml-2">{product.name}</div>
-                <div className="text-sm ml-2">
-                  {new Intl.NumberFormat("es-CL", {
-                    style: "currency",
-                    currency: "CLP",
-                    minimumFractionDigits: 0,
-                  }).format(product.price)}
+        body={
+          <div className="space-y-4">
+            {productsInCart.map((product) => (
+              <div key={product.id} className="text-gray-900 flex flex-col">
+                <div className="flex items-center w-full">
+                  <div className="w-1/3 p-2 flex box-border border rounded justify-center">Foto</div>
+                  <div className="w-2/3">
+                    <div className="text-sm ml-2">{product.name}</div>
+                    <div className="text-sm ml-2">
+                      {new Intl.NumberFormat("es-CL", {
+                        style: "currency",
+                        currency: "CLP",
+                        minimumFractionDigits: 0,
+                      }).format(product.price)}
+                    </div>
+                  </div>
+                  <div className="w-1/3 h-5 flex justify-center items-center text-sm border rounded">
+                    {product.quantity}
+                  </div>
                 </div>
+                <div className="flex items-center w-full text-sm">
+                  <div className="w-1/2">Subtotal</div>
+                  <div className="w-1/2 flex justify-end">
+                    {new Intl.NumberFormat("es-CL", {
+                      style: "currency",
+                      currency: "CLP",
+                      minimumFractionDigits: 0,
+                    }).format(product.price * product.quantity)}
+                  </div>
+                </div>
+                <div className="mb-2">------------------------------------------------------</div>
               </div>
-              <div className="w-1/3 h-5 flex justify-center items-center text-sm border rounded">
-                {product.quantity}
-              </div>
-            </div>
-            <div className="flex items-center w-full text-sm">
-              <div className="w-1/2">Subtotal</div>
-              <div className="w-1/2 flex justify-end">
-                {new Intl.NumberFormat("es-CL", {
-                  style: "currency",
-                  currency: "CLP",
-                  minimumFractionDigits: 0,
-                }).format(product.price * product.quantity)}
-              </div>
-            </div>
-            <div className="mb-2">------------------------------------------------------</div>
-            {/* <div className="flex items-center w-full mb-3 text-sm">
-              <div className="w-1/2">Total</div>
-              <div className="w-1/2 flex justify-end">
-                {new Intl.NumberFormat("es-CL", {
-                  style: "currency",
-                  currency: "CLP",
-                  minimumFractionDigits: 0,
-                }).format(product.price * product.quantity)}
-              </div>
-            </div> */}
+            ))}
           </div>
-        ))}
+        }
+        fixedBody={
+          <div className="flex items-center w-full mt-3 text-sm text-gray-900">
+            <div className="w-1/2 font-semibold">Total</div>
+            <div className="w-1/2 flex justify-end font-semibold">
+              {new Intl.NumberFormat("es-CL", {
+                style: "currency",
+                currency: "CLP",
+                minimumFractionDigits: 0,
+              }).format(500000)}
+            </div>
+          </div>
+        }
         buttonBName="Cerrar"
         onButtonBClickAction={closeModal}
       />
