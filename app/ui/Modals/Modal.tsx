@@ -38,9 +38,9 @@ export default function Modal({
                 X
               </button>
             </div>
-            {/* Modal body */}
+            {/* Modal body scrolleable*/}
             <div className="p-4 max-h-[70vh] overflow-y-auto">{body}</div>
-            {/* Body fijo */}
+            {/* Model Body fijo */}
             <div className="p-4">{fixedBody}</div>
             {/* Modal footer */}
             <div className="pt-4 pl-4">
