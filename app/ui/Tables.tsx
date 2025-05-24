@@ -244,7 +244,7 @@ export default function Tables() {
                 style: "currency",
                 currency: "CLP",
                 minimumFractionDigits: 0,
-              }).format(500000)}
+              }).format(productsInCart.reduce((acc, product) => acc + product.price * product.quantity, 0))}
             </div>
           </div>
         }
