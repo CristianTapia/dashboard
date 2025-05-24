@@ -142,7 +142,7 @@ export default function Tables() {
               </button>
               {/* Circulito rojo de notificación */}
               <span className="absolute text-center top-3 right-5 block h-6 w-6 rounded-full ring-1 ring-white bg-red-500">
-                1
+                {productsInCart.reduce((acc, product) => acc + product.quantity, 0)}
               </span>
             </div>
             <div className="relative flex justify-center pt-4">
