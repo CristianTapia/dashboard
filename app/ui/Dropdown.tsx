@@ -1,28 +1,33 @@
 "use client";
 
 import { ReactNode } from "react";
+import { forwardRef } from "react";
 
-export default function Dropdown({
-  isOpen,
-  optionA,
-  optionB,
-  onOptionAClickAction,
-  onOptionBClickAction,
-  className,
-  submenu,
-}: {
-  isOpen: boolean;
-  optionA?: string;
-  optionB?: string;
-  onOptionAClickAction: () => void;
-  onOptionBClickAction: () => void;
-  className?: string;
-  submenu?: ReactNode;
-}) {
+const Dropdown = forwardRef(function Dropdown(
+  {
+    isOpen,
+    optionA,
+    optionB,
+    onOptionAClickAction,
+    onOptionBClickAction,
+    className,
+    submenu,
+  }: {
+    isOpen: boolean;
+    optionA?: string;
+    optionB?: string;
+    onOptionAClickAction: () => void;
+    onOptionBClickAction: () => void;
+    className?: string;
+    submenu?: ReactNode;
+  },
+  ref: React.ForwardedRef<HTMLDivElement>
+) {
   if (!isOpen) return null;
 
   return (
     <div
+      ref={ref}
       className={`absolute right-0 z-10 w-40 bg-white rounded-md shadow-lg border transition-all duration-200 transform opacity-100 scale-100 ${
         className ?? "top-[30px] mt-1"
       }`}
@@ -54,4 +59,6 @@ export default function Dropdown({
       </ul>
     </div>
   );
-}
+});
+
+export default Dropdown;

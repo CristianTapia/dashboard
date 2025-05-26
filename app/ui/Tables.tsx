@@ -15,6 +15,7 @@ export default function Tables() {
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
   const selectedTable = tablesArray.find((table) => table.id === selectedTableId);
 
+  // const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Búsqueda y Filtro
@@ -122,7 +123,9 @@ export default function Tables() {
                   ⋮
                 </button>
                 {openDropdownId === option.id && (
+                  // <div ref={dropdownRef}>
                   <Dropdown
+                    ref={dropdownRef}
                     isOpen={true}
                     optionA="Editar"
                     onOptionAClickAction={() => {
@@ -135,6 +138,7 @@ export default function Tables() {
                       openModal("confirmDelete", option.id);
                     }}
                   />
+                  // </div>
                 )}
               </div>
             </div>
