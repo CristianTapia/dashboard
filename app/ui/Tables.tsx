@@ -1,7 +1,7 @@
 "use client";
 import { Bell, DollarSign, ClipboardList } from "lucide-react";
 import { tablesArray, productsInCart } from "../lib/data";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
 import AddTable from "./Modals/AddTable";
@@ -14,6 +14,8 @@ export default function Tables() {
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
   const selectedTable = tablesArray.find((table) => table.id === selectedTableId);
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Búsqueda y Filtro
   const [filters, setFilters] = useState({ term: "" });
@@ -43,13 +45,39 @@ export default function Tables() {
     setActiveModal(null);
   }
   // Dropdown
-  function toggleDropdown(id?: number) {
-    if (typeof id !== "number") {
-      // setIsOpen((prev) => !prev);
-    } else {
-      setOpenDropdownId((prev) => (prev === id ? null : id));
+  // Manejo de clics fuera del dropdown
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpenDropdownId(null);
+      }
     }
-    return;
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpenDropdownId(null);
+      }
+    }
+
+    function handleScroll() {
+      setOpenDropdownId(null);
+    }
+
+    if (openDropdownId !== null) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEscape);
+      window.addEventListener("scroll", handleScroll, true);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+      window.removeEventListener("scroll", handleScroll, true);
+    };
+  }, [openDropdownId]);
+
+  function toggleDropdown(id: number) {
+    setOpenDropdownId((prev) => (prev === id ? null : id));
   }
 
   return (
@@ -86,11 +114,7 @@ export default function Tables() {
             <div className="flex justify-between items-center">
               <div className="w-32">Mesa {option.number}</div>
               {/* Contenedor con onBlur */}
-              <div
-                tabIndex={0} // Permite que onBlur funcione
-                onBlur={() => setTimeout(() => setOpenDropdownId(null), 100)} // Se cierra si pierdo el foco
-                className="relative"
-              >
+              <div className="relative">
                 <button
                   onClick={() => toggleDropdown(option.id)}
                   className="text-white p-2 py-1 rounded cursor-pointer"
