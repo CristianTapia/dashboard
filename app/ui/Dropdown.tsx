@@ -3,24 +3,18 @@
 import { ReactNode } from "react";
 import { forwardRef } from "react";
 
+type DropdownProps = {
+  isOpen: boolean;
+  optionA?: string;
+  optionB?: string;
+  onOptionAClickAction: () => void;
+  onOptionBClickAction: () => void;
+  className?: string;
+  submenu?: ReactNode;
+};
+
 const Dropdown = forwardRef(function Dropdown(
-  {
-    isOpen,
-    optionA,
-    optionB,
-    onOptionAClickAction,
-    onOptionBClickAction,
-    className,
-    submenu,
-  }: {
-    isOpen: boolean;
-    optionA?: string;
-    optionB?: string;
-    onOptionAClickAction: () => void;
-    onOptionBClickAction: () => void;
-    className?: string;
-    submenu?: ReactNode;
-  },
+  { isOpen, optionA, optionB, onOptionAClickAction, onOptionBClickAction, className, submenu }: DropdownProps,
   ref: React.ForwardedRef<HTMLDivElement>
 ) {
   if (!isOpen) return null;

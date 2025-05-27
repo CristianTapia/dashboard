@@ -50,7 +50,7 @@ export default function Tables() {
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOpenDropdownId(null);
+        setTimeout(() => setOpenDropdownId(null), 100);
       }
     }
 
@@ -115,15 +115,18 @@ export default function Tables() {
             <div className="flex justify-between items-center">
               <div className="w-32">Mesa {option.number}</div>
               {/* Contenedor con onBlur */}
+
               <div className="relative">
                 <button
-                  onClick={() => toggleDropdown(option.id)}
+                  onClick={() => {
+                    toggleDropdown(option.id);
+                    console.log("Click botón para ID", option.id);
+                  }}
                   className="text-white p-2 py-1 rounded cursor-pointer"
                 >
                   ⋮
                 </button>
                 {openDropdownId === option.id && (
-                  // <div ref={dropdownRef}>
                   <Dropdown
                     ref={dropdownRef}
                     isOpen={true}
@@ -138,7 +141,6 @@ export default function Tables() {
                       openModal("confirmDelete", option.id);
                     }}
                   />
-                  // </div>
                 )}
               </div>
             </div>
