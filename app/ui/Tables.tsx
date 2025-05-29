@@ -51,18 +51,11 @@ export default function Tables() {
   // Manejo de clics fuera del dropdown
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      // Si ignorar el click, no cerrar
-      if (buttonRef.current && ignoreClickRef.current) {
-        ignoreClickRef.current = false;
-        return;
-      }
-      console.log("Click fuera del dropdown");
-      console.log(ignoreClickRef.current);
       // Si clic fuera del dropdown y del botón, cerrar
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node) &&
-        !buttonRef.current?.contains(event.target as Node)
+        buttonRef.current?.contains(event.target as Node)
       ) {
         setOpenDropdownId(null);
       }
@@ -85,7 +78,7 @@ export default function Tables() {
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside, false);
       document.removeEventListener("keydown", handleEscape);
       window.removeEventListener("scroll", handleScroll, true);
     };
@@ -132,10 +125,10 @@ export default function Tables() {
                 <button
                   ref={buttonRef}
                   onClick={() => {
-                    ignoreClickRef.current = true;
-                    console.log(ignoreClickRef.current);
+                    // ignoreClickRef.current = true;
+                    console.log("buttonRef", buttonRef.current);
+                    console.log("ignoreClickRef", ignoreClickRef.current);
                     console.log("Click en el boton", option.id);
-                    // setOpenDropdownId(openDropdownId === option.id ? null : option.id);
                     toggleDropdown(option.id);
                   }}
                   className="text-white p-2 py-1 rounded cursor-pointer"
