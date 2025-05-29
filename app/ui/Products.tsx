@@ -45,7 +45,8 @@ export default function Products() {
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setTimeout(() => setOpenDropdownId(null), 100);
+        // setTimeout(() => setOpenDropdownId(null), 100);
+        setOpenDropdownId(null);
       }
     }
 

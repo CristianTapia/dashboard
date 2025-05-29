@@ -17,6 +17,8 @@ export default function Tables() {
 
   // const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const ignoreClickRef = useRef(false); // esta bandera evita el conflicto
 
   // Búsqueda y Filtro
   const [filters, setFilters] = useState({ term: "" });
@@ -49,8 +51,20 @@ export default function Tables() {
   // Manejo de clics fuera del dropdown
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setTimeout(() => setOpenDropdownId(null), 100);
+      // Si ignorar el click, no cerrar
+      if (buttonRef.current && ignoreClickRef.current) {
+        ignoreClickRef.current = false;
+        return;
+      }
+      console.log("Click fuera del dropdown");
+      console.log(ignoreClickRef.current);
+      // Si clic fuera del dropdown y del botón, cerrar
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        !buttonRef.current?.contains(event.target as Node)
+      ) {
+        setOpenDropdownId(null);
       }
     }
 
@@ -114,13 +128,15 @@ export default function Tables() {
           <div key={option.id} className="relative box-border border p-4 rounded shadow-md bg-gray w-[200px]">
             <div className="flex justify-between items-center">
               <div className="w-32">Mesa {option.number}</div>
-              {/* Contenedor con onBlur */}
-
               <div className="relative">
                 <button
+                  ref={buttonRef}
                   onClick={() => {
+                    ignoreClickRef.current = true;
+                    console.log(ignoreClickRef.current);
+                    console.log("Click en el boton", option.id);
+                    // setOpenDropdownId(openDropdownId === option.id ? null : option.id);
                     toggleDropdown(option.id);
-                    console.log("Click botón para ID", option.id);
                   }}
                   className="text-white p-2 py-1 rounded cursor-pointer"
                 >
@@ -144,7 +160,9 @@ export default function Tables() {
                 )}
               </div>
             </div>
+
             <div className="w-32">{option.name}</div>
+
             <div className="flex justify-center gap-4 p-4">
               {/* ALERTAS */}
 

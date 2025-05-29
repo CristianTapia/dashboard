@@ -22,8 +22,8 @@ const Dropdown = forwardRef(function Dropdown(
   return (
     <div
       ref={ref}
-      className={`absolute right-0 z-10 w-40 bg-white rounded-md shadow-lg border transition-all duration-200 transform opacity-100 scale-100 ${
-        className ?? "top-[30px] mt-1"
+      className={`absolute right-0 z-50 w-40 bg-white rounded-md shadow-lg border transition-all duration-200 transform opacity-100 scale-100 ${
+        className ?? "top-[40px] mt-1"
       }`}
     >
       <ul className="py-1">
