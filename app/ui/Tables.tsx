@@ -15,10 +15,7 @@ export default function Tables() {
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
   const selectedTable = tablesArray.find((table) => table.id === selectedTableId);
 
-  // const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const ignoreClickRef = useRef(false); // esta bandera evita el conflicto
 
   // Búsqueda y Filtro
   const [filters, setFilters] = useState({ term: "" });
@@ -51,13 +48,9 @@ export default function Tables() {
   // Manejo de clics fuera del dropdown
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      // Si clic fuera del dropdown y del botón, cerrar
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        buttonRef.current?.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setOpenDropdownId(null);
+        console.log("Clic fuera del dropdown");
       }
     }
 
@@ -85,7 +78,14 @@ export default function Tables() {
   }, [openDropdownId]);
 
   function toggleDropdown(id: number) {
-    setOpenDropdownId((prev) => (prev === id ? null : id));
+    // setOpenDropdownId((prev) => (prev === id ? null : id));
+    setOpenDropdownId((prev) => {
+      if (prev === id) {
+        return null;
+      } else {
+        return id;
+      }
+    });
   }
 
   return (
@@ -123,12 +123,7 @@ export default function Tables() {
               <div className="w-32">Mesa {option.number}</div>
               <div className="relative">
                 <button
-                  ref={buttonRef}
                   onClick={() => {
-                    // ignoreClickRef.current = true;
-                    console.log("buttonRef", buttonRef.current);
-                    console.log("ignoreClickRef", ignoreClickRef.current);
-                    console.log("Click en el boton", option.id);
                     toggleDropdown(option.id);
                   }}
                   className="text-white p-2 py-1 rounded cursor-pointer"
