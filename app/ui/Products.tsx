@@ -45,7 +45,6 @@ export default function Products() {
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        // setTimeout(() => setOpenDropdownId(null), 100);
         setOpenDropdownId(null);
       }
     }
@@ -205,12 +204,19 @@ export default function Products() {
             <div className="flex justify-between items-center">
               <div className="w-32">Producto {option.id}</div>
               <div className="relative">
-                <button
-                  onClick={() => toggleDropdown(option.id)}
-                  className="text-white p-2 py-1 rounded cursor-pointer"
-                >
-                  ⋮
-                </button>
+                {openDropdownId === option.id ? (
+                  // Simulación visual: se ve igual pero no reacciona
+                  <div className="text-white p-2 py-1 rounded cursor-pointer select-none">⋮</div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      toggleDropdown(option.id);
+                    }}
+                    className="text-white p-2 py-1 rounded cursor-pointer"
+                  >
+                    ⋮
+                  </button>
+                )}
                 {openDropdownId === option.id && (
                   <div ref={dropdownRef}>
                     <Dropdown

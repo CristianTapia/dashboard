@@ -44,7 +44,7 @@ export default function Tables() {
   function closeModal() {
     setActiveModal(null);
   }
-  // Dropdown
+
   // Manejo de clics fuera del dropdown
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
