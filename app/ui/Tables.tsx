@@ -50,7 +50,6 @@ export default function Tables() {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setOpenDropdownId(null);
-        console.log("Clic fuera del dropdown");
       }
     }
 
@@ -78,14 +77,7 @@ export default function Tables() {
   }, [openDropdownId]);
 
   function toggleDropdown(id: number) {
-    // setOpenDropdownId((prev) => (prev === id ? null : id));
-    setOpenDropdownId((prev) => {
-      if (prev === id) {
-        return null;
-      } else {
-        return id;
-      }
-    });
+    setOpenDropdownId((prev) => (prev === id ? null : id));
   }
 
   return (
@@ -129,7 +121,6 @@ export default function Tables() {
                   <button
                     onClick={() => {
                       toggleDropdown(option.id);
-                      console.log("click en el boton");
                     }}
                     className="text-white p-2 py-1 rounded cursor-pointer"
                   >
