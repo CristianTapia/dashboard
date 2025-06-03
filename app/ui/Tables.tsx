@@ -6,8 +6,12 @@ import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
 import AddTable from "./Modals/AddTable";
 import EditTable from "./Modals/EditTable";
+import Filtering from "./Modals/Filtering";
 
 export default function Tables() {
+  // Estados principales
+  const [tables] = useState(tablesArray);
+  const [sortedTables, setSortedTables] = useState(tablesArray);
   const [activeModal, setActiveModal] = useState<
     null | "addTable" | "confirmDelete" | "editTable" | "reviewOrder" | "useFilter"
   >(null);
@@ -18,19 +22,55 @@ export default function Tables() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Búsqueda y Filtro
-  const [filters, setFilters] = useState({ term: "" });
+  const [search, setSearch] = useState({ term: "" });
+  const [activeAlphabeticalOrder, setActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
+
+  // Estados temporales para los filtros
+  const [tempActiveAlphabeticalOrder, setTempActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
 
   // Búsqueda y Filtro
-  let filtered = [...tablesArray];
+  // let filtered = [...tablesArray];
 
-  if (filters.term.trim() !== "") {
-    filtered = filtered.filter((table) => {
-      const term = filters.term.toLowerCase();
-      return table.name.toLowerCase().includes(term) || table.number.toString().includes(term);
+  // if (filters.term.trim() !== "") {
+  //   filtered = filtered.filter((table) => {
+  //     const term = filters.term.toLowerCase();
+  //     return table.name.toLowerCase().includes(term) || table.number.toString().includes(term);
+  //   });
+  // }
+
+  useEffect(() => {
+    let filtered = [...tablesArray];
+
+    // Filtro por búsqueda
+    if (search.term.trim() !== "") {
+      const normalize = (str: string) =>
+        str
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase();
+
+      const term = normalize(search.term);
+      filtered = filtered.filter(
+        (product) => normalize(product.name).includes(term) || product.stock.toString().includes(term)
+      );
+    }
+
+    // Ordenamiento combinado según prioridad
+    filtered.sort((a, b) => {
+      // 1. Orden alfabético
+      if (activeAlphabeticalOrder) {
+        const result = a.name.localeCompare(b.name);
+        if (result !== 0) return activeAlphabeticalOrder === "asc" ? result : -result;
+      }
+      return 0;
     });
-  }
 
-  const showTables = filtered;
+    setSortedTables(filtered);
+  }, [search.term, activeAlphabeticalOrder]);
+
+  function resetFilters() {
+    setTempActiveAlphabeticalOrder(null);
+  }
 
   // Modal
   function openModal(
@@ -90,9 +130,9 @@ export default function Tables() {
           className="border-1 p-2 rounded"
           type="text"
           placeholder="Buscar Mesa"
-          value={filters.term}
+          value={search.term}
           onChange={(e) => {
-            setFilters((prev) => ({ ...prev, term: e.target.value }));
+            setSearch((prev) => ({ ...prev, term: e.target.value }));
           }}
         />
         <div className="relative inline-block">
@@ -109,7 +149,7 @@ export default function Tables() {
       </div>
 
       <div className="flex flex-wrap gap-8 justify-center">
-        {showTables.map((option) => (
+        {sortedTables.map((option) => (
           <div key={option.id} className="relative box-border border p-4 rounded shadow-md bg-gray w-[200px]">
             <div className="flex justify-between items-center">
               <div className="w-32">Mesa {option.number}</div>
@@ -290,7 +330,7 @@ export default function Tables() {
         isOpen={activeModal === "useFilter"}
         onCloseAction={closeModal}
         title="Filtrar"
-        body={<div className="text-gray-900">Falta colocar los filtros</div>}
+        body={<Filtering onResetFiltersClickAction={resetFilters} />}
         buttonAName="Aplicar"
         onButtonAClickAction={() => {}}
         buttonBName="Cancelar"

@@ -1,17 +1,17 @@
 type FilteringProps = {
   category?: React.ReactNode;
-  showHideCategoryButton: string;
-  onShowHideCategoryClickAction: () => void;
+  showHideCategoryButton?: string;
+  onShowHideCategoryClickAction?: () => void;
   stock?: React.ReactNode;
-  showHideStockButton: string;
-  onShowHideStockClickAction: () => void;
+  showHideStockButton?: string;
+  onShowHideStockClickAction?: () => void;
   price?: React.ReactNode;
-  showHidePriceButton: string;
-  onShowHidePriceClickAction: () => void;
+  showHidePriceButton?: string;
+  onShowHidePriceClickAction?: () => void;
   alphabetical?: React.ReactNode;
-  showHideAlphabeticalButton: string;
-  onShowHideAlphabeticalClickAction: () => void;
-  onResetFiltersClickAction: () => void;
+  showHideAlphabeticalButton?: string;
+  onShowHideAlphabeticalClickAction?: () => void;
+  onResetFiltersClickAction?: () => void;
 };
 
 export default function Filtering({
