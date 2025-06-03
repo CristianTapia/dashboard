@@ -29,15 +29,6 @@ export default function Tables() {
   const [tempActiveAlphabeticalOrder, setTempActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
 
   // Búsqueda y Filtro
-  // let filtered = [...tablesArray];
-
-  // if (filters.term.trim() !== "") {
-  //   filtered = filtered.filter((table) => {
-  //     const term = filters.term.toLowerCase();
-  //     return table.name.toLowerCase().includes(term) || table.number.toString().includes(term);
-  //   });
-  // }
-
   useEffect(() => {
     let filtered = [...tablesArray];
 
