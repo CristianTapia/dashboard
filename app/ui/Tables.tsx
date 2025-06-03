@@ -122,14 +122,20 @@ export default function Tables() {
             <div className="flex justify-between items-center">
               <div className="w-32">Mesa {option.number}</div>
               <div className="relative">
-                <button
-                  onClick={() => {
-                    toggleDropdown(option.id);
-                  }}
-                  className="text-white p-2 py-1 rounded cursor-pointer"
-                >
-                  ⋮
-                </button>
+                {openDropdownId === option.id ? (
+                  // Simulación visual: se ve igual pero no reacciona
+                  <div className="text-white p-2 py-1 rounded cursor-pointer select-none">⋮</div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      toggleDropdown(option.id);
+                      console.log("click en el boton");
+                    }}
+                    className="text-white p-2 py-1 rounded cursor-pointer"
+                  >
+                    ⋮
+                  </button>
+                )}
                 {openDropdownId === option.id && (
                   <Dropdown
                     ref={dropdownRef}
