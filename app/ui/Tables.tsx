@@ -76,20 +76,20 @@ export default function Tables() {
     setActiveModal(null);
   }
 
-  // Manejo de clics fuera del dropdown
   useEffect(() => {
+    // Manejo de clics fuera del dropdown
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setOpenDropdownId(null);
       }
     }
-
+    // Manejo de escape para cerrar el dropdown
     function handleEscape(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setOpenDropdownId(null);
       }
     }
-
+    // Manejo de scroll para cerrar el dropdown
     function handleScroll() {
       setOpenDropdownId(null);
     }
