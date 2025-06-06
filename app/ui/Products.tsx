@@ -48,13 +48,13 @@ export default function Products() {
         setOpenDropdownId(null);
       }
     }
-
+    // Manejo de escape para cerrar el dropdown
     function handleEscape(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setOpenDropdownId(null);
       }
     }
-
+    // Manejo de scroll para cerrar el dropdown
     function handleScroll() {
       setOpenDropdownId(null);
     }
