@@ -1,4 +1,7 @@
 "use client";
+
+// import clsx from "clsx";
+
 import { Bell, DollarSign, ClipboardList } from "lucide-react";
 import { tablesArray, productsInCart } from "../lib/data";
 import { useState, useEffect, useRef } from "react";
@@ -7,6 +10,7 @@ import Dropdown from "./Dropdown";
 import AddTable from "./Modals/AddTable";
 import EditTable from "./Modals/EditTable";
 import Filtering from "./Modals/Filtering";
+import FilteringButton from "./Modals/FilteringButton";
 
 export default function Tables() {
   // Estados principales
@@ -24,7 +28,6 @@ export default function Tables() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Filtros
-
   const [activeAlphabeticalOrder, setActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
 
   // Estados temporales para los filtros
@@ -32,7 +35,7 @@ export default function Tables() {
 
   // Búsqueda y Filtro
   useEffect(() => {
-    let filtered = [...tablesArray];
+    let filtered = [...tables];
 
     // Filtro por búsqueda
     if (search.term.trim() !== "") {
@@ -43,9 +46,7 @@ export default function Tables() {
           .toLowerCase();
 
       const term = normalize(search.term);
-      filtered = filtered.filter(
-        (product) => normalize(product.name).includes(term) || product.stock.toString().includes(term)
-      );
+      filtered = filtered.filter((table) => normalize(table.name).includes(term));
     }
 
     // Ordenamiento combinado según prioridad
@@ -65,6 +66,11 @@ export default function Tables() {
     setTempActiveAlphabeticalOrder(null);
   }
 
+  // Botones toggle de filtros
+  function toggleTempActiveAlphabeticalOrder(value: "asc" | "desc") {
+    setTempActiveAlphabeticalOrder((prev) => (prev === value ? null : value));
+  }
+
   // Modal
   function openModal(
     modalName: "addTable" | "confirmDelete" | "editTable" | "reviewOrder" | "useFilter",
@@ -72,10 +78,18 @@ export default function Tables() {
   ) {
     setActiveModal(modalName);
     setSelectedTableId(tableId ?? null);
+
+    if (modalName === "useFilter") {
+      setTempActiveAlphabeticalOrder(activeAlphabeticalOrder);
+    }
   }
 
   function closeModal() {
     setActiveModal(null);
+  }
+
+  function toggleDropdown(id: number) {
+    setOpenDropdownId((prev) => (prev === id ? null : id));
   }
 
   useEffect(() => {
@@ -108,10 +122,6 @@ export default function Tables() {
       window.removeEventListener("scroll", handleScroll, true);
     };
   }, [openDropdownId]);
-
-  function toggleDropdown(id: number) {
-    setOpenDropdownId((prev) => (prev === id ? null : id));
-  }
 
   return (
     <div className="flex flex-col">
@@ -323,9 +333,45 @@ export default function Tables() {
         isOpen={activeModal === "useFilter"}
         onCloseAction={closeModal}
         title="Filtrar"
-        body={<Filtering onResetFiltersClickAction={resetFilters} />}
-        buttonAName="Aplicar"
-        onButtonAClickAction={() => {}}
+        body={
+          <Filtering
+            onResetFiltersClickAction={resetFilters}
+            // ORDEN ALFABÉTICO
+            onShowHideAlphabeticalClickAction={() => null}
+            showHideAlphabeticalButton="Ordenar Alfabéticamente"
+            alphabetical={
+              <div className="text-gray-900 flex text-sm gap-1">
+                <FilteringButton
+                  onClick={() => toggleTempActiveAlphabeticalOrder("asc")}
+                  // variantClassName={clsx({
+                  //   "bg-blue-300": tempActiveAlphabeticalOrder === "asc",
+                  //   "bg-gray-300 text-white cursor-not-allowed":
+                  //     tempActiveStockOrder !== null || tempActivePriceOrder !== null,
+                  //   "cursor-pointer hover:bg-blue-300": tempActiveStockOrder === null && tempActivePriceOrder === null,
+                  // })}
+                  text="A - Z"
+                  // disabled={tempActiveStockOrder !== null || tempActivePriceOrder !== null}
+                />
+                <FilteringButton
+                  onClick={() => toggleTempActiveAlphabeticalOrder("desc")}
+                  // variantClassName={clsx({
+                  //   "bg-blue-300 ": tempActiveAlphabeticalOrder === "desc",
+                  //   "bg-gray-300 text-white cursor-not-allowed":
+                  //     tempActiveStockOrder !== null || tempActivePriceOrder !== null,
+                  //   "cursor-pointer hover:bg-blue-300": tempActiveStockOrder === null && tempActivePriceOrder === null,
+                  // })}
+                  text="Z - A"
+                  // disabled={tempActiveStockOrder !== null || tempActivePriceOrder !== null}
+                />
+              </div>
+            }
+          />
+        }
+        buttonAName="Aplicar Filtros"
+        onButtonAClickAction={() => {
+          setActiveAlphabeticalOrder(tempActiveAlphabeticalOrder);
+          closeModal();
+        }}
         buttonBName="Cancelar"
         onButtonBClickAction={closeModal}
       />

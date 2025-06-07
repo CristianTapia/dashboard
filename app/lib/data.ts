@@ -39,10 +39,28 @@ const mesaNumbers = [
   75, 78, 80, 83, 85, 88, 90, 93, 95, 98, 100, 103, 105, 108, 110, 113, 115, 118, 120, 123,
 ];
 
+const mesaNames = [
+  "Sol",
+  "Luna",
+  "Mar",
+  "Cielo",
+  "Bosque",
+  "Río",
+  "Montaña",
+  "Arena",
+  "Estrella",
+  "Nube",
+  "Fuego",
+  "Brisa",
+  "Trueno",
+  "Rocío",
+  "Aurora",
+];
+
 export const tablesArray = mesaNumbers.map((num, index) => ({
   id: index + 1,
   number: num,
-  name: `Mesa ${num}`,
+  name: `${mesaNames[index % mesaNames.length]}`,
   category: index % 2 === 0 ? "Interior" : "Terraza",
   stock: ["Bajo", "Medio", "Alto"][index % 3],
 }));

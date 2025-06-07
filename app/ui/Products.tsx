@@ -41,37 +41,6 @@ export default function Products() {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Manejo de clics fuera del dropdown
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOpenDropdownId(null);
-      }
-    }
-    // Manejo de escape para cerrar el dropdown
-    function handleEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setOpenDropdownId(null);
-      }
-    }
-    // Manejo de scroll para cerrar el dropdown
-    function handleScroll() {
-      setOpenDropdownId(null);
-    }
-
-    if (openDropdownId !== null) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleEscape);
-      window.addEventListener("scroll", handleScroll, true);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscape);
-      window.removeEventListener("scroll", handleScroll, true);
-    };
-  }, [openDropdownId]);
-
   // FILTROS
   useEffect(() => {
     let filtered = [...products];
@@ -155,6 +124,12 @@ export default function Products() {
     }
   }
 
+  const handleTempCategoryChange = (category: string) => {
+    setTempSelectedCategories((prevSelected) =>
+      prevSelected.includes(category) ? prevSelected.filter((item) => item !== category) : [...prevSelected, category]
+    );
+  };
+
   function closeModal() {
     setActiveModal(null);
   }
@@ -163,11 +138,36 @@ export default function Products() {
     setOpenDropdownId((prev) => (prev === id ? null : id));
   }
 
-  const handleTempCategoryChange = (category: string) => {
-    setTempSelectedCategories((prevSelected) =>
-      prevSelected.includes(category) ? prevSelected.filter((item) => item !== category) : [...prevSelected, category]
-    );
-  };
+  // Manejo de clics fuera del dropdown
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpenDropdownId(null);
+      }
+    }
+    // Manejo de escape para cerrar el dropdown
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpenDropdownId(null);
+      }
+    }
+    // Manejo de scroll para cerrar el dropdown
+    function handleScroll() {
+      setOpenDropdownId(null);
+    }
+
+    if (openDropdownId !== null) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEscape);
+      window.addEventListener("scroll", handleScroll, true);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+      window.removeEventListener("scroll", handleScroll, true);
+    };
+  }, [openDropdownId]);
 
   // Renderizado
   return (
