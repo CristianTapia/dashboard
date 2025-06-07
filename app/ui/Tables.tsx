@@ -60,7 +60,7 @@ export default function Tables() {
     });
 
     setSortedTables(filtered);
-  }, [search.term, activeAlphabeticalOrder]);
+  }, [tables, search.term, activeAlphabeticalOrder]);
 
   function resetFilters() {
     setTempActiveAlphabeticalOrder(null);
