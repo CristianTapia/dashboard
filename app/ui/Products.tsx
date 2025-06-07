@@ -415,9 +415,7 @@ export default function Products() {
           closeModal();
         }}
         buttonBName="Cancelar"
-        onButtonBClickAction={() => {
-          closeModal();
-        }}
+        onButtonBClickAction={closeModal}
       />
     </div>
   );

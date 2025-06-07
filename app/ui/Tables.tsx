@@ -31,6 +31,7 @@ export default function Tables() {
   const [activeAlphabeticalOrder, setActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
 
   // Estados temporales para los filtros
+  const [tempActiveAttention, setTempActiveAttention] = useState<"yes" | "no" | null>(null);
   const [tempActiveAlphabeticalOrder, setTempActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
 
   // Búsqueda y Filtro
@@ -64,11 +65,16 @@ export default function Tables() {
 
   function resetFilters() {
     setTempActiveAlphabeticalOrder(null);
+    setTempActiveAttention(null);
   }
 
   // Botones toggle de filtros
   function toggleTempActiveAlphabeticalOrder(value: "asc" | "desc") {
     setTempActiveAlphabeticalOrder((prev) => (prev === value ? null : value));
+  }
+
+  function toggleTempActiveAttention(value: "yes" | "no") {
+    setTempActiveAttention((prev) => (prev === value ? null : value));
   }
 
   // Modal
@@ -336,6 +342,37 @@ export default function Tables() {
         body={
           <Filtering
             onResetFiltersClickAction={resetFilters}
+            // ORDEN POR STOCK
+            onShowHideStockClickAction={() => null}
+            showHideStockButton="Ordenar por notificación de atención"
+            stock={
+              <div className="text-gray-900 flex text-sm gap-1">
+                <FilteringButton
+                  onClick={() => toggleTempActiveAttention("no")}
+                  // variantClassName={clsx({
+                  //   "bg-blue-300": tempActiveStockOrder === "asc",
+                  //   "bg-gray-300 text-white cursor-not-allowed":
+                  //     tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null,
+                  //   "cursor-pointer hover:bg-blue-300":
+                  //     tempActivePriceOrder === null && tempActiveAlphabeticalOrder === null,
+                  // })}
+                  text="Sin notificación"
+                  // disabled={tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null}
+                />
+                <FilteringButton
+                  onClick={() => toggleTempActiveAttention("yes")}
+                  // variantClassName={clsx({
+                  //   "bg-blue-300": tempActiveStockOrder === "desc",
+                  //   "bg-gray-300 text-white cursor-not-allowed":
+                  //     tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null,
+                  //   "cursor-pointer hover:bg-blue-300":
+                  //     tempActivePriceOrder === null && tempActiveAlphabeticalOrder === null,
+                  // })}
+                  text="Con notificación"
+                  // disabled={tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null}
+                />
+              </div>
+            }
             // ORDEN ALFABÉTICO
             onShowHideAlphabeticalClickAction={() => null}
             showHideAlphabeticalButton="Ordenar Alfabéticamente"
