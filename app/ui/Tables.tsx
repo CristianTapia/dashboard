@@ -12,6 +12,8 @@ export default function Tables() {
   // Estados principales
   const [tables] = useState(tablesArray);
   const [sortedTables, setSortedTables] = useState(tablesArray);
+  const [search, setSearch] = useState({ term: "" });
+
   const [activeModal, setActiveModal] = useState<
     null | "addTable" | "confirmDelete" | "editTable" | "reviewOrder" | "useFilter"
   >(null);
@@ -21,8 +23,8 @@ export default function Tables() {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Búsqueda y Filtro
-  const [search, setSearch] = useState({ term: "" });
+  // Filtros
+
   const [activeAlphabeticalOrder, setActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
 
   // Estados temporales para los filtros
