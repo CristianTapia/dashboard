@@ -1,6 +1,6 @@
 "use client";
 
-// import clsx from "clsx";
+import clsx from "clsx";
 
 import { Bell, DollarSign, ClipboardList } from "lucide-react";
 import { tablesArray, productsInCart } from "../lib/data";
@@ -199,12 +199,18 @@ export default function Tables() {
 
             <div className="flex justify-center gap-4 p-4">
               {/* ALERTAS */}
-
               {/* Alerta Atención */}
-              <div className="p-2 items-center gap-1 border rounded text-red-500 bg-red-100 animate-pulse cursor-pointer">
-                <Bell size={16} />
-                <span className="text-sm">Atención</span>
-              </div>
+              {
+                <div
+                  className={clsx(
+                    "p-2 items-center gap-1 border rounded text-red-500 bg-red-100 flex",
+                    option.attention === 1 ? "animate-pulse cursor-pointer" : ""
+                  )}
+                >
+                  <Bell size={16} />
+                  <span className="text-sm">Atención</span>
+                </div>
+              }
 
               {/* Alerta Cuenta */}
               <div className="p-2 items-center gap-1 border rounded text-yellow-600 bg-yellow-100 animate-pulse cursor-pointer">
