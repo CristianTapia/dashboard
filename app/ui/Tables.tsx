@@ -213,7 +213,12 @@ export default function Tables() {
               }
 
               {/* Alerta Cuenta */}
-              <div className="p-2 items-center gap-1 border rounded text-yellow-600 bg-yellow-100 animate-pulse cursor-pointer">
+              <div
+                className={clsx(
+                  "p-2 items-center gap-1 border rounded text-yellow-600 bg-yellow-100 flex",
+                  option.check === 1 ? "animate-pulse cursor-pointer" : ""
+                )}
+              >
                 <DollarSign size={16} />
                 <span className="text-sm">Cuenta</span>
               </div>
