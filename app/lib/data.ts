@@ -61,7 +61,7 @@ export const tablesArray = mesaNumbers.map((num, index) => ({
   id: index + 1,
   number: num,
   name: `${mesaNames[index % mesaNames.length]}`,
-  category: index % 2 === 0 ? "Interior" : "Terraza",
   stock: ["Bajo", "Medio", "Alto"][index % 3],
-  attention: Math.random() < 0.5 ? 0 : 1, // 50% chance
+  attention: index % 2 === 0 ? 1 : 0,
+  check: index % 2 === 0 ? 1 : 0,
 }));
