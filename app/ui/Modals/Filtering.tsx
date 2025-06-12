@@ -52,7 +52,7 @@ export default function Filtering({
         </button>
         {price}
       </div>
-      <div className="text-gray-900 mt-2 mb-2 cursor-pointer">
+      <div className="text-gray-900 mt-2 mb-2">
         <button className="text-sm text-blue-600 underline mb-2" onClick={onShowHideAlphabeticalClickAction}>
           {showHideAlphabeticalButton}
         </button>

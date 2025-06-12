@@ -28,11 +28,11 @@ export default function Tables() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Filtros
-  const [activeAttentionOrder, setActiveAttentionOrder] = useState<"yes" | "no" | null>(null);
+  const [activeAssistanceOrder, setActiveAssistanceOrder] = useState<"yes" | "no" | null>(null);
   const [activeAlphabeticalOrder, setActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
 
   // Estados temporales para los filtros
-  const [tempActiveAttentionOrder, setTempActiveAttentionOrder] = useState<"yes" | "no" | null>(null);
+  const [tempActiveAssistanceOrder, setTempActiveAssistanceOrder] = useState<"yes" | "no" | null>(null);
   const [tempActiveAlphabeticalOrder, setTempActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
 
   // Búsqueda y Filtro
@@ -60,19 +60,19 @@ export default function Tables() {
       }
 
       // 1. Atención primero
-      if (activeAttentionOrder) {
-        const result = a.attention - b.attention;
-        if (result !== 0) return activeAttentionOrder === "no" ? result : -result;
+      if (activeAssistanceOrder) {
+        const result = a.assistance - b.assistance;
+        if (result !== 0) return activeAssistanceOrder === "no" ? result : -result;
       }
       return 0;
     });
 
     setSortedTables(filtered);
-  }, [tables, search.term, activeAlphabeticalOrder, activeAttentionOrder]);
+  }, [tables, search.term, activeAlphabeticalOrder, activeAssistanceOrder]);
 
   function resetFilters() {
     setTempActiveAlphabeticalOrder(null);
-    setTempActiveAttentionOrder(null);
+    setTempActiveAssistanceOrder(null);
   }
 
   // Botones toggle de filtros
@@ -80,8 +80,8 @@ export default function Tables() {
     setTempActiveAlphabeticalOrder((prev) => (prev === value ? null : value));
   }
 
-  function toggleTempActiveAttention(value: "yes" | "no") {
-    setTempActiveAttentionOrder((prev) => (prev === value ? null : value));
+  function toggleTempActiveAssistanceOrder(value: "yes" | "no") {
+    setTempActiveAssistanceOrder((prev) => (prev === value ? null : value));
   }
 
   // Modal
@@ -211,7 +211,7 @@ export default function Tables() {
                 <div
                   className={clsx(
                     "p-2 items-center gap-1 border rounded text-red-500 bg-red-100 flex",
-                    option.attention === 1 ? "animate-pulse cursor-pointer" : ""
+                    option.assistance === 1 ? "animate-pulse cursor-pointer" : ""
                   )}
                 >
                   <Bell size={16} />
@@ -366,9 +366,9 @@ export default function Tables() {
             stock={
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
-                  onClick={() => toggleTempActiveAttention("yes")}
+                  onClick={() => toggleTempActiveAssistanceOrder("yes")}
                   variantClassName={clsx({
-                    "bg-blue-300": tempActiveAttentionOrder === "yes",
+                    "bg-blue-300": tempActiveAssistanceOrder === "yes",
                     "bg-gray-300 text-white cursor-not-allowed": tempActiveAlphabeticalOrder !== null,
                     "cursor-pointer": tempActiveAlphabeticalOrder === null,
                   })}
@@ -376,9 +376,9 @@ export default function Tables() {
                   disabled={tempActiveAlphabeticalOrder !== null}
                 />
                 <FilteringButton
-                  onClick={() => toggleTempActiveAttention("no")}
+                  onClick={() => toggleTempActiveAssistanceOrder("no")}
                   variantClassName={clsx({
-                    "bg-blue-300": tempActiveAttentionOrder === "no",
+                    "bg-blue-300": tempActiveAssistanceOrder === "no",
                     "bg-gray-300 text-white cursor-not-allowed":
                       tempActiveAlphabeticalOrder !== null || tempActiveAlphabeticalOrder !== null,
                     "cursor-pointer hover:bg-blue-300":
@@ -399,24 +399,24 @@ export default function Tables() {
                   variantClassName={clsx({
                     "bg-blue-300": tempActiveAlphabeticalOrder === "asc",
                     "bg-gray-300 text-white cursor-not-allowed":
-                      // tempActiveAttentionOrder !== null || tempActivePriceOrder !== null,
-                      tempActiveAttentionOrder !== null,
+                      // tempActiveAssistanceOrder !== null || tempActivePriceOrder !== null,
+                      tempActiveAssistanceOrder !== null,
                     // "cursor-pointer hover:bg-blue-300": tempActiveStockOrder === null && tempActivePriceOrder === null,
-                    "cursor-pointer": tempActiveAttentionOrder === null,
+                    "cursor-pointer": tempActiveAssistanceOrder === null,
                   })}
                   text="A - Z"
                   // disabled={tempActiveStockOrder !== null || tempActivePriceOrder !== null}
-                  disabled={tempActiveAttentionOrder !== null}
+                  disabled={tempActiveAssistanceOrder !== null}
                 />
                 <FilteringButton
                   onClick={() => toggleTempActiveAlphabeticalOrder("desc")}
                   variantClassName={clsx({
                     "bg-blue-300 ": tempActiveAlphabeticalOrder === "desc",
-                    "bg-gray-300 text-white cursor-not-allowed": tempActiveAttentionOrder !== null,
-                    "cursor-pointer": tempActiveAttentionOrder === null,
+                    "bg-gray-300 text-white cursor-not-allowed": tempActiveAssistanceOrder !== null,
+                    "cursor-pointer": tempActiveAssistanceOrder === null,
                   })}
                   text="Z - A"
-                  disabled={tempActiveAttentionOrder !== null}
+                  disabled={tempActiveAssistanceOrder !== null}
                 />
               </div>
             }
@@ -424,7 +424,7 @@ export default function Tables() {
         }
         buttonAName="Aplicar Filtros"
         onButtonAClickAction={() => {
-          setActiveAttentionOrder(tempActiveAttentionOrder);
+          setActiveAssistanceOrder(tempActiveAssistanceOrder);
           setActiveAlphabeticalOrder(tempActiveAlphabeticalOrder);
           closeModal();
         }}

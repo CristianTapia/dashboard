@@ -62,6 +62,6 @@ export const tablesArray = mesaNumbers.map((num, index) => ({
   number: num,
   name: `${mesaNames[index % mesaNames.length]}`,
   stock: ["Bajo", "Medio", "Alto"][index % 3],
-  attention: index % 2 === 0 ? 1 : 0,
+  assistance: index % 2 === 0 ? 1 : 0,
   check: index % 2 === 0 ? 0 : 1,
 }));
