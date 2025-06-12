@@ -393,26 +393,26 @@ export default function Tables() {
                 <FilteringButton
                   onClick={() => toggleTempActiveAlphabeticalOrder("asc")}
                   variantClassName={clsx({
-                    "bg-blue-600": tempActiveAlphabeticalOrder === "asc",
+                    "bg-blue-300": tempActiveAlphabeticalOrder === "asc",
                     "bg-gray-300 text-white cursor-not-allowed":
                       // tempActiveAttentionOrder !== null || tempActivePriceOrder !== null,
                       tempActiveAttentionOrder !== null,
                     // "cursor-pointer hover:bg-blue-300": tempActiveStockOrder === null && tempActivePriceOrder === null,
-                    "cursor-pointer hover:bg-blue-300": tempActiveAttentionOrder === null,
+                    "cursor-pointer": tempActiveAttentionOrder === null,
                   })}
                   text="A - Z"
                   // disabled={tempActiveStockOrder !== null || tempActivePriceOrder !== null}
+                  disabled={tempActiveAttentionOrder !== null}
                 />
                 <FilteringButton
                   onClick={() => toggleTempActiveAlphabeticalOrder("desc")}
-                  // variantClassName={clsx({
-                  //   "bg-blue-300 ": tempActiveAlphabeticalOrder === "desc",
-                  //   "bg-gray-300 text-white cursor-not-allowed":
-                  //     tempActiveStockOrder !== null || tempActivePriceOrder !== null,
-                  //   "cursor-pointer hover:bg-blue-300": tempActiveStockOrder === null && tempActivePriceOrder === null,
-                  // })}
+                  variantClassName={clsx({
+                    "bg-blue-300 ": tempActiveAlphabeticalOrder === "desc",
+                    "bg-gray-300 text-white cursor-not-allowed": tempActiveAttentionOrder !== null,
+                    "cursor-pointer": tempActiveAttentionOrder === null,
+                  })}
                   text="Z - A"
-                  // disabled={tempActiveStockOrder !== null || tempActivePriceOrder !== null}
+                  disabled={tempActiveAttentionOrder !== null}
                 />
               </div>
             }
