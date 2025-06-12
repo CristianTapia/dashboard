@@ -58,11 +58,17 @@ export default function Tables() {
         const result = a.name.localeCompare(b.name);
         if (result !== 0) return activeAlphabeticalOrder === "asc" ? result : -result;
       }
+
+      // 1. Atención primero
+      if (activeAttentionOrder) {
+        const result = a.attention - b.attention;
+        if (result !== 0) return activeAttentionOrder === "no" ? result : -result;
+      }
       return 0;
     });
 
     setSortedTables(filtered);
-  }, [tables, search.term, activeAlphabeticalOrder]);
+  }, [tables, search.term, activeAlphabeticalOrder, activeAttentionOrder]);
 
   function resetFilters() {
     setTempActiveAlphabeticalOrder(null);
@@ -354,34 +360,32 @@ export default function Tables() {
         body={
           <Filtering
             onResetFiltersClickAction={resetFilters}
-            // ORDEN POR STOCK
+            // ORDEN POR ATENCIÓN
             onShowHideStockClickAction={() => null}
             showHideStockButton="Ordenar por Atención"
             stock={
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
-                  onClick={() => toggleTempActiveAttention("no")}
-                  // variantClassName={clsx({
-                  //   "bg-blue-300": tempActiveStockOrder === "asc",
-                  //   "bg-gray-300 text-white cursor-not-allowed":
-                  //     tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null,
-                  //   "cursor-pointer hover:bg-blue-300":
-                  //     tempActivePriceOrder === null && tempActiveAlphabeticalOrder === null,
-                  // })}
-                  text="Sin notificación"
-                  // disabled={tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null}
-                />
-                <FilteringButton
                   onClick={() => toggleTempActiveAttention("yes")}
                   variantClassName={clsx({
                     "bg-blue-300": tempActiveAttentionOrder === "yes",
+                    "bg-gray-300 text-white cursor-not-allowed": tempActiveAlphabeticalOrder !== null,
+                    "cursor-pointer": tempActiveAlphabeticalOrder === null,
+                  })}
+                  text="Atención"
+                  disabled={tempActiveAlphabeticalOrder !== null}
+                />
+                <FilteringButton
+                  onClick={() => toggleTempActiveAttention("no")}
+                  variantClassName={clsx({
+                    "bg-blue-300": tempActiveAttentionOrder === "no",
                     "bg-gray-300 text-white cursor-not-allowed":
                       tempActiveAlphabeticalOrder !== null || tempActiveAlphabeticalOrder !== null,
                     "cursor-pointer hover:bg-blue-300":
                       tempActiveAlphabeticalOrder === null && tempActiveAlphabeticalOrder === null,
                   })}
-                  text="Con notificación"
-                  // disabled={tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null}
+                  text="No Atención"
+                  disabled={tempActiveAlphabeticalOrder !== null}
                 />
               </div>
             }
