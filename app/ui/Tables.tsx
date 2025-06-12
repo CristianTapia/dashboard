@@ -28,10 +28,11 @@ export default function Tables() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Filtros
+  const [activeAttentionOrder, setActiveAttentionOrder] = useState<"yes" | "no" | null>(null);
   const [activeAlphabeticalOrder, setActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
 
   // Estados temporales para los filtros
-  const [tempActiveAttention, setTempActiveAttention] = useState<"yes" | "no" | null>(null);
+  const [tempActiveAttentionOrder, setTempActiveAttentionOrder] = useState<"yes" | "no" | null>(null);
   const [tempActiveAlphabeticalOrder, setTempActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
 
   // Búsqueda y Filtro
@@ -65,7 +66,7 @@ export default function Tables() {
 
   function resetFilters() {
     setTempActiveAlphabeticalOrder(null);
-    setTempActiveAttention(null);
+    setTempActiveAttentionOrder(null);
   }
 
   // Botones toggle de filtros
@@ -74,7 +75,7 @@ export default function Tables() {
   }
 
   function toggleTempActiveAttention(value: "yes" | "no") {
-    setTempActiveAttention((prev) => (prev === value ? null : value));
+    setTempActiveAttentionOrder((prev) => (prev === value ? null : value));
   }
 
   // Modal
@@ -355,7 +356,7 @@ export default function Tables() {
             onResetFiltersClickAction={resetFilters}
             // ORDEN POR STOCK
             onShowHideStockClickAction={() => null}
-            showHideStockButton="Ordenar por notificación de atención"
+            showHideStockButton="Ordenar por Atención"
             stock={
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
@@ -372,13 +373,13 @@ export default function Tables() {
                 />
                 <FilteringButton
                   onClick={() => toggleTempActiveAttention("yes")}
-                  // variantClassName={clsx({
-                  //   "bg-blue-300": tempActiveStockOrder === "desc",
-                  //   "bg-gray-300 text-white cursor-not-allowed":
-                  //     tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null,
-                  //   "cursor-pointer hover:bg-blue-300":
-                  //     tempActivePriceOrder === null && tempActiveAlphabeticalOrder === null,
-                  // })}
+                  variantClassName={clsx({
+                    "bg-blue-300": tempActiveAttentionOrder === "yes",
+                    "bg-gray-300 text-white cursor-not-allowed":
+                      tempActiveAlphabeticalOrder !== null || tempActiveAlphabeticalOrder !== null,
+                    "cursor-pointer hover:bg-blue-300":
+                      tempActiveAlphabeticalOrder === null && tempActiveAlphabeticalOrder === null,
+                  })}
                   text="Con notificación"
                   // disabled={tempActivePriceOrder !== null || tempActiveAlphabeticalOrder !== null}
                 />
@@ -391,12 +392,14 @@ export default function Tables() {
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
                   onClick={() => toggleTempActiveAlphabeticalOrder("asc")}
-                  // variantClassName={clsx({
-                  //   "bg-blue-300": tempActiveAlphabeticalOrder === "asc",
-                  //   "bg-gray-300 text-white cursor-not-allowed":
-                  //     tempActiveStockOrder !== null || tempActivePriceOrder !== null,
-                  //   "cursor-pointer hover:bg-blue-300": tempActiveStockOrder === null && tempActivePriceOrder === null,
-                  // })}
+                  variantClassName={clsx({
+                    "bg-blue-600": tempActiveAlphabeticalOrder === "asc",
+                    "bg-gray-300 text-white cursor-not-allowed":
+                      // tempActiveAttentionOrder !== null || tempActivePriceOrder !== null,
+                      tempActiveAttentionOrder !== null,
+                    // "cursor-pointer hover:bg-blue-300": tempActiveStockOrder === null && tempActivePriceOrder === null,
+                    "cursor-pointer hover:bg-blue-300": tempActiveAttentionOrder === null,
+                  })}
                   text="A - Z"
                   // disabled={tempActiveStockOrder !== null || tempActivePriceOrder !== null}
                 />
@@ -417,6 +420,7 @@ export default function Tables() {
         }
         buttonAName="Aplicar Filtros"
         onButtonAClickAction={() => {
+          setActiveAttentionOrder(tempActiveAttentionOrder);
           setActiveAlphabeticalOrder(tempActiveAlphabeticalOrder);
           closeModal();
         }}
