@@ -29,10 +29,12 @@ export default function Tables() {
 
   // Filtros
   const [activeAssistanceOrder, setActiveAssistanceOrder] = useState<"yes" | "no" | null>(null);
+  const [activeCheckOrder, setActiveCheckOrder] = useState<"yes" | "no" | null>(null);
   const [activeAlphabeticalOrder, setActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
 
   // Estados temporales para los filtros
   const [tempActiveAssistanceOrder, setTempActiveAssistanceOrder] = useState<"yes" | "no" | null>(null);
+  const [tempActiveCheckOrder, setTempActiveCheckOrder] = useState<"yes" | "no" | null>(null);
   const [tempActiveAlphabeticalOrder, setTempActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
 
   // Búsqueda y Filtro
@@ -59,20 +61,28 @@ export default function Tables() {
         if (result !== 0) return activeAlphabeticalOrder === "asc" ? result : -result;
       }
 
-      // 1. Atención primero
+      // 2. Orden por Atención
       if (activeAssistanceOrder) {
         const result = a.assistance - b.assistance;
         if (result !== 0) return activeAssistanceOrder === "no" ? result : -result;
       }
+
+      // 3. Orden por Cuenta
+      if (activeCheckOrder) {
+        const result = a.check - b.check;
+        if (result !== 0) return activeCheckOrder === "no" ? result : -result;
+      }
+
       return 0;
     });
 
     setSortedTables(filtered);
-  }, [tables, search.term, activeAlphabeticalOrder, activeAssistanceOrder]);
+  }, [tables, search.term, activeAlphabeticalOrder, activeAssistanceOrder, activeCheckOrder]);
 
   function resetFilters() {
     setTempActiveAlphabeticalOrder(null);
     setTempActiveAssistanceOrder(null);
+    setActiveCheckOrder(null);
   }
 
   // Botones toggle de filtros
@@ -82,6 +92,10 @@ export default function Tables() {
 
   function toggleTempActiveAssistanceOrder(value: "yes" | "no") {
     setTempActiveAssistanceOrder((prev) => (prev === value ? null : value));
+  }
+
+  function toggleTempActiveCheckOrder(value: "yes" | "no") {
+    setTempActiveCheckOrder((prev) => (prev === value ? null : value));
   }
 
   // Modal
@@ -94,6 +108,8 @@ export default function Tables() {
 
     if (modalName === "useFilter") {
       setTempActiveAlphabeticalOrder(activeAlphabeticalOrder);
+      setTempActiveAssistanceOrder(activeAssistanceOrder);
+      setTempActiveCheckOrder(activeCheckOrder);
     }
   }
 
@@ -360,7 +376,7 @@ export default function Tables() {
         body={
           <Filtering
             onResetFiltersClickAction={resetFilters}
-            // ORDEN POR ATENCIÓN
+            // Orden por atención
             onShowHideStockClickAction={() => null}
             showHideStockButton="Ordenar por Atención"
             stock={
@@ -380,7 +396,7 @@ export default function Tables() {
                   variantClassName={clsx({
                     "bg-blue-300": tempActiveAssistanceOrder === "no",
                     "bg-gray-300 text-white cursor-not-allowed":
-                      tempActiveAlphabeticalOrder !== null || tempActiveAlphabeticalOrder !== null,
+                      tempActiveAlphabeticalOrder !== null || tempActiveCheckOrder !== null,
                     "cursor-pointer": tempActiveAlphabeticalOrder === null && tempActiveAlphabeticalOrder === null,
                   })}
                   text="No Atención"
@@ -388,30 +404,31 @@ export default function Tables() {
                 />
               </div>
             }
-            // ORDEN POR Cuenta
+            // Orden por Cuenta
             onShowHidePriceClickAction={() => null}
             showHidePriceButton="Ordenar por Cuenta"
             price={
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
-                  onClick={() => toggleTempActiveAssistanceOrder("yes")}
+                  onClick={() => toggleTempActiveCheckOrder("yes")}
                   variantClassName={clsx({
-                    "bg-blue-300": tempActiveAssistanceOrder === "yes",
-                    "bg-gray-300 text-white cursor-not-allowed": tempActiveAlphabeticalOrder !== null,
-                    "cursor-pointer": tempActiveAlphabeticalOrder === null,
+                    "bg-blue-300": tempActiveCheckOrder === "yes",
+                    "bg-gray-300 text-white cursor-not-allowed":
+                      tempActiveAlphabeticalOrder !== null || tempActiveAssistanceOrder !== null,
+                    "cursor-pointer": tempActiveAlphabeticalOrder === null && tempActiveAssistanceOrder === null,
                   })}
-                  text="Atención"
+                  text="Cuenta"
                   disabled={tempActiveAlphabeticalOrder !== null}
                 />
                 <FilteringButton
-                  onClick={() => toggleTempActiveAssistanceOrder("no")}
+                  onClick={() => toggleTempActiveCheckOrder("no")}
                   variantClassName={clsx({
-                    "bg-blue-300": tempActiveAssistanceOrder === "no",
+                    "bg-blue-300": tempActiveCheckOrder === "no",
                     "bg-gray-300 text-white cursor-not-allowed":
-                      tempActiveAlphabeticalOrder !== null || tempActiveAlphabeticalOrder !== null,
-                    "cursor-pointer": tempActiveAlphabeticalOrder === null && tempActiveAlphabeticalOrder === null,
+                      tempActiveAlphabeticalOrder !== null || tempActiveAssistanceOrder !== null,
+                    "cursor-pointer": tempActiveAlphabeticalOrder === null && tempActiveAssistanceOrder === null,
                   })}
-                  text="No Atención"
+                  text="No Cuenta"
                   disabled={tempActiveAlphabeticalOrder !== null}
                 />
               </div>
@@ -453,6 +470,7 @@ export default function Tables() {
         onButtonAClickAction={() => {
           setActiveAssistanceOrder(tempActiveAssistanceOrder);
           setActiveAlphabeticalOrder(tempActiveAlphabeticalOrder);
+          setActiveCheckOrder(tempActiveCheckOrder);
           closeModal();
         }}
         buttonBName="Cancelar"
