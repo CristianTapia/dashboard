@@ -381,8 +381,35 @@ export default function Tables() {
                     "bg-blue-300": tempActiveAssistanceOrder === "no",
                     "bg-gray-300 text-white cursor-not-allowed":
                       tempActiveAlphabeticalOrder !== null || tempActiveAlphabeticalOrder !== null,
-                    "cursor-pointer hover:bg-blue-300":
-                      tempActiveAlphabeticalOrder === null && tempActiveAlphabeticalOrder === null,
+                    "cursor-pointer": tempActiveAlphabeticalOrder === null && tempActiveAlphabeticalOrder === null,
+                  })}
+                  text="No Atención"
+                  disabled={tempActiveAlphabeticalOrder !== null}
+                />
+              </div>
+            }
+            // ORDEN POR Cuenta
+            onShowHidePriceClickAction={() => null}
+            showHidePriceButton="Ordenar por Cuenta"
+            price={
+              <div className="text-gray-900 flex text-sm gap-1">
+                <FilteringButton
+                  onClick={() => toggleTempActiveAssistanceOrder("yes")}
+                  variantClassName={clsx({
+                    "bg-blue-300": tempActiveAssistanceOrder === "yes",
+                    "bg-gray-300 text-white cursor-not-allowed": tempActiveAlphabeticalOrder !== null,
+                    "cursor-pointer": tempActiveAlphabeticalOrder === null,
+                  })}
+                  text="Atención"
+                  disabled={tempActiveAlphabeticalOrder !== null}
+                />
+                <FilteringButton
+                  onClick={() => toggleTempActiveAssistanceOrder("no")}
+                  variantClassName={clsx({
+                    "bg-blue-300": tempActiveAssistanceOrder === "no",
+                    "bg-gray-300 text-white cursor-not-allowed":
+                      tempActiveAlphabeticalOrder !== null || tempActiveAlphabeticalOrder !== null,
+                    "cursor-pointer": tempActiveAlphabeticalOrder === null && tempActiveAlphabeticalOrder === null,
                   })}
                   text="No Atención"
                   disabled={tempActiveAlphabeticalOrder !== null}
