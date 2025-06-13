@@ -1,6 +1,6 @@
 type FilteringProps = {
-  category?: React.ReactNode;
-  showHideCategoryButton?: string;
+  filterA?: React.ReactNode;
+  showHideFilterAButton?: string;
   onShowHideCategoryClickAction?: () => void;
   stock?: React.ReactNode;
   showHideStockButton?: string;
@@ -15,8 +15,8 @@ type FilteringProps = {
 };
 
 export default function Filtering({
-  category,
-  showHideCategoryButton,
+  filterA,
+  showHideFilterAButton,
   onShowHideCategoryClickAction,
   stock,
   showHideStockButton,
@@ -36,9 +36,9 @@ export default function Filtering({
       </button>
       <div className="text-gray-900 mb-2">
         <button className="text-sm text-blue-600 underline mb-2 cursor-pointer" onClick={onShowHideCategoryClickAction}>
-          {showHideCategoryButton}
+          {showHideFilterAButton}
         </button>
-        {category}
+        {filterA}
       </div>
       <div className="text-gray-900 mt-2 mb-2">
         <button className="text-sm text-blue-600 underline mb-2 cursor-pointer" onClick={onShowHideStockClickAction}>

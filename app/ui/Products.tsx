@@ -295,8 +295,8 @@ export default function Products() {
             onResetFiltersClickAction={resetFilters}
             // CATEGORÍAS
             onShowHideCategoryClickAction={() => setShowCategories((prev) => !prev)}
-            showHideCategoryButton={showCategories ? "Ocultar Categorías" : "Mostrar Categorías"}
-            category={
+            showHideFilterAButton={showCategories ? "Ocultar Categorías" : "Mostrar Categorías"}
+            filterA={
               showCategories && (
                 <ul className="mt-2 space-y-2">
                   {uniqueCategories.map((category) => (
