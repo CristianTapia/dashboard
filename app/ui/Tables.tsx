@@ -377,9 +377,9 @@ export default function Tables() {
           <Filtering
             onResetFiltersClickAction={resetFilters}
             // Orden por atención
-            onShowHideStockClickAction={() => null}
-            showHideStockButton="Ordenar por Atención"
-            stock={
+            onShowHideFilterAClickAction={() => null}
+            showHideFilterAButton="Ordenar por Atención"
+            filterA={
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
                   onClick={() => toggleTempActiveAssistanceOrder("yes")}
@@ -406,9 +406,9 @@ export default function Tables() {
               </div>
             }
             // Orden por Cuenta
-            onShowHidePriceClickAction={() => null}
-            showHidePriceButton="Ordenar por Cuenta"
-            price={
+            onShowHideFilterBClickAction={() => null}
+            showHideFilterBButton="Ordenar por Cuenta"
+            filterB={
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
                   onClick={() => toggleTempActiveCheckOrder("yes")}
@@ -435,9 +435,9 @@ export default function Tables() {
               </div>
             }
             // Orden Alfabético
-            onShowHideAlphabeticalClickAction={() => null}
-            showHideAlphabeticalButton="Ordenar Alfabéticamente"
-            alphabetical={
+            onShowHideFilterCClickAction={() => null}
+            showHideFilterCButton="Ordenar Alfabéticamente"
+            filterC={
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
                   onClick={() => toggleTempActiveAlphabeticalOrder("asc")}

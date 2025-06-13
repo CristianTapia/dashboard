@@ -1,32 +1,32 @@
 type FilteringProps = {
   filterA?: React.ReactNode;
   showHideFilterAButton?: string;
-  onShowHideCategoryClickAction?: () => void;
-  stock?: React.ReactNode;
-  showHideStockButton?: string;
-  onShowHideStockClickAction?: () => void;
-  price?: React.ReactNode;
-  showHidePriceButton?: string;
-  onShowHidePriceClickAction?: () => void;
-  alphabetical?: React.ReactNode;
-  showHideAlphabeticalButton?: string;
-  onShowHideAlphabeticalClickAction?: () => void;
+  onShowHideFilterAClickAction?: () => void;
+  filterB?: React.ReactNode;
+  showHideFilterBButton?: string;
+  onShowHideFilterBClickAction?: () => void;
+  filterC?: React.ReactNode;
+  showHideFilterCButton?: string;
+  onShowHideFilterCClickAction?: () => void;
+  filterD?: React.ReactNode;
+  showHideFilterDButton?: string;
+  onShowHideFilterDClickAction?: () => void;
   onResetFiltersClickAction?: () => void;
 };
 
 export default function Filtering({
   filterA,
   showHideFilterAButton,
-  onShowHideCategoryClickAction,
-  stock,
-  showHideStockButton,
-  onShowHideStockClickAction,
-  price,
-  showHidePriceButton,
-  onShowHidePriceClickAction,
-  alphabetical,
-  showHideAlphabeticalButton,
-  onShowHideAlphabeticalClickAction,
+  onShowHideFilterAClickAction,
+  filterB,
+  showHideFilterBButton,
+  onShowHideFilterBClickAction,
+  filterC,
+  showHideFilterCButton,
+  onShowHideFilterCClickAction,
+  filterD,
+  showHideFilterDButton,
+  onShowHideFilterDClickAction,
   onResetFiltersClickAction,
 }: FilteringProps) {
   return (
@@ -35,28 +35,28 @@ export default function Filtering({
         Restear filtros
       </button>
       <div className="text-gray-900 mb-2">
-        <button className="text-sm text-blue-600 underline mb-2 cursor-pointer" onClick={onShowHideCategoryClickAction}>
+        <button className="text-sm text-blue-600 underline mb-2 cursor-pointer" onClick={onShowHideFilterAClickAction}>
           {showHideFilterAButton}
         </button>
         {filterA}
       </div>
       <div className="text-gray-900 mt-2 mb-2">
-        <button className="text-sm text-blue-600 underline mb-2 cursor-pointer" onClick={onShowHideStockClickAction}>
-          {showHideStockButton}
+        <button className="text-sm text-blue-600 underline mb-2 cursor-pointer" onClick={onShowHideFilterBClickAction}>
+          {showHideFilterBButton}
         </button>
-        {stock}
+        {filterB}
       </div>
       <div className="text-gray-900 mt-2 mb-2">
-        <button className="text-sm text-blue-600 underline mb-2 cursor-pointer" onClick={onShowHidePriceClickAction}>
-          {showHidePriceButton}
+        <button className="text-sm text-blue-600 underline mb-2 cursor-pointer" onClick={onShowHideFilterCClickAction}>
+          {showHideFilterCButton}
         </button>
-        {price}
+        {filterC}
       </div>
       <div className="text-gray-900 mt-2 mb-2">
-        <button className="text-sm text-blue-600 underline mb-2" onClick={onShowHideAlphabeticalClickAction}>
-          {showHideAlphabeticalButton}
+        <button className="text-sm text-blue-600 underline mb-2" onClick={onShowHideFilterDClickAction}>
+          {showHideFilterDButton}
         </button>
-        {alphabetical}
+        {filterD}
       </div>
     </>
   );

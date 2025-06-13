@@ -294,7 +294,7 @@ export default function Products() {
           <Filtering
             onResetFiltersClickAction={resetFilters}
             // CATEGORÍAS
-            onShowHideCategoryClickAction={() => setShowCategories((prev) => !prev)}
+            onShowHideFilterAClickAction={() => setShowCategories((prev) => !prev)}
             showHideFilterAButton={showCategories ? "Ocultar Categorías" : "Mostrar Categorías"}
             filterA={
               showCategories && (
@@ -313,9 +313,9 @@ export default function Products() {
               )
             }
             // ORDEN POR STOCK
-            onShowHideStockClickAction={() => null}
-            showHideStockButton="Ordenar por Stock"
-            stock={
+            onShowHideFilterBClickAction={() => null}
+            showHideFilterBButton="Ordenar por Stock"
+            filterB={
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
                   onClick={() => toggleTempActiveStockOrder("asc")}
@@ -344,9 +344,9 @@ export default function Products() {
               </div>
             }
             // ORDEN POR PRECIO
-            onShowHidePriceClickAction={() => null}
-            showHidePriceButton="Ordenar por Precio"
-            price={
+            onShowHideFilterCClickAction={() => null}
+            showHideFilterCButton="Ordenar por Precio"
+            filterC={
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
                   onClick={() => toggleTempActivePriceOrder("asc")}
@@ -375,9 +375,9 @@ export default function Products() {
               </div>
             }
             // ORDEN ALFABÉTICO
-            onShowHideAlphabeticalClickAction={() => null}
-            showHideAlphabeticalButton="Ordenar Alfabéticamente"
-            alphabetical={
+            onShowHideFilterDClickAction={() => null}
+            showHideFilterDButton="Ordenar Alfabéticamente"
+            filterD={
               <div className="text-gray-900 flex text-sm gap-1">
                 <FilteringButton
                   onClick={() => toggleTempActiveAlphabeticalOrder("asc")}
