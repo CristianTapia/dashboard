@@ -82,7 +82,7 @@ export default function Tables() {
   function resetFilters() {
     setTempActiveAlphabeticalOrder(null);
     setTempActiveAssistanceOrder(null);
-    setActiveCheckOrder(null);
+    setTempActiveCheckOrder(null);
   }
 
   // Botones toggle de filtros
@@ -385,11 +385,12 @@ export default function Tables() {
                   onClick={() => toggleTempActiveAssistanceOrder("yes")}
                   variantClassName={clsx({
                     "bg-blue-300": tempActiveAssistanceOrder === "yes",
-                    "bg-gray-300 text-white cursor-not-allowed": tempActiveAlphabeticalOrder !== null,
-                    "cursor-pointer": tempActiveAlphabeticalOrder === null,
+                    "bg-gray-300 text-white cursor-not-allowed":
+                      tempActiveAlphabeticalOrder !== null || tempActiveCheckOrder !== null,
+                    "cursor-pointer": tempActiveAlphabeticalOrder === null && tempActiveCheckOrder === null,
                   })}
                   text="Atención"
-                  disabled={tempActiveAlphabeticalOrder !== null}
+                  disabled={tempActiveAlphabeticalOrder !== null || tempActiveCheckOrder !== null}
                 />
                 <FilteringButton
                   onClick={() => toggleTempActiveAssistanceOrder("no")}
@@ -397,10 +398,10 @@ export default function Tables() {
                     "bg-blue-300": tempActiveAssistanceOrder === "no",
                     "bg-gray-300 text-white cursor-not-allowed":
                       tempActiveAlphabeticalOrder !== null || tempActiveCheckOrder !== null,
-                    "cursor-pointer": tempActiveAlphabeticalOrder === null && tempActiveAlphabeticalOrder === null,
+                    "cursor-pointer": tempActiveAlphabeticalOrder === null && tempActiveCheckOrder === null,
                   })}
                   text="No Atención"
-                  disabled={tempActiveAlphabeticalOrder !== null}
+                  disabled={tempActiveAlphabeticalOrder !== null || tempActiveCheckOrder !== null}
                 />
               </div>
             }
@@ -418,7 +419,7 @@ export default function Tables() {
                     "cursor-pointer": tempActiveAlphabeticalOrder === null && tempActiveAssistanceOrder === null,
                   })}
                   text="Cuenta"
-                  disabled={tempActiveAlphabeticalOrder !== null}
+                  disabled={tempActiveAlphabeticalOrder !== null || tempActiveAssistanceOrder !== null}
                 />
                 <FilteringButton
                   onClick={() => toggleTempActiveCheckOrder("no")}
@@ -429,11 +430,11 @@ export default function Tables() {
                     "cursor-pointer": tempActiveAlphabeticalOrder === null && tempActiveAssistanceOrder === null,
                   })}
                   text="No Cuenta"
-                  disabled={tempActiveAlphabeticalOrder !== null}
+                  disabled={tempActiveAlphabeticalOrder !== null || tempActiveAssistanceOrder !== null}
                 />
               </div>
             }
-            // ORDEN ALFABÉTICO
+            // Orden Alfabético
             onShowHideAlphabeticalClickAction={() => null}
             showHideAlphabeticalButton="Ordenar Alfabéticamente"
             alphabetical={
@@ -443,24 +444,22 @@ export default function Tables() {
                   variantClassName={clsx({
                     "bg-blue-300": tempActiveAlphabeticalOrder === "asc",
                     "bg-gray-300 text-white cursor-not-allowed":
-                      // tempActiveAssistanceOrder !== null || tempActivePriceOrder !== null,
-                      tempActiveAssistanceOrder !== null,
-                    // "cursor-pointer hover:bg-blue-300": tempActiveStockOrder === null && tempActivePriceOrder === null,
-                    "cursor-pointer": tempActiveAssistanceOrder === null,
+                      tempActiveAssistanceOrder !== null || tempActiveCheckOrder !== null,
+                    "cursor-pointer": tempActiveAssistanceOrder === null && tempActiveCheckOrder === null,
                   })}
                   text="A - Z"
-                  // disabled={tempActiveStockOrder !== null || tempActivePriceOrder !== null}
-                  disabled={tempActiveAssistanceOrder !== null}
+                  disabled={tempActiveAssistanceOrder !== null || tempActiveCheckOrder !== null}
                 />
                 <FilteringButton
                   onClick={() => toggleTempActiveAlphabeticalOrder("desc")}
                   variantClassName={clsx({
                     "bg-blue-300 ": tempActiveAlphabeticalOrder === "desc",
-                    "bg-gray-300 text-white cursor-not-allowed": tempActiveAssistanceOrder !== null,
-                    "cursor-pointer": tempActiveAssistanceOrder === null,
+                    "bg-gray-300 text-white cursor-not-allowed":
+                      tempActiveAssistanceOrder !== null || tempActiveCheckOrder !== null,
+                    "cursor-pointer": tempActiveAssistanceOrder === null && tempActiveCheckOrder === null,
                   })}
                   text="Z - A"
-                  disabled={tempActiveAssistanceOrder !== null}
+                  disabled={tempActiveAssistanceOrder !== null || tempActiveCheckOrder !== null}
                 />
               </div>
             }
