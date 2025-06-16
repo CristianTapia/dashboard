@@ -293,7 +293,7 @@ export default function Products() {
         body={
           <Filtering
             onResetFiltersClickAction={resetFilters}
-            // CATEGORÍAS
+            // Categorías
             onShowHideFilterAClickAction={() => setShowCategories((prev) => !prev)}
             showHideFilterAButton={showCategories ? "Ocultar Categorías" : "Mostrar Categorías"}
             filterA={
@@ -312,7 +312,7 @@ export default function Products() {
                 </ul>
               )
             }
-            // ORDEN POR STOCK
+            // Orden por Stock
             onShowHideFilterBClickAction={() => null}
             showHideFilterBButton="Ordenar por Stock"
             filterB={
@@ -343,7 +343,7 @@ export default function Products() {
                 />
               </div>
             }
-            // ORDEN POR PRECIO
+            // Ordn por Precio
             onShowHideFilterCClickAction={() => null}
             showHideFilterCButton="Ordenar por Precio"
             filterC={
@@ -374,7 +374,7 @@ export default function Products() {
                 />
               </div>
             }
-            // ORDEN ALFABÉTICO
+            // Orden Alfabético
             onShowHideFilterDClickAction={() => null}
             showHideFilterDButton="Ordenar Alfabéticamente"
             filterD={
