@@ -323,8 +323,8 @@ export default function Tables() {
         onCloseAction={closeModal}
         title="Código QR"
         body={"Código QR"}
-        buttonAName="Cerrar"
-        onButtonAClickAction={closeModal}
+        buttonBName="Cerrar"
+        onButtonBClickAction={closeModal}
       />
 
       {/* Modal para Revisar la orden */}
