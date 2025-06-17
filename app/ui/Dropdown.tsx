@@ -7,14 +7,26 @@ type DropdownProps = {
   isOpen: boolean;
   optionA?: string;
   optionB?: string;
-  onOptionAClickAction: () => void;
-  onOptionBClickAction: () => void;
+  optionC?: string;
+  onOptionAClickAction?: () => void;
+  onOptionBClickAction?: () => void;
+  onOptionCClickAction?: () => void;
   className?: string;
   submenu?: ReactNode;
 };
 
 const Dropdown = forwardRef(function Dropdown(
-  { isOpen, optionA, optionB, onOptionAClickAction, onOptionBClickAction, className, submenu }: DropdownProps,
+  {
+    isOpen,
+    optionA,
+    optionB,
+    optionC,
+    onOptionAClickAction,
+    onOptionBClickAction,
+    onOptionCClickAction,
+    className,
+    submenu,
+  }: DropdownProps,
   ref: React.ForwardedRef<HTMLDivElement>
 ) {
   if (!isOpen) return null;
@@ -33,23 +45,33 @@ const Dropdown = forwardRef(function Dropdown(
         >
           {optionA}
         </li>
-
-        {/* Contenedor con submenu */}
-        <li className="relative group">
-          <div
+        {optionB && (
+          <li
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
             onClick={onOptionBClickAction}
           >
             {optionB}
-          </div>
+          </li>
+        )}
 
-          {/* Submenú */}
-          {submenu && (
-            <div className="absolute left-full top-0 ml-1 w-40 bg-white border rounded-md shadow-lg hidden group-hover:block z-20">
-              {submenu}
+        {/* Contenedor con submenu */}
+        {optionC && (
+          <li className="relative group">
+            <div
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+              onClick={onOptionCClickAction}
+            >
+              {optionC}
             </div>
-          )}
-        </li>
+
+            {/* Submenú */}
+            {submenu && (
+              <div className="absolute left-full top-0 ml-1 w-40 bg-white border rounded-md shadow-lg hidden group-hover:block z-20">
+                {submenu}
+              </div>
+            )}
+          </li>
+        )}
       </ul>
     </div>
   );

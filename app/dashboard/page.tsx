@@ -4,11 +4,12 @@ export default function Overview() {
       <div className="flex flex-wrap gap-8">
         <div className="relative box-border border p-4 rounded shadow-md bg-gray w-[400px]">
           <div className="flex justify-between items-center mb-5">🧾 Venta mensual</div>
-          <div className="flex items-end justify-between">
-            <div className="justify-end">$40.000.000</div>
-            <div className="text-xs justify-end">+2.5% ⬆️</div>
+          <div className="flex items-end">
+            <div className="text-xl leading-none">$40.000.000</div>
+            <div className="text-xs ml-2">+2.5% ⬆️</div>
           </div>
-          <div className="text-xs mt-2">Comparado con $35M mes pasado</div>
+
+          <div className="text-xs mt-4">Comparado con $35M mes pasado</div>
         </div>
         <div className="relative box-border border p-4 rounded shadow-md bg-gray w-[400px]">
           <div className="flex justify-between items-center mb-5">🧾 Venta semanal</div>

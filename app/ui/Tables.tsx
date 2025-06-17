@@ -19,7 +19,7 @@ export default function Tables() {
   const [search, setSearch] = useState({ term: "" });
 
   const [activeModal, setActiveModal] = useState<
-    null | "addTable" | "confirmDelete" | "editTable" | "reviewOrder" | "useFilter"
+    null | "addTable" | "confirmDelete" | "editTable" | "reviewOrder" | "useFilter" | "seeQR"
   >(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
@@ -100,7 +100,7 @@ export default function Tables() {
 
   // Modal
   function openModal(
-    modalName: "addTable" | "confirmDelete" | "editTable" | "reviewOrder" | "useFilter",
+    modalName: "addTable" | "confirmDelete" | "editTable" | "reviewOrder" | "useFilter" | "seeQR",
     tableId?: number
   ) {
     setActiveModal(modalName);
@@ -213,6 +213,11 @@ export default function Tables() {
                       setOpenDropdownId(null);
                       openModal("confirmDelete", option.id);
                     }}
+                    optionC="Código QR"
+                    onOptionCClickAction={() => {
+                      setOpenDropdownId(null);
+                      openModal("seeQR", option.id);
+                    }}
                   />
                 )}
               </div>
@@ -310,6 +315,16 @@ export default function Tables() {
         }}
         buttonBName="Cancelar"
         onButtonBClickAction={closeModal}
+      />
+
+      {/* Modal para ver código QR */}
+      <Modal
+        isOpen={activeModal === "seeQR"}
+        onCloseAction={closeModal}
+        title="Código QR"
+        body={"Código QR"}
+        buttonAName="Cerrar"
+        onButtonAClickAction={closeModal}
       />
 
       {/* Modal para Revisar la orden */}
