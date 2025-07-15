@@ -2,7 +2,6 @@
 
 import clsx from "clsx";
 
-import { productArray } from "../lib/data";
 import { useState, useEffect, useRef } from "react";
 import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
@@ -11,10 +10,18 @@ import EditProduct from "./Modals/EditProduct";
 import Filtering from "./Modals/Filtering";
 import FilteringButton from "./Modals/FilteringButton";
 
-export default function Products() {
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  category: string;
+  stock?: number;
+  description?: string;
+}
+
+export default function Products({ products }: { products: Product[] }) {
   // Estados principales
-  const [products] = useState(productArray);
-  const [sortedProducts, setSortedProducts] = useState(productArray);
+  const [sortedProducts, setSortedProducts] = useState<Product[]>(products);
   const [search, setSearch] = useState({ term: "" });
 
   const [activeModal, setActiveModal] = useState<null | "addProduct" | "confirmDelete" | "editProduct" | "useFilter">(
@@ -55,7 +62,9 @@ export default function Products() {
 
       const term = normalize(search.term);
       filtered = filtered.filter(
-        (product) => normalize(product.name).includes(term) || product.stock.toString().includes(term)
+        (product) =>
+          normalize(product.name).includes(term) ||
+          (typeof product.stock !== "undefined" && product.stock.toString().includes(term))
       );
     }
 
@@ -74,7 +83,7 @@ export default function Products() {
 
       // 2. Orden por stock
       if (activeStockOrder) {
-        const result = a.stock - b.stock;
+        const result = (a.stock ?? 0) - (b.stock ?? 0);
         if (result !== 0) return activeStockOrder === "asc" ? result : -result;
       }
 
