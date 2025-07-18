@@ -1,4 +1,4 @@
--- (Re)crear categories y products
+-- Crear nuevamente categories y products
 CREATE TABLE IF NOT EXISTS categories (
   id         BIGSERIAL PRIMARY KEY,
   name       TEXT NOT NULL UNIQUE,
