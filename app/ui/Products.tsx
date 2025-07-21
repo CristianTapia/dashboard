@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, FormEvent } from "react";
 import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
 import AddProduct from "./Modals/AddProduct";
@@ -178,6 +178,55 @@ export default function Products({ products }: { products: Product[] }) {
     };
   }, [openDropdownId]);
 
+  // Lógica de subida e inserción:
+  async function handleAddProduct(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    // 1) Obtener los valores del form
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const name = formData.get("name") as string;
+    const price = Number(formData.get("price"));
+    const category = formData.get("category") as string;
+    const stock = Number(formData.get("stock"));
+    // etc…
+    // 2) Sacamos la imagen y la subimos a Storage
+    // const file = formData.get("image") as File | null;
+    // let image_url: string | null = null;
+
+    // if (file && file.size > 0) {
+    // Subida a Supabase Storage
+    // const supabase = createClient(
+    //   process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    //   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    // );
+    // const path = `products/${Date.now()}_${file.name}`;
+    // const { error: upErr } = await supabase
+    //   .storage.from("products")
+    //   .upload(path, file);
+    // if (upErr) throw upErr;
+
+    // const { publicUrl, error: urlErr } = supabase
+    //   .storage.from("products")
+    //   .getPublicUrl(path);
+    // if (urlErr) throw urlErr;
+    // image_url = publicUrl;
+
+    // 3) Llamamos a nuestra API route (/api/products) pasando todo en el body
+    const res = await fetch("/api/products", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, price, category, stock }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      console.error("Error creando producto:", err);
+      return;
+    }
+
+    setActiveModal(null);
+  }
+
   // Renderizado
   return (
     <div className="flex flex-col">
@@ -266,10 +315,23 @@ export default function Products({ products }: { products: Product[] }) {
         isOpen={activeModal === "addProduct"}
         onCloseAction={closeModal}
         title="Agregar Producto"
-        body={<AddProduct />}
+        body={<AddProduct onSubmitAction={handleAddProduct} />}
         buttonAName="Agregar"
         buttonBName="Cancelar"
-        onButtonAClickAction={closeModal}
+        // onButtonAClickAction={() => {
+        //   const form = document.getElementById("add-product-form")?.requestSubmit();
+        // }}
+        onButtonAClickAction={() => {
+          // 1) Buscamos el <form> por su id
+          const form = document.getElementById("add-product-form") as HTMLFormElement | null;
+
+          // 2) Si existe, disparamos su submit
+          if (form) {
+            form.requestSubmit(); // aquí sí existe requestSubmit()
+          } else {
+            console.error("No encontré el formulario con id add-product-form");
+          }
+        }}
         onButtonBClickAction={closeModal}
       />
 
@@ -279,8 +341,8 @@ export default function Products({ products }: { products: Product[] }) {
         title={`Editar Producto ${selectedProduct?.id ?? ""}`}
         body={<EditProduct />}
         buttonAName="Confirmar"
-        onButtonAClickAction={closeModal}
         buttonBName="Cancelar"
+        onButtonAClickAction={closeModal}
         onButtonBClickAction={closeModal}
       />
 

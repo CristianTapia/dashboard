@@ -22,3 +22,42 @@ export async function GET() {
   console.log("→ data:", data);
   return NextResponse.json(data);
 }
+
+// Create a new product
+export async function POST(request: Request) {
+  try {
+    // 1) Leemos el body JSON que envía el cliente
+    const { name, price, category, stock, image_url } = await request.json();
+
+    // 2) Disparamos un POST al REST de Supabase
+    const res = await fetch(REST_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: API_KEY,
+        authorization: `Bearer ${API_KEY}`,
+      },
+      body: JSON.stringify({
+        name,
+        price,
+        category,
+        stock: stock ?? null,
+        image_url: image_url ?? null,
+      }),
+    });
+
+    // 3) Si hay error, lo devolvemos
+    if (!res.ok) {
+      const err = await res.text();
+      return NextResponse.json({ error: err }, { status: res.status });
+    }
+
+    // 4) OK, devolvemos el registro insertado
+    const created = await res.json();
+    return NextResponse.json(created, { status: 201 });
+  } catch (error: unknown) {
+    // Type guard para extraer mensaje si es Error
+    const message = error instanceof Error ? error.message : "Unexpected error";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
