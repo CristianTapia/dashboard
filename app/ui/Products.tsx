@@ -47,6 +47,7 @@ export default function Products({ products }: { products: Product[] }) {
   const uniqueCategories = [...new Set(products.map((p) => p.category))];
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   // FILTROS
   useEffect(() => {
@@ -299,22 +300,11 @@ export default function Products({ products }: { products: Product[] }) {
         isOpen={activeModal === "addProduct"}
         onCloseAction={closeModal}
         title="Agregar Producto"
-        body={<AddProduct onSubmitAction={handleAddProduct} />}
+        body={<AddProduct ref={formRef} onSubmitAction={handleAddProduct} />}
         buttonAName="Agregar"
         buttonBName="Cancelar"
-        // onButtonAClickAction={() => {
-        //   const form = document.getElementById("add-product-form")?.requestSubmit();
-        // }}
         onButtonAClickAction={() => {
-          // 1) Buscamos el <form> por su id
-          const form = document.getElementById("add-product-form") as HTMLFormElement | null;
-
-          // 2) Si existe, disparamos su submit
-          if (form) {
-            form.requestSubmit(); // aquí sí existe requestSubmit()
-          } else {
-            console.error("No encontré el formulario con id add-product-form");
-          }
+          formRef.current?.requestSubmit();
         }}
         onButtonBClickAction={closeModal}
       />
