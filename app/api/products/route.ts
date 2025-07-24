@@ -27,7 +27,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     // 1) Leemos el body JSON que envía el cliente
-    const { name, price, category, stock, image_url } = await request.json();
+    const { name, price, categoryId, stock, image_url } = await request.json();
 
     // 2) Disparamos un POST al REST de Supabase
     const res = await fetch(REST_URL, {
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         name,
         price,
-        category,
+        category_id: categoryId,
         stock: stock ?? null,
         image_url: image_url ?? null,
       }),
