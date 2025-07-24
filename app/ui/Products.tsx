@@ -178,53 +178,37 @@ export default function Products({ products }: { products: Product[] }) {
     };
   }, [openDropdownId]);
 
-  // Lógica de subida e inserción:
-  async function handleAddProduct(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    // 1) Obtener los valores del form
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const name = formData.get("name") as string;
-    const price = Number(formData.get("price"));
-    const category = formData.get("category") as string;
-    const stock = Number(formData.get("stock"));
-    // etc…
-    // 2) Sacamos la imagen y la subimos a Storage
-    // const file = formData.get("image") as File | null;
-    // let image_url: string | null = null;
-
-    // if (file && file.size > 0) {
-    // Subida a Supabase Storage
-    // const supabase = createClient(
-    //   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    //   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    // );
-    // const path = `products/${Date.now()}_${file.name}`;
-    // const { error: upErr } = await supabase
-    //   .storage.from("products")
-    //   .upload(path, file);
-    // if (upErr) throw upErr;
-
-    // const { publicUrl, error: urlErr } = supabase
-    //   .storage.from("products")
-    //   .getPublicUrl(path);
-    // if (urlErr) throw urlErr;
-    // image_url = publicUrl;
-
-    // 3) Llamamos a nuestra API route (/api/products) pasando todo en el body
-    const res = await fetch("/api/products", {
+  async function handleAddProduct(data: { name: string; price: number; stock?: number; categoryName: string }) {
+    // 1) Upsert categoría → Supabase la crea si no existe
+    const resCat = await fetch("/api/categories", {
       method: "POST",
+      body: JSON.stringify({ name: data.categoryName }),
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, price, category, stock }),
     });
+    const category = await resCat.json();
+    const categoryId = category.id;
 
-    if (!res.ok) {
-      const err = await res.json();
-      console.error("Error creando producto:", err);
-      return;
-    }
+    // 2) Insertar producto apuntando al category_id
+    const resProd = await fetch("/api/products", {
+      method: "POST",
+      body: JSON.stringify({
+        name: data.name,
+        price: data.price,
+        stock: data.stock,
+        categoryId,
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+    const created = await resProd.json();
 
-    setActiveModal(null);
+    // 3) Agregar a la lista
+    setSortedProducts((prev) => [
+      {
+        ...created,
+        category: data.categoryName,
+      },
+      ...prev,
+    ]);
   }
 
   // Renderizado

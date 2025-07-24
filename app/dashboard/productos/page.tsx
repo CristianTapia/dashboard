@@ -1,11 +1,32 @@
-import Products from "@/app/ui/Products";
+// import Products from "@/app/ui/Products";
 
-export default async function ProductsView() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL!;
-  const res = await fetch(`${base}/api/products`, {
-    next: { revalidate: 0 },
-  });
-  if (!res.ok) throw new Error(`Error cargando productos: ${res.status}`);
-  const products = await res.json();
+// export default async function ProductsView() {
+//   const base = process.env.NEXT_PUBLIC_BASE_URL!;
+//   const res = await fetch(`${base}/api/products`, {
+//     next: { revalidate: 0 },
+//   });
+//   if (!res.ok) throw new Error(`Error cargando productos: ${res.status}`);
+//   const products = await res.json();
+//   return <Products products={products} />;
+// }
+
+import Products from "@/app/ui/Products";
+import { createClient } from "@supabase/supabase-js";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+
+export default async function ProductsPage() {
+  const supabase = createServerComponentClient({ cookies });
+
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, name, price, stock, category:categories(name)")
+    .order("created_at", { ascending: false });
+
+  const products = (data ?? []).map((p) => ({
+    ...p,
+    category: Array.isArray(p.category) && p.category.length > 0 ? p.category[0].name : "Sin categoría",
+  }));
+
   return <Products products={products} />;
 }
