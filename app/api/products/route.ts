@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
 const REST_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/products`;
 const API_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -24,40 +25,56 @@ export async function GET() {
 }
 
 // Create a new product
+// export async function POST(request: Request) {
+//   try {
+//     // 1) Leemos el body JSON que envía el cliente
+//     const { name, price, categoryId, stock } = await request.json();
+
+//     // 2) Disparamos un POST al REST de Supabase
+//     const res = await fetch(REST_URL, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//         apikey: API_KEY,
+//         authorization: `Bearer ${API_KEY}`,
+//       },
+//       body: JSON.stringify({
+//         name,
+//         price,
+//         category_id: categoryId,
+//         stock: stock ?? null,
+//         // image_url: image_url ?? null,
+//       }),
+//     });
+
+//     // 3) Si hay error, lo devolvemos
+//     if (!res.ok) {
+//       const err = await res.text();
+//       return NextResponse.json({ error: err }, { status: res.status });
+//     }
+
+//     // 4) OK, devolvemos el registro insertado
+//     const created = await res.json();
+//     return NextResponse.json(created, { status: 201 });
+//   } catch (error: unknown) {
+//     // Type guard para extraer mensaje si es Error
+//     const message = error instanceof Error ? error.message : "Unexpected error";
+//     return NextResponse.json({ error: message }, { status: 500 });
+//   }
+// }
+
+// app/api/products/route.ts
+
 export async function POST(request: Request) {
-  try {
-    // 1) Leemos el body JSON que envía el cliente
-    const { name, price, categoryId, stock, image_url } = await request.json();
+  const body = await request.json();
 
-    // 2) Disparamos un POST al REST de Supabase
-    const res = await fetch(REST_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: API_KEY,
-        authorization: `Bearer ${API_KEY}`,
-      },
-      body: JSON.stringify({
-        name,
-        price,
-        category_id: categoryId,
-        stock: stock ?? null,
-        image_url: image_url ?? null,
-      }),
-    });
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
-    // 3) Si hay error, lo devolvemos
-    if (!res.ok) {
-      const err = await res.text();
-      return NextResponse.json({ error: err }, { status: res.status });
-    }
+  const { data, error } = await supabase.from("products").insert([body]);
 
-    // 4) OK, devolvemos el registro insertado
-    const created = await res.json();
-    return NextResponse.json(created, { status: 201 });
-  } catch (error: unknown) {
-    // Type guard para extraer mensaje si es Error
-    const message = error instanceof Error ? error.message : "Unexpected error";
-    return NextResponse.json({ error: message }, { status: 500 });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  return NextResponse.json({ data }, { status: 200 });
 }

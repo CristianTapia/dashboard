@@ -242,8 +242,8 @@ export default function Products({ products }: { products: Product[] }) {
 
       {/* Lista de productos */}
       <div className="flex flex-wrap gap-8 justify-center">
-        {sortedProducts.map((option) => (
-          <div key={option.id} className="relative box-border border p-4 rounded shadow-md bg-gray w-[200px]">
+        {sortedProducts.map((option, index) => (
+          <div key={index} className="relative box-border border p-4 rounded shadow-md bg-gray w-[200px]">
             <div className="flex justify-between items-center">
               <div className="w-32">Producto {option.id}</div>
               <div className="relative">
