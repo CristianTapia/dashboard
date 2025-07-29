@@ -150,7 +150,7 @@ export default function Products({ products, categories }: { products: Product[]
   }
 
   const onSuccess = () => {
-    console.log("Producto agregado con éxito. Aquí podrías refrescar los datos.");
+    console.log("Categoría agregada con éxito. Aquí podrías refrescar los datos.");
     // router.refresh(); // si usas App Router con fetch server-side
   };
 
@@ -279,6 +279,7 @@ export default function Products({ products, categories }: { products: Product[]
         title="Agregar Producto"
         body={
           <AddProduct
+            ref={formRef}
             onSuccess={() => {
               onSuccess();
               closeModal();

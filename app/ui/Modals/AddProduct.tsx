@@ -135,7 +135,7 @@ const AddProduct = forwardRef(function AddProduct(
     if (res.ok) {
       onSuccess();
     } else {
-      console.error("Error al agregar producto");
+      console.error("Error al agregar categoria");
     }
   };
 
