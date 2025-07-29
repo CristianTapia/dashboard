@@ -19,7 +19,12 @@ interface Product {
   description?: string;
 }
 
-export default function Products({ products }: { products: Product[] }) {
+interface Category {
+  id: number;
+  name: string;
+}
+
+export default function Products({ products, categories }: { products: Product[]; categories: Category[] }) {
   // Estados principales
   const [sortedProducts, setSortedProducts] = useState<Product[]>(products);
   const [search, setSearch] = useState({ term: "" });
@@ -144,6 +149,11 @@ export default function Products({ products }: { products: Product[] }) {
     setActiveModal(null);
   }
 
+  const onSuccess = () => {
+    console.log("Producto agregado con éxito. Aquí podrías refrescar los datos.");
+    // router.refresh(); // si usas App Router con fetch server-side
+  };
+
   function toggleDropdown(id: number) {
     setOpenDropdownId((prev) => (prev === id ? null : id));
   }
@@ -178,39 +188,6 @@ export default function Products({ products }: { products: Product[] }) {
       window.removeEventListener("scroll", handleScroll, true);
     };
   }, [openDropdownId]);
-
-  async function handleAddProduct(data: { name: string; price: number; stock?: number; categoryName: string }) {
-    // 1) Upsert categoría → Supabase la crea si no existe
-    const resCat = await fetch("/api/categories", {
-      method: "POST",
-      body: JSON.stringify({ name: data.categoryName }),
-      headers: { "Content-Type": "application/json" },
-    });
-    const category = await resCat.json();
-    const categoryId = category.id;
-
-    // 2) Insertar producto apuntando al category_id
-    const resProd = await fetch("/api/products", {
-      method: "POST",
-      body: JSON.stringify({
-        name: data.name,
-        price: data.price,
-        stock: data.stock,
-        categoryId,
-      }),
-      headers: { "Content-Type": "application/json" },
-    });
-    const created = await resProd.json();
-
-    // 3) Agregar a la lista
-    setSortedProducts((prev) => [
-      {
-        ...created,
-        category: data.categoryName,
-      },
-      ...prev,
-    ]);
-  }
 
   // Renderizado
   return (
@@ -300,7 +277,14 @@ export default function Products({ products }: { products: Product[] }) {
         isOpen={activeModal === "addProduct"}
         onCloseAction={closeModal}
         title="Agregar Producto"
-        body={<AddProduct ref={formRef} onSubmitAction={handleAddProduct} />}
+        body={
+          <AddProduct
+            onSuccess={() => {
+              onSuccess();
+              closeModal();
+            }}
+          />
+        }
         buttonAName="Agregar"
         buttonBName="Cancelar"
         onButtonAClickAction={() => {

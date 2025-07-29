@@ -11,14 +11,28 @@ export async function GET() {
   return NextResponse.json(data);
 }
 
-export async function POST(request: Request) {
-  const { name } = (await request.json()) as { name: string };
-  const { data, error } = await supabase
-    .from("categories")
-    .upsert({ name }, { onConflict: "name" })
-    .select("id, name")
-    .single();
+// export async function POST(request: Request) {
+//   const { name } = (await request.json()) as { name: string };
+//   const { data, error } = await supabase
+//     .from("categories")
+//     .upsert({ name }, { onConflict: "name" })
+//     .select("id, name")
+//     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data, { status: 201 });
+//   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+//   return NextResponse.json(data, { status: 201 });
+// }
+
+export async function POST(request: Request) {
+  const body = await request.json();
+
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
+  const { data, error } = await supabase.from("categories").insert([body]);
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ data }, { status: 200 });
 }

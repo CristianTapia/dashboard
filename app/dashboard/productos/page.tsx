@@ -7,14 +7,9 @@ export default async function ProductsPage() {
   const supabase = createServerComponentClient({ cookies });
 
   const { data, error } = await supabase
-    .from("products")
-    .select("id, name, price, stock, category:categories(name)")
+    .from("categories")
+    .select("id, name")
     .order("created_at", { ascending: false });
 
-  const products = (data ?? []).map((p) => ({
-    ...p,
-    category: Array.isArray(p.category) && p.category.length > 0 ? p.category[0].name : "Sin categoría",
-  }));
-
-  return <Products products={products} />;
+  return <Products categories={data ?? []} products={[]} />;
 }
