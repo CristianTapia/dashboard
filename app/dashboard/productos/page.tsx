@@ -1,5 +1,5 @@
 import Products from "@/app/ui/Products";
-import { createSupabaseServerClient } from "@/app/lib/supabaseServer";
+import { createSupabaseServerClient } from "@/app/lib/supabase/Server";
 
 export default async function ProductsPage() {
   const supabase = await createSupabaseServerClient();
