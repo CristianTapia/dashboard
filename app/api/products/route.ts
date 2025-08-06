@@ -1,80 +1,36 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createServer } from "@/app/lib/supabase/Server";
+import { CreateProductInput, CreateProductSchema } from "@/app/lib/validators/product";
 
-const REST_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/products`;
-const API_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-// Get all products
+// READ PRODUCTS FROM THE DATABASE
 export async function GET() {
-  console.log("🔍 Llamaron a /api/products");
-  const res = await fetch(`${REST_URL}?select=*&order=created_at.desc`, {
-    headers: {
-      apikey: API_KEY,
-      authorization: `Bearer ${API_KEY}`,
-    },
-  });
-
-  if (!res.ok) {
-    const err = await res.text();
-    return NextResponse.json({ error: err }, { status: res.status });
-  }
-
-  const data = await res.json();
-  console.log("→ data:", data);
-  return NextResponse.json(data);
-}
-
-// Create a new product
-// export async function POST(request: Request) {
-//   try {
-//     // 1) Leemos el body JSON que envía el cliente
-//     const { name, price, categoryId, stock } = await request.json();
-
-//     // 2) Disparamos un POST al REST de Supabase
-//     const res = await fetch(REST_URL, {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//         apikey: API_KEY,
-//         authorization: `Bearer ${API_KEY}`,
-//       },
-//       body: JSON.stringify({
-//         name,
-//         price,
-//         category_id: categoryId,
-//         stock: stock ?? null,
-//         // image_url: image_url ?? null,
-//       }),
-//     });
-
-//     // 3) Si hay error, lo devolvemos
-//     if (!res.ok) {
-//       const err = await res.text();
-//       return NextResponse.json({ error: err }, { status: res.status });
-//     }
-
-//     // 4) OK, devolvemos el registro insertado
-//     const created = await res.json();
-//     return NextResponse.json(created, { status: 201 });
-//   } catch (error: unknown) {
-//     // Type guard para extraer mensaje si es Error
-//     const message = error instanceof Error ? error.message : "Unexpected error";
-//     return NextResponse.json({ error: message }, { status: 500 });
-//   }
-// }
-
-// app/api/products/route.ts
-
-export async function POST(request: Request) {
-  const body = await request.json();
-
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-
-  const { data, error } = await supabase.from("products").insert([body]);
+  const supabase = await createServer();
+  const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: true });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ data }, { status: 200 });
+  return NextResponse.json(data);
+}
+
+// CREATE A NEW PRODUCT IN THE DATABASE
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    console.log("📦 BODY RECIBIDO:", body);
+    const parsed = CreateProductSchema.parse(body);
+    const supabase = await createServer();
+    const { data, error } = await supabase.from("products").insert([parsed]).select().single();
+
+    if (error) {
+      console.error("❌ SUPABASE ERROR:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(data, { status: 201 });
+  } catch (err: any) {
+    console.error("❌ VALIDATION ERROR:", err);
+    return NextResponse.json({ error: err.message || "Error al procesar la solicitud" }, { status: 400 });
+  }
 }
