@@ -81,20 +81,40 @@ const AddProduct = forwardRef(function AddProduct(
   return (
     <form ref={localRef} onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {/* Category */}
-      <select
-        className="text-sm/6 font-medium text-gray-900"
-        name="category_id"
-        value={form.category_id}
-        onChange={handleChange}
-        required
-      >
-        <option value="">Selecciona una categoría</option>
-        {categories.map((cat) => (
-          <option key={cat.id} value={cat.id}>
-            {cat.name}
-          </option>
-        ))}
-      </select>
+      <div className="flex sm:col-span-4 pb-2 gap-2">
+        <select
+          className="cursor-pointer text-sm/6 font-medium text-gray-900 outline-1 rounded-md outline-gray-300 py-1.5"
+          name="category_id"
+          value={form.category_id}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Selecciona una categoría</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
+        <button className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition">
+          +
+        </button>
+      </div>
+
+      {/* Category */}
+      <div className="sm:col-span-4 pb-2">
+        <label className="text-sm/6 font-medium text-gray-900">Nombre Categoría</label>
+        <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
+          <input
+            name="name"
+            type="text"
+            value={form.name}
+            className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
+            onChange={handleChange}
+            required
+          />
+        </div>
+      </div>
 
       {/* Nombre */}
       <div className="sm:col-span-4 pb-2">
