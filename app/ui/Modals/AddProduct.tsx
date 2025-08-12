@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useImperativeHandle, useState, forwardRef, useEffect, useRef } from "react";
+import ImageInput from "../Modals/ImageInput";
 
 type Category = {
   id: string;
@@ -96,7 +97,7 @@ const AddProduct = forwardRef(function AddProduct(
       </select>
 
       {/* Nombre */}
-      <div className="sm:col-span-4 pb-4">
+      <div className="sm:col-span-4 pb-2">
         <label className="text-sm/6 font-medium text-gray-900">Nombre *</label>
         <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
           <input
@@ -131,7 +132,7 @@ const AddProduct = forwardRef(function AddProduct(
       </div>
 
       {/* Imagen */}
-      {/* <ImageInput /> */}
+      <ImageInput />
 
       {/* Stock */}
       <div className="sm:col-span-4">
@@ -160,6 +161,7 @@ const AddProduct = forwardRef(function AddProduct(
           <input
             name="description"
             type="text"
+            placeholder="Opcional"
             value={form.description}
             className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
             onChange={handleChange}
@@ -171,4 +173,3 @@ const AddProduct = forwardRef(function AddProduct(
 });
 
 export default AddProduct;
-//
