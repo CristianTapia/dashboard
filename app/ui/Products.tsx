@@ -19,12 +19,12 @@ interface Product {
   description?: string;
 }
 
-interface Category {
-  id: number;
-  name: string;
-}
+// interface Category {
+//   id: number;
+//   name: string;
+// }
 
-export default function Products({ products, categories }: { products: Product[]; categories: Category[] }) {
+export default function Products({ products }: { products: Product[] }) {
   // Estados principales
   const [sortedProducts, setSortedProducts] = useState<Product[]>(products);
   const [search, setSearch] = useState({ term: "" });

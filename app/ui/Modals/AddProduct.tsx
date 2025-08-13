@@ -21,6 +21,7 @@ const AddProduct = forwardRef(function AddProduct(
   });
 
   const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryNameBox, setCategoryNameBox] = useState("");
   const localRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -79,7 +80,7 @@ const AddProduct = forwardRef(function AddProduct(
   };
 
   return (
-    <form ref={localRef} onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
       {/* Category */}
       <div className="flex sm:col-span-4 pb-2 gap-2">
         <select
@@ -100,95 +101,96 @@ const AddProduct = forwardRef(function AddProduct(
           +
         </button>
       </div>
-
-      {/* Category */}
+      {/* Category Add Field*/}
       <div className="sm:col-span-4 pb-2">
-        <label className="text-sm/6 font-medium text-gray-900">Nombre Categoría</label>
+        {/* <label className="text-sm/6 font-medium text-gray-900">Nombre Categoría</label> */}
         <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
           <input
-            name="name"
+            name="category_name"
             type="text"
-            value={form.name}
+            value=""
+            placeholder="Nueva categoría"
             className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
             onChange={handleChange}
             required
           />
         </div>
       </div>
-
-      {/* Nombre */}
-      <div className="sm:col-span-4 pb-2">
-        <label className="text-sm/6 font-medium text-gray-900">Nombre *</label>
-        <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
-          <input
-            name="name"
-            type="text"
-            value={form.name}
-            className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
-            onChange={handleChange}
-            required
-          />
+      <form ref={localRef} onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Nombre */}
+        <div className="sm:col-span-4 pb-2">
+          <label className="text-sm/6 font-medium text-gray-900">Nombre *</label>
+          <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
+            <input
+              name="name"
+              type="text"
+              value={form.name}
+              className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
+              onChange={handleChange}
+              required
+            />
+          </div>
         </div>
-      </div>
 
-      {/* Precio */}
-      <div className="sm:col-span-4 pb-4">
-        <label className="text-sm/6 font-medium text-gray-900">Precio *</label>
-        <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
-          <input
-            name="price"
-            type="number"
-            value={form.price}
-            className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
-            onChange={handleChange}
-            required
-            onKeyDown={(e) => {
-              if (["e", "E", "+", "-"].includes(e.key)) {
-                e.preventDefault();
-              }
-            }}
-          />
+        {/* Precio */}
+        <div className="sm:col-span-4 pb-4">
+          <label className="text-sm/6 font-medium text-gray-900">Precio *</label>
+          <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
+            <input
+              name="price"
+              type="number"
+              value={form.price}
+              className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
+              onChange={handleChange}
+              required
+              onKeyDown={(e) => {
+                if (["e", "E", "+", "-"].includes(e.key)) {
+                  e.preventDefault();
+                }
+              }}
+            />
+          </div>
         </div>
-      </div>
 
-      {/* Imagen */}
-      <ImageInput />
+        {/* Imagen */}
+        <ImageInput />
 
-      {/* Stock */}
-      <div className="sm:col-span-4">
-        <label className="text-sm/6 font-medium text-gray-900">Stock</label>
-        <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
-          <input
-            name="stock"
-            type="number"
-            value={form.stock}
-            className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
-            placeholder="Opcional"
-            onChange={handleChange}
-            onKeyDown={(e) => {
-              if (["e", "E", "+", "-"].includes(e.key)) {
-                e.preventDefault();
-              }
-            }}
-          />
+        {/* Stock */}
+        <div className="sm:col-span-4">
+          <label className="text-sm/6 font-medium text-gray-900">Stock</label>
+          <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
+            <input
+              name="stock"
+              type="number"
+              value={form.stock}
+              className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
+              placeholder="Opcional"
+              onChange={handleChange}
+              onKeyDown={(e) => {
+                if (["e", "E", "+", "-"].includes(e.key)) {
+                  e.preventDefault();
+                }
+              }}
+            />
+          </div>
         </div>
-      </div>
 
-      {/* Description */}
-      <div className="sm:col-span-4 pb-4">
-        <label className="text-sm/6 font-medium text-gray-900">Descripción</label>
-        <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
-          <input
-            name="description"
-            type="text"
-            placeholder="Opcional"
-            value={form.description}
-            className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
-            onChange={handleChange}
-          />
+        {/* Description */}
+        <div className="sm:col-span-4 pb-4">
+          <label className="text-sm/6 font-medium text-gray-900">Descripción</label>
+          <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
+            <input
+              name="description"
+              type="text"
+              placeholder="Opcional"
+              value={form.description}
+              className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
+              onChange={handleChange}
+            />
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 });
 
