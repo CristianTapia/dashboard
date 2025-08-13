@@ -21,7 +21,7 @@ const AddProduct = forwardRef(function AddProduct(
   });
 
   const [categories, setCategories] = useState<Category[]>([]);
-  const [categoryNameBox, setCategoryNameBox] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
   const localRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -97,25 +97,30 @@ const AddProduct = forwardRef(function AddProduct(
             </option>
           ))}
         </select>
-        <button className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition">
+        <button
+          onClick={() => setIsOpen(true)}
+          className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
+        >
           +
         </button>
       </div>
       {/* Category Add Field*/}
-      <div className="sm:col-span-4 pb-2">
-        {/* <label className="text-sm/6 font-medium text-gray-900">Nombre Categoría</label> */}
-        <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
-          <input
-            name="category_name"
-            type="text"
-            value=""
-            placeholder="Nueva categoría"
-            className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
-            onChange={handleChange}
-            required
-          />
+      {isOpen && (
+        <div className="sm:col-span-4 pb-2">
+          <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
+            <input
+              name="category_name"
+              type="text"
+              value=""
+              placeholder="Nueva categoría"
+              className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
+              onChange={handleChange}
+              required
+            />
+          </div>
         </div>
-      </div>
+      )}
+
       <form ref={localRef} onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Nombre */}
         <div className="sm:col-span-4 pb-2">
