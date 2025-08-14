@@ -22,9 +22,55 @@ const AddProduct = forwardRef(function AddProduct(
   });
 
   const [categories, setCategories] = useState<Category[]>([]);
-  const [isOpen, setIsOpen] = useState(true);
   const localRef = useRef<HTMLFormElement>(null);
+  const [newCategory, setNewCategory] = useState("");
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
+  // Normalize function to handle case and whitespace
+  const normalize = (s: string) => s.trim().toLowerCase();
+
+  // Handle adding a new category
+  const handleAddCategory = async () => {
+    const name = newCategory.trim();
+    if (!name) return;
+
+    // Evita duplicados en cliente
+    if (categories.some((c) => normalize(c.name) === normalize(name))) {
+      alert("Esa categoría ya existe.");
+      return;
+    }
+
+    try {
+      setAddingCategory(true);
+      const res = await fetch("/api/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      const created = await res.json();
+
+      if (!res.ok) {
+        console.error("Error al crear categoría:", created);
+        alert(created?.error ?? "No se pudo crear la categoría");
+        return;
+      }
+
+      // Añade a la lista y selecciónala
+      setCategories((prev) => [...prev, created]); // created: {id, name}
+      setForm((prev) => ({ ...prev, category_id: created.id }));
+
+      // Limpia UI
+      setNewCategory("");
+      setIsOpen(false);
+    } catch (e: any) {
+      alert("Error de red: " + e.message);
+    } finally {
+      setAddingCategory(false);
+    }
+  };
+
+  // Carga categorías al montar el componente
   useEffect(() => {
     const fetchCategories = async () => {
       const res = await fetch("/api/categories");
@@ -82,47 +128,58 @@ const AddProduct = forwardRef(function AddProduct(
 
   return (
     <div>
-      <form ref={localRef} onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Category */}
-        <div className="flex sm:col-span-4 pb-2 gap-2">
-          <select
-            className="cursor-pointer text-sm/6 font-medium text-gray-900 outline-1 rounded-md outline-gray-300 py-1.5"
-            name="category_id"
-            value={form.category_id}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Selecciona una categoría</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={isOpen ? () => setIsOpen(false) : () => setIsOpen(true)}
-            className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
-          >
-            {isOpen ? "Cerrar" : "Añadir"}
-          </button>
-        </div>
-        {/* Category Add Field*/}
-        {isOpen && (
-          <div className="sm:col-span-4 pb-2">
-            <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
-              <input
-                name="category_name"
-                type="text"
-                value=""
-                placeholder="Nueva categoría"
-                className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-        )}
+      {/* Category */}
+      <div className="flex sm:col-span-4 pb-2 gap-2">
+        <select
+          className="cursor-pointer text-sm/6 font-medium text-gray-900 outline-1 rounded-md outline-gray-300 py-1.5"
+          name="category_id"
+          value={form.category_id}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Selecciona una categoría</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
 
+        <button
+          onClick={isOpen ? () => setIsOpen(false) : () => setIsOpen(true)}
+          className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
+        >
+          {isOpen ? "Cerrar" : "Añadir"}
+        </button>
+      </div>
+
+      {/* Category Add Field*/}
+      {isOpen && (
+        <div className="sm:col-span-4 pb-2">
+          <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
+            <input
+              name="category_name"
+              type="text"
+              value={newCategory}
+              placeholder="Nueva categoría"
+              className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
+              onChange={(e) => setNewCategory(e.target.value)}
+              required
+            />
+            {/* Save button */}
+            <button
+              type="button"
+              onClick={handleAddCategory}
+              disabled={!newCategory.trim() || addingCategory}
+              className="cursor-pointer rounded bg-emerald-600 px-4 py-1.5 text-sm text-white hover:bg-emerald-700 disabled:opacity-50"
+            >
+              {addingCategory ? "Guardando..." : "Guardar"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      <form ref={localRef} onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Nombre */}
         <div className="sm:col-span-4 pb-2">
           <label className="text-sm/6 font-medium text-gray-900">Nombre *</label>
