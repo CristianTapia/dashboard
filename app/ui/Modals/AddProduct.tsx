@@ -2,7 +2,7 @@
 
 import React, { useImperativeHandle, useState, forwardRef, useEffect, useRef } from "react";
 import ImageInput from "../Modals/ImageInput";
-import { is } from "zod/locales";
+// import { is } from "zod/locales";
 
 type Category = {
   id: string;
