@@ -2,7 +2,6 @@
 
 import React, { useImperativeHandle, useState, forwardRef, useEffect, useRef } from "react";
 import ImageInput from "../Modals/ImageInput";
-// import { is } from "zod/locales";
 
 type Category = {
   id: string;
@@ -25,7 +24,7 @@ const AddProduct = forwardRef(function AddProduct(
   const localRef = useRef<HTMLFormElement>(null);
   const [newCategory, setNewCategory] = useState("");
   const [addingCategory, setAddingCategory] = useState(false);
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   // Normalize function to handle case and whitespace
   const normalize = (s: string) => s.trim().toLowerCase();
