@@ -9,6 +9,7 @@ export const CreateProductSchema = z.object({
     .union([z.string(), z.number()])
     .transform((val) => Number(val)) // <-- asegura que sea un número
     .refine((val) => !isNaN(val), "ID de categoría inválido"),
+  image_path: z.string().min(1).optional().nullable(),
 });
 
 export type CreateProductInput = z.infer<typeof CreateProductSchema>;

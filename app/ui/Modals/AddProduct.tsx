@@ -25,6 +25,7 @@ const AddProduct = forwardRef(function AddProduct(
   const [newCategory, setNewCategory] = useState("");
   const [addingCategory, setAddingCategory] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [imagePath, setImagePath] = useState<string | null>(null);
 
   // Normalize function to handle case and whitespace
   const normalize = (s: string) => s.trim().toLowerCase();
@@ -105,6 +106,7 @@ const AddProduct = forwardRef(function AddProduct(
           stock: form.stock ? Number(form.stock) : 0,
           description: form.description,
           category_id: form.category_id,
+          image_path: imagePath,
         }),
       });
 
@@ -215,7 +217,7 @@ const AddProduct = forwardRef(function AddProduct(
         </div>
 
         {/* Imagen */}
-        <ImageInput />
+        <ImageInput onUploaded={setImagePath} />
 
         {/* Stock */}
         <div className="sm:col-span-4">
