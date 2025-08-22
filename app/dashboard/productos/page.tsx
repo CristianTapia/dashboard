@@ -1,13 +1,29 @@
 import Products from "@/app/ui/Products";
 import { createServer } from "@/app/lib/supabase/Server";
 import { createSupabaseAdmin } from "@/app/lib/supabase/Admin";
-
-// export const dynamic = "force-dynamic";
+import { cookies } from "next/headers";
 
 export default async function ProductsPage() {
-  const supabase = await createServer();
+  // TRAER DATOS DESDE LA API
+  // 1) Categorias
+  const base = process.env.NEXT_PUBLIC_SITE_URL /* prod */ ?? "http://localhost:3001"; /* dev: confirma tu puerto */
+
+  const catRes = await fetch(`${base}/api/categories`, {
+    method: "GET",
+    headers: { cookie: cookies().toString() }, // reenvía sesión si tu API usa RLS
+    cache: "no-store",
+  });
+
+  if (!catRes.ok) {
+    const err = await catRes.json().catch(() => ({}));
+    throw new Error(`Error categorías: ${err?.error ?? catRes.statusText}`);
+  }
+
+  const categories: Array<{ id: number; name: string }> = await catRes.json();
 
   // SALTARSE LA API PARA TRAER PRODUCTOS
+  const supabase = await createServer();
+
   // 1) traer categorías y productos
   const { data: products, error } = await supabase
     .from("products")
@@ -45,5 +61,5 @@ export default async function ProductsPage() {
     image_url: p.image_path ? mapPathToUrl.get(p.image_path) ?? null : null,
   }));
 
-  return <Products products={mapped as any} />;
+  return <Products products={mapped as any} categories={categories as any} />;
 }

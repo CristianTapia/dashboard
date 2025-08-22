@@ -2,8 +2,10 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+// Inicializa el cliente de Supabase
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
+// Maneja las solicitudes GET y POST para categorías
 export async function GET() {
   const { data, error } = await supabase.from("categories").select("id, name").order("name", { ascending: true });
 

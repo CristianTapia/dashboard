@@ -21,7 +21,12 @@ interface Product {
   image_url?: string | null;
 }
 
-export default function Products({ products }: { products: Product[] }) {
+interface Category {
+  id: number;
+  name: string;
+}
+
+export default function Products({ products, categories }: { products: Product[]; categories: Category[] }) {
   // Estados principales
   const [sortedProducts, setSortedProducts] = useState<Product[]>(products);
   const [search, setSearch] = useState({ term: "" });
@@ -31,7 +36,7 @@ export default function Products({ products }: { products: Product[] }) {
   );
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
-  const [categories, setCategories] = useState<any[]>([]);
+  // const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   // const didRun = useRef(false);
   const selectedProduct = products.find((product) => product.id === selectedProductId);
@@ -188,43 +193,6 @@ export default function Products({ products }: { products: Product[] }) {
       window.removeEventListener("scroll", handleScroll, true);
     };
   }, [openDropdownId]);
-
-  // Traer datos de la API
-  useEffect(() => {
-    // if (didRun.current) return;
-    // didRun.current = true;
-
-    const controller = new AbortController();
-
-    (async () => {
-      try {
-        const res = await fetch("/api/categories", {
-          method: "GET",
-          // Headers no son necesarios para GET, pero no hacen daño
-          // headers: { "Content-Type": "application/json" },
-          cache: "no-store", // evita cache agresivo
-          signal: controller.signal, // permite cancelar si desmonta
-        });
-
-        const result = await res.json();
-        if (!res.ok) {
-          console.error("🛑 Error del servidor:", result);
-          alert("Error: " + (result?.error || "Error desconocido"));
-          return;
-        }
-        setCategories(result);
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("🚨 Error de red:", err);
-          alert("Error de red: " + err.message);
-        }
-      } finally {
-        setLoading(false);
-      }
-    })();
-
-    return () => controller.abort();
-  }, []);
 
   // Renderizado
   return (
