@@ -31,6 +31,9 @@ export default function Products({ products }: { products: Product[] }) {
   );
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  // const didRun = useRef(false);
   const selectedProduct = products.find((product) => product.id === selectedProductId);
 
   // Filtros
@@ -46,20 +49,10 @@ export default function Products({ products }: { products: Product[] }) {
   const [tempActiveStockOrder, setTempActiveStockOrder] = useState<"asc" | "desc" | null>(null);
   const [tempActiveAlphabeticalOrder, setTempActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
 
-  const uniqueCategories = [...new Set(products.map((p) => p.category ?? ""))].filter(Boolean);
+  // const uniqueCategories = [...new Set(products.map((p) => p.category ?? ""))].filter(Boolean);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
-
-  // Carga productos al montar el componente
-  // useEffect(() => {
-  //   const fetchProducts = async () => {
-  //     const res = await fetch("/api/products");
-  //     const data = await res.json();
-  //     setSortedProducts(data);
-  //   };
-  //   fetchProducts();
-  // }, []);
 
   // FILTROS
   useEffect(() => {
@@ -195,6 +188,43 @@ export default function Products({ products }: { products: Product[] }) {
       window.removeEventListener("scroll", handleScroll, true);
     };
   }, [openDropdownId]);
+
+  // Traer datos de la API
+  useEffect(() => {
+    // if (didRun.current) return;
+    // didRun.current = true;
+
+    const controller = new AbortController();
+
+    (async () => {
+      try {
+        const res = await fetch("/api/categories", {
+          method: "GET",
+          // Headers no son necesarios para GET, pero no hacen daño
+          // headers: { "Content-Type": "application/json" },
+          cache: "no-store", // evita cache agresivo
+          signal: controller.signal, // permite cancelar si desmonta
+        });
+
+        const result = await res.json();
+        if (!res.ok) {
+          console.error("🛑 Error del servidor:", result);
+          alert("Error: " + (result?.error || "Error desconocido"));
+          return;
+        }
+        setCategories(result);
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("🚨 Error de red:", err);
+          alert("Error de red: " + err.message);
+        }
+      } finally {
+        setLoading(false);
+      }
+    })();
+
+    return () => controller.abort();
+  }, []);
 
   // Renderizado
   return (
@@ -351,14 +381,14 @@ export default function Products({ products }: { products: Product[] }) {
             filterA={
               showCategories && (
                 <ul className="mt-2 space-y-2">
-                  {uniqueCategories.map((category) => (
-                    <li key={category} className="text-sm pl-2">
+                  {categories.map((category) => (
+                    <li key={category.id} className="text-sm pl-2">
                       <input
                         type="checkbox"
-                        checked={tempSelectedCategories.includes(category)}
-                        onChange={() => handleTempCategoryChange(category)}
+                        checked={tempSelectedCategories.includes(category.name)}
+                        onChange={() => handleTempCategoryChange(category.name)}
                       />
-                      <label className="ml-2">{category}</label>
+                      <label className="ml-2">{category.name}</label>
                     </li>
                   ))}
                 </ul>

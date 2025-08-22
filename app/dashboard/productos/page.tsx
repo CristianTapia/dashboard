@@ -7,7 +7,8 @@ import { createSupabaseAdmin } from "@/app/lib/supabase/Admin";
 export default async function ProductsPage() {
   const supabase = await createServer();
 
-  // Trae tus productos con la ruta interna del storage (ej: "products/123.jpg")
+  // SALTARSE LA API PARA TRAER PRODUCTOS
+  // 1) traer categorías y productos
   const { data: products, error } = await supabase
     .from("products")
     .select("id, name, price, stock, description, category:categories(id, name), image_path")
@@ -22,7 +23,7 @@ export default async function ProductsPage() {
   const mapPathToUrl = new Map<string, string>();
   if (paths.length) {
     const { data: signed, error: signErr } = await admin.storage
-      .from("product-images") // <- tu bucket
+      .from("product-images") // <- Supabase bucket
       .createSignedUrls(paths, 60 * 60); // 1 hora
 
     if (signErr) {
