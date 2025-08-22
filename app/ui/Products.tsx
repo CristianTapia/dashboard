@@ -9,6 +9,7 @@ import AddProduct from "./Modals/AddProduct";
 import EditProduct from "./Modals/EditProduct";
 import Filtering from "./Modals/Filtering";
 import FilteringButton from "./Modals/FilteringButton";
+import Image from "next/image";
 
 interface Product {
   id: number;
@@ -17,12 +18,8 @@ interface Product {
   category: string;
   stock?: number;
   description?: string;
+  image_url?: string | null;
 }
-
-// interface Category {
-//   id: number;
-//   name: string;
-// }
 
 export default function Products({ products }: { products: Product[] }) {
   // Estados principales
@@ -49,10 +46,20 @@ export default function Products({ products }: { products: Product[] }) {
   const [tempActiveStockOrder, setTempActiveStockOrder] = useState<"asc" | "desc" | null>(null);
   const [tempActiveAlphabeticalOrder, setTempActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
 
-  const uniqueCategories = [...new Set(products.map((p) => p.category))];
+  const uniqueCategories = [...new Set(products.map((p) => p.category ?? ""))].filter(Boolean);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  // Carga productos al montar el componente
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     const res = await fetch("/api/products");
+  //     const data = await res.json();
+  //     setSortedProducts(data);
+  //   };
+  //   fetchProducts();
+  // }, []);
 
   // FILTROS
   useEffect(() => {
@@ -219,8 +226,8 @@ export default function Products({ products }: { products: Product[] }) {
 
       {/* Lista de productos */}
       <div className="flex flex-wrap gap-8 justify-center">
-        {sortedProducts.map((option, index) => (
-          <div key={index} className="relative box-border border p-4 rounded shadow-md bg-gray w-[200px]">
+        {sortedProducts.map((option) => (
+          <div key={option.id} className="relative box-border border p-4 rounded shadow-md bg-gray w-[200px]">
             <div className="flex justify-between items-center">
               <div className="w-32">Producto {option.id}</div>
               <div className="relative">
@@ -265,9 +272,24 @@ export default function Products({ products }: { products: Product[] }) {
                 minimumFractionDigits: 0,
               }).format(option.price)}
             </div>
-            <div className="w-32 pb-1">{option.category}</div>
+            <div className="w-32 pb-1">{option.category ?? "—"}</div>
             <div className="w-32 pb-3">Stock: {option.stock}</div>
-            <div className="p-12 box-border border rounded">Foto</div>
+            <div className="p-12 box-border border rounded">
+              {option.image_url ? (
+                <Image
+                  src={option.image_url ?? ""}
+                  alt={option.name}
+                  width={96}
+                  height={96}
+                  className="w-24 h-24 object-cover rounded border"
+                  unoptimized
+                />
+              ) : (
+                <div className="w-24 h-24 border border-gray-300 rounded flex items-center justify-center text-sm">
+                  Sin foto
+                </div>
+              )}
+            </div>
           </div>
         ))}
       </div>
