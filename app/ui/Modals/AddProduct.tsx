@@ -9,7 +9,7 @@ type Category = {
 };
 
 const AddProduct = forwardRef(function AddProduct(
-  { onSuccess }: { onSuccess: () => void },
+  { onSuccess, categories }: { onSuccess: () => void; categories: Category[] },
   ref: React.Ref<HTMLFormElement>
 ) {
   const [form, setForm] = useState({
@@ -20,7 +20,7 @@ const AddProduct = forwardRef(function AddProduct(
     category_id: "",
   });
 
-  const [categories, setCategories] = useState<Category[]>([]);
+  // const [categories, setCategories] = useState<Category[]>([]);
   const localRef = useRef<HTMLFormElement>(null);
   const [newCategory, setNewCategory] = useState("");
   const [addingCategory, setAddingCategory] = useState(false);
@@ -36,10 +36,10 @@ const AddProduct = forwardRef(function AddProduct(
     if (!name) return;
 
     // Evita duplicados en cliente
-    if (categories.some((c) => normalize(c.name) === normalize(name))) {
-      alert("Esa categoría ya existe.");
-      return;
-    }
+    // if (categories.some((c) => normalize(c.name) === normalize(name))) {
+    //   alert("Esa categoría ya existe.");
+    //   return;
+    // }
 
     try {
       setAddingCategory(true);
@@ -57,7 +57,7 @@ const AddProduct = forwardRef(function AddProduct(
       }
 
       // Añade a la lista y selecciónala
-      setCategories((prev) => [...prev, created]); // created: {id, name}
+      // setCategories((prev) => [...prev, created]); // created: {id, name}
       setForm((prev) => ({ ...prev, category_id: created.id }));
 
       // Limpia UI
@@ -71,14 +71,14 @@ const AddProduct = forwardRef(function AddProduct(
   };
 
   // Carga categorías al montar el componente
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const res = await fetch("/api/categories");
-      const data = await res.json();
-      setCategories(data);
-    };
-    fetchCategories();
-  }, []);
+  // useEffect(() => {
+  //   const fetchCategories = async () => {
+  //     const res = await fetch("/api/categories");
+  //     const data = await res.json();
+  //     setCategories(data);
+  //   };
+  //   fetchCategories();
+  // }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });

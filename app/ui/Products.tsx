@@ -36,9 +36,7 @@ export default function Products({ products, categories }: { products: Product[]
   );
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
-  // const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  // const didRun = useRef(false);
   const selectedProduct = products.find((product) => product.id === selectedProductId);
 
   // Filtros
@@ -304,6 +302,7 @@ export default function Products({ products, categories }: { products: Product[]
               onSuccess();
               closeModal();
             }}
+            categories={categories as any}
           />
         }
         buttonAName="Agregar"
