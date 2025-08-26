@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useImperativeHandle, useState, forwardRef, useEffect, useRef } from "react";
+import React, { useImperativeHandle, useState, forwardRef, useRef } from "react";
+import { useRouter } from "next/navigation";
 import ImageInput from "../Modals/ImageInput";
 
 type Category = {
@@ -9,7 +10,7 @@ type Category = {
 };
 
 const AddProduct = forwardRef(function AddProduct(
-  { onSuccess, categories }: { onSuccess: () => void; categories: Category[] },
+  { onSuccess, initialCategories }: { onSuccess: () => void; initialCategories: Category[] },
   ref: React.Ref<HTMLFormElement>
 ) {
   const [form, setForm] = useState({
@@ -20,7 +21,7 @@ const AddProduct = forwardRef(function AddProduct(
     category_id: "",
   });
 
-  // const [categories, setCategories] = useState<Category[]>([]);
+  const router = useRouter();
   const localRef = useRef<HTMLFormElement>(null);
   const [newCategory, setNewCategory] = useState("");
   const [addingCategory, setAddingCategory] = useState(false);
@@ -30,16 +31,17 @@ const AddProduct = forwardRef(function AddProduct(
   // Normalize function to handle case and whitespace
   const normalize = (s: string) => s.trim().toLowerCase();
 
-  // Handle adding a new category
+  // POST NUEVA CATEGORÍA USANDO INPUT
+  // Cierra el input y limpia
   const handleAddCategory = async () => {
     const name = newCategory.trim();
     if (!name) return;
 
     // Evita duplicados en cliente
-    // if (categories.some((c) => normalize(c.name) === normalize(name))) {
-    //   alert("Esa categoría ya existe.");
-    //   return;
-    // }
+    if (initialCategories.some((c) => normalize(c.name) === normalize(name))) {
+      alert("Esa categoría ya existe.");
+      return;
+    }
 
     try {
       setAddingCategory(true);
@@ -57,7 +59,6 @@ const AddProduct = forwardRef(function AddProduct(
       }
 
       // Añade a la lista y selecciónala
-      // setCategories((prev) => [...prev, created]); // created: {id, name}
       setForm((prev) => ({ ...prev, category_id: created.id }));
 
       // Limpia UI
@@ -68,18 +69,12 @@ const AddProduct = forwardRef(function AddProduct(
     } finally {
       setAddingCategory(false);
     }
+    // Vuelve a renderizar el parent server component y re-fetch
+    router.refresh();
   };
 
-  // Carga categorías al montar el componente
-  // useEffect(() => {
-  //   const fetchCategories = async () => {
-  //     const res = await fetch("/api/categories");
-  //     const data = await res.json();
-  //     setCategories(data);
-  //   };
-  //   fetchCategories();
-  // }, []);
-
+  // POST DE PRODUCTOS A TRAVÉS DEL FORMULARIO
+  // Maneja cambios en los inputs
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -139,7 +134,7 @@ const AddProduct = forwardRef(function AddProduct(
           required
         >
           <option value="">Selecciona una categoría</option>
-          {categories.map((cat) => (
+          {initialCategories.map((cat) => (
             <option key={cat.id} value={cat.id}>
               {cat.name}
             </option>

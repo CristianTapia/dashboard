@@ -26,7 +26,13 @@ interface Category {
   name: string;
 }
 
-export default function Products({ products, categories }: { products: Product[]; categories: Category[] }) {
+export default function Products({
+  products,
+  initialCategories,
+}: {
+  products: Product[];
+  initialCategories: Category[];
+}) {
   // Estados principales
   const [sortedProducts, setSortedProducts] = useState<Product[]>(products);
   const [search, setSearch] = useState({ term: "" });
@@ -302,7 +308,7 @@ export default function Products({ products, categories }: { products: Product[]
               onSuccess();
               closeModal();
             }}
-            categories={categories as any}
+            initialCategories={initialCategories as any}
           />
         }
         buttonAName="Agregar"
@@ -348,7 +354,7 @@ export default function Products({ products, categories }: { products: Product[]
             filterA={
               showCategories && (
                 <ul className="mt-2 space-y-2">
-                  {categories.map((category) => (
+                  {initialCategories.map((category) => (
                     <li key={category.id} className="text-sm pl-2">
                       <input
                         type="checkbox"

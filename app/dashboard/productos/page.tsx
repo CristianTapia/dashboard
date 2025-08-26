@@ -12,6 +12,7 @@ export default async function ProductsPage() {
     method: "GET",
     headers: { cookie: cookies().toString() }, // reenvía sesión si tu API usa RLS
     cache: "no-store",
+    next: { tags: ["categories"] }, // opcional: para revalidar con ISR
   });
 
   if (!catRes.ok) {
@@ -61,5 +62,5 @@ export default async function ProductsPage() {
     image_url: p.image_path ? mapPathToUrl.get(p.image_path) ?? null : null,
   }));
 
-  return <Products products={mapped as any} categories={categories as any} />;
+  return <Products products={mapped as any} initialCategories={categories as any} />;
 }
