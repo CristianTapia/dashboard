@@ -4,28 +4,20 @@ import { createSupabaseAdmin } from "@/app/lib/supabase/Admin";
 import { cookies } from "next/headers";
 
 export default async function ProductsPage() {
-  // TRAER DATOS DESDE LA API
-  // 1) Categorias
-  const base = process.env.NEXT_PUBLIC_SITE_URL /* prod */ ?? "http://localhost:3001"; /* dev: confirma tu puerto */
+  // TRAER PRODUCTOS DIRECTAMENTE DESDE LA BD
+  const supabase = await createServer();
+  // 1) Categorias - Leer datos con anon (SSR)
+  const { data: categories = [], error: catError } = await supabase
+    .from("categories")
+    .select("*")
+    .order("created_at", { ascending: true });
 
-  const catRes = await fetch(`${base}/api/categories`, {
-    method: "GET",
-    headers: { cookie: cookies().toString() }, // reenvía sesión si tu API usa RLS
-    cache: "no-store",
-    next: { tags: ["categories"] }, // opcional: para revalidar con ISR
-  });
-
-  if (!catRes.ok) {
-    const err = await catRes.json().catch(() => ({}));
-    throw new Error(`Error categorías: ${err?.error ?? catRes.statusText}`);
+  if (catError) {
+    console.error("Error en Supabase:", catError);
+    return <div>Error cargando datos</div>;
   }
 
-  const categories: Array<{ id: number; name: string }> = await catRes.json();
-
-  // SALTARSE LA API PARA TRAER PRODUCTOS
-  const supabase = await createServer();
-
-  // 1) traer categorías y productos
+  // 1) GET a la tabla products directo a Supabase
   const { data: products, error } = await supabase
     .from("products")
     .select("id, name, price, stock, description, category:categories(id, name), image_path")
