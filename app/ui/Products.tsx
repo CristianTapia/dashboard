@@ -276,18 +276,18 @@ export default function Products({
             </div>
             <div className="w-32 pb-1">{option.category ?? "—"}</div>
             <div className="w-32 pb-3">Stock: {option.stock}</div>
-            <div className="p-12 box-border border rounded">
+            <div className="p-5 flex justify-center">
               {option.image_url ? (
                 <Image
                   src={option.image_url ?? ""}
                   alt={option.name}
                   width={96}
                   height={96}
-                  className="w-24 h-24 object-cover rounded border"
+                  className="w-34 h-34 object-cover rounded border"
                   unoptimized
                 />
               ) : (
-                <div className="w-24 h-24 border border-gray-300 rounded flex items-center justify-center text-sm">
+                <div className="w-34 h-34 border border-gray-300 rounded flex items-center justify-center text-sm">
                   Sin foto
                 </div>
               )}
