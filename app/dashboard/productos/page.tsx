@@ -1,7 +1,6 @@
 import Products from "@/app/ui/Products";
 import { createServer } from "@/app/lib/supabase/Server";
 import { createSupabaseAdmin } from "@/app/lib/supabase/Admin";
-import { cookies } from "next/headers";
 
 export default async function ProductsPage() {
   // TRAER PRODUCTOS DIRECTAMENTE DESDE LA BD
@@ -10,22 +9,22 @@ export default async function ProductsPage() {
   const { data: categories = [], error: catError } = await supabase
     .from("categories")
     .select("*")
-    .order("created_at", { ascending: true });
+    .order("name", { ascending: true });
 
   if (catError) {
     console.error("Error en Supabase:", catError);
     return <div>Error cargando datos</div>;
   }
 
-  // 1) GET a la tabla products directo a Supabase
+  // 2) Productos - Leer datos
   const { data: products, error } = await supabase
     .from("products")
     .select("id, name, price, stock, description, category:categories(id, name), image_path")
-    .order("name", { ascending: true });
+    .order("id", { ascending: true });
 
   if (error) throw error;
 
-  // 2) firmar imágenes (server only)
+  // 2.1) firmar imágenes (server only)
   const admin = createSupabaseAdmin();
   const paths = (products ?? []).map((p) => p.image_path).filter((p): p is string => !!p);
 
@@ -44,7 +43,7 @@ export default async function ProductsPage() {
     }
   }
 
-  // 3) normalizar y añadir image_url firmada
+  // 2.2) normalizar y añadir image_url firmada
   const mapped = (products ?? []).map((p) => ({
     ...p,
     // p.category puede venir como objeto o array => extraemos el .name
