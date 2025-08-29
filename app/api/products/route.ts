@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createServer } from "@/app/lib/supabase/Server";
 import { CreateProductInput, CreateProductSchema } from "@/app/lib/validators/product";
 
-// READ PRODUCTS FROM THE DATABASE
+// [GET] READ PRODUCTS FROM THE DATABASE
 export async function GET() {
   const supabase = await createServer();
   const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: true });
@@ -14,7 +14,7 @@ export async function GET() {
   return NextResponse.json(data);
 }
 
-// CREATE A NEW PRODUCT IN THE DATABASE
+// [POST] CREATE A NEW PRODUCT IN THE DATABASE
 export async function POST(req: Request) {
   try {
     const body = await req.json();

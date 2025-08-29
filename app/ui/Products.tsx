@@ -323,7 +323,15 @@ export default function Products({
         isOpen={activeModal === "editProduct"}
         onCloseAction={closeModal}
         title={`Editar Producto ${selectedProduct?.id ?? ""}`}
-        body={<EditProduct />}
+        body={
+          <EditProduct
+            ref={formRef}
+            onSuccess={() => {
+              onSuccess();
+              closeModal();
+            }}
+          />
+        }
         buttonAName="Confirmar"
         buttonBName="Cancelar"
         onButtonAClickAction={closeModal}
