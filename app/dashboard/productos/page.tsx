@@ -3,7 +3,7 @@ import { createServer } from "@/app/lib/supabase/Server";
 import { createSupabaseAdmin } from "@/app/lib/supabase/Admin";
 
 export default async function ProductsPage() {
-  // TRAER PRODUCTOS DIRECTAMENTE DESDE LA BD
+  // [GET] TRAER PRODUCTOS DIRECTAMENTE DESDE LA BD
   const supabase = await createServer();
   // 1) Categorias - Leer datos con anon (SSR)
   const { data: categories = [], error: catError } = await supabase

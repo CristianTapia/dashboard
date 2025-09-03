@@ -86,7 +86,7 @@ const EditProduct = forwardRef(function AddProduct(
   // Normalize function to handle case and whitespace
   const normalize = (s: string) => s.trim().toLowerCase();
 
-  // POST NUEVA CATEGORÍA USANDO INPUT
+  // [POST] NUEVA CATEGORÍA USANDO INPUT
   // Cierra el input y limpia
   const handleEditCategory = async () => {
     const name = newCategory.trim();
