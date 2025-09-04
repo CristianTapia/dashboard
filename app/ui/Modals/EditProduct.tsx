@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useImperativeHandle, useState, forwardRef, useRef } from "react";
+import React, { useImperativeHandle, useState, forwardRef, useRef, use } from "react";
 import { useRouter } from "next/navigation";
 import ImageInput from "../Modals/ImageInput";
 import { Product, Category } from "@/app/lib/types";
+import { is } from "zod/locales";
 
 const EditProduct = forwardRef(function EditProduct(
   { onSuccess, product, categories }: { onSuccess: () => void; product: Product; categories: Category[] },
@@ -21,8 +22,14 @@ const EditProduct = forwardRef(function EditProduct(
   const localRef = useRef<HTMLFormElement>(null);
   const [newCategory, setNewCategory] = useState("");
   const [editingCategory, setEditingCategory] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+
   const [imagePath, setImagePath] = useState<string | null>(null);
+
+  // Edition mode
+  const [isActive, setIsActive] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [draftValue, setDraftValue] = useState<string>("");
+  const [isSaving, setIssaving] = useState(false);
 
   // Normalize function to handle case and whitespace
   const normalize = (s: string) => s.trim().toLowerCase();
@@ -59,7 +66,7 @@ const EditProduct = forwardRef(function EditProduct(
 
       // Limpia UI
       setNewCategory("");
-      setIsOpen(false);
+      // setIsActive(false);
     } catch (e: any) {
       alert("Error de red: " + e.message);
     } finally {
@@ -125,12 +132,24 @@ const EditProduct = forwardRef(function EditProduct(
         <label className="text-sm/6 font-medium text-gray-900">Categoría:</label>
         <div className="flex items-center w-full gap-2">
           <div className="flex-[1] text-sm/6 font-medium text-gray-900">{product.category.name}</div>
-          <button
-            onClick={isOpen ? () => setIsOpen(false) : () => setIsOpen(true)}
-            className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
-          >
-            {isOpen ? "Cerrar" : "Editar"}
-          </button>
+          {isActive !== "category" && (
+            <button
+              onClick={() => setIsActive(isActive === "category" ? null : "category")}
+              className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
+            >
+              Editar
+            </button>
+          )}
+
+          {isActive === "category" && (
+            <div className="flex gap-4 px-4 py-1.5 items-center text-sm transition">
+              <button className="cursor-pointer">✅</button>
+              <button onClick={() => setIsActive(null)} className="cursor-pointer">
+                ❌
+              </button>
+              <input type="text" placeholder="Nueva categoría" className="ml-2 border px-2 py-1 rounded" />
+            </div>
+          )}
         </div>
       </div>
 
@@ -139,12 +158,24 @@ const EditProduct = forwardRef(function EditProduct(
         <label className="text-sm/6 font-medium text-gray-900">Nombre:</label>
         <div className="flex items-center w-full gap-2">
           <div className="flex-[1] text-sm/6 font-medium text-gray-900">{product.name}</div>
-          <button
-            onClick={isOpen ? () => setIsOpen(false) : () => setIsOpen(true)}
-            className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
-          >
-            {isOpen ? "Cerrar" : "Editar"}
-          </button>
+          {isActive !== "name" && (
+            <button
+              onClick={() => setIsActive(isActive === "name" ? null : "name")}
+              className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
+            >
+              Editar
+            </button>
+          )}
+
+          {isActive === "name" && (
+            <div className="flex gap-4 px-4 py-1.5 items-center text-sm transition">
+              <button className="cursor-pointer">✅</button>
+              <button onClick={() => setIsActive(null)} className="cursor-pointer">
+                ❌
+              </button>
+              <input type="text" placeholder="Nuevo nombre" className="ml-2 border px-2 py-1 rounded" />
+            </div>
+          )}
         </div>
       </div>
 
@@ -159,12 +190,23 @@ const EditProduct = forwardRef(function EditProduct(
               minimumFractionDigits: 0,
             }).format(product.price)}
           </div>
-          <button
-            onClick={isOpen ? () => setIsOpen(false) : () => setIsOpen(true)}
-            className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
-          >
-            {isOpen ? "Cerrar" : "Editar"}
-          </button>
+          {isActive !== "price" && (
+            <button
+              onClick={() => setIsActive(isActive === "price" ? null : "price")}
+              className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
+            >
+              Editar
+            </button>
+          )}
+          {isActive === "price" && (
+            <div className="flex gap-4 px-4 py-1.5 items-center text-sm transition">
+              <button className="cursor-pointer">✅</button>
+              <button onClick={() => setIsActive(null)} className="cursor-pointer">
+                ❌
+              </button>
+              <input type="number" placeholder="Nuevo precio" className="ml-2 border px-2 py-1 rounded" />
+            </div>
+          )}
         </div>
       </div>
 
@@ -173,46 +215,64 @@ const EditProduct = forwardRef(function EditProduct(
         <label className="text-sm/6 font-medium text-gray-900">Stock:</label>
         <div className="flex items-center w-full gap-2">
           <div className="flex-[1] text-sm/6 font-medium text-gray-900">{product.stock}</div>
-          <button
-            onClick={isOpen ? () => setIsOpen(false) : () => setIsOpen(true)}
-            className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
-          >
-            {isOpen ? "Cerrar" : "Editar"}
-          </button>
+          {isActive !== "stock" && (
+            <button
+              onClick={() => setIsActive(isActive === "stock" ? null : "stock")}
+              className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
+            >
+              Editar
+            </button>
+          )}
+          {isActive === "stock" && (
+            <div className="flex gap-4 px-4 py-1.5 items-center text-sm transition">
+              <button className="cursor-pointer">✅</button>
+              <button onClick={() => setIsActive(null)} className="cursor-pointer">
+                ❌
+              </button>
+              <input
+                name="stock"
+                type="number"
+                className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
+                placeholder="Nuevo stock"
+                onChange={handleChange}
+                onKeyDown={(e) => {
+                  if (["e", "E", "+", "-"].includes(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
+              />
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Guardando onKeyDown para despues */}
-      {/* <input
-              name="stock"
-              type="number"
-              value={form.stock}
-              className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
-              placeholder="Opcional"
-              onChange={handleChange}
-              onKeyDown={(e) => {
-                if (["e", "E", "+", "-"].includes(e.key)) {
-                  e.preventDefault();
-                }
-              }}
-            /> */}
-
       {/* Description */}
       <div className="sm:col-span-4 pb-2">
-        <label className="text-sm/6 font-medium text-gray-900">Stock:</label>
+        <label className="text-sm/6 font-medium text-gray-900">Descripción:</label>
         <div className="flex items-center w-full gap-2">
           <div className="flex-[1] text-sm/6 font-medium text-gray-900">{product.description}</div>
-          <button
-            onClick={isOpen ? () => setIsOpen(false) : () => setIsOpen(true)}
-            className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
-          >
-            {isOpen ? "Cerrar" : "Editar"}
-          </button>
+          {isActive !== "description" && (
+            <button
+              onClick={() => setIsActive(isActive === "description" ? null : "description")}
+              className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
+            >
+              Editar
+            </button>
+          )}
+          {isActive === "description" && (
+            <div className="flex gap-4 px-4 py-1.5 items-center text-sm transition">
+              <button className="cursor-pointer">✅</button>
+              <button onClick={() => setIsActive(null)} className="cursor-pointer">
+                ❌
+              </button>
+              <input type="text" placeholder="Nueva descripción" className="ml-2 border px-2 py-1 rounded" />
+            </div>
+          )}
         </div>
       </div>
 
       {/* Category Add Field */}
-      {isOpen && (
+      {/* {isActive && (
         <div className="sm:col-span-4 pb-2">
           <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
             <input
@@ -223,9 +283,9 @@ const EditProduct = forwardRef(function EditProduct(
               className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
               onChange={(e) => setNewCategory(e.target.value)}
               required
-            />
-            {/* Save button */}
-            <button
+            /> */}
+      {/* Save button */}
+      {/* <button
               type="button"
               onClick={handleEditCategory}
               disabled={!newCategory.trim() || editingCategory}
@@ -235,7 +295,7 @@ const EditProduct = forwardRef(function EditProduct(
             </button>
           </div>
         </div>
-      )}
+      )} */}
 
       <form ref={localRef} onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Imagen */}
