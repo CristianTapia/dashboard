@@ -122,9 +122,9 @@ const EditProduct = forwardRef(function EditProduct(
     <div>
       {/* Category */}
       <div className="sm:col-span-4 pb-2">
-        <label className="text-sm/6 font-medium text-gray-900">Categoría</label>
-        <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
-          <div>{product.name}</div>
+        <label className="text-sm/6 font-medium text-gray-900">Nombre:</label>
+        <div className="flex items-center w-full gap-2">
+          <div className="flex-[1] text-sm/6 font-medium text-gray-900">{product.name}</div>
           <button
             onClick={isOpen ? () => setIsOpen(false) : () => setIsOpen(true)}
             className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
@@ -134,7 +134,7 @@ const EditProduct = forwardRef(function EditProduct(
         </div>
       </div>
 
-      {/* Category Add Field*/}
+      {/* Category Add Field */}
       {isOpen && (
         <div className="sm:col-span-4 pb-2">
           <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
