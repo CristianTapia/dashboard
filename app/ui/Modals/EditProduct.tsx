@@ -122,9 +122,86 @@ const EditProduct = forwardRef(function EditProduct(
     <div>
       {/* Category */}
       <div className="sm:col-span-4 pb-2">
+        <label className="text-sm/6 font-medium text-gray-900">Categoría:</label>
+        <div className="flex items-center w-full gap-2">
+          <div className="flex-[1] text-sm/6 font-medium text-gray-900">{product.category.name}</div>
+          <button
+            onClick={isOpen ? () => setIsOpen(false) : () => setIsOpen(true)}
+            className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
+          >
+            {isOpen ? "Cerrar" : "Editar"}
+          </button>
+        </div>
+      </div>
+
+      {/* Name */}
+      <div className="sm:col-span-4 pb-2">
         <label className="text-sm/6 font-medium text-gray-900">Nombre:</label>
         <div className="flex items-center w-full gap-2">
           <div className="flex-[1] text-sm/6 font-medium text-gray-900">{product.name}</div>
+          <button
+            onClick={isOpen ? () => setIsOpen(false) : () => setIsOpen(true)}
+            className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
+          >
+            {isOpen ? "Cerrar" : "Editar"}
+          </button>
+        </div>
+      </div>
+
+      {/* Price */}
+      <div className="sm:col-span-4 pb-2">
+        <label className="text-sm/6 font-medium text-gray-900">Precio:</label>
+        <div className="flex items-center w-full gap-2">
+          <div className="flex-[1] text-sm/6 font-medium text-gray-900">
+            {new Intl.NumberFormat("es-CL", {
+              style: "currency",
+              currency: "CLP",
+              minimumFractionDigits: 0,
+            }).format(product.price)}
+          </div>
+          <button
+            onClick={isOpen ? () => setIsOpen(false) : () => setIsOpen(true)}
+            className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
+          >
+            {isOpen ? "Cerrar" : "Editar"}
+          </button>
+        </div>
+      </div>
+
+      {/* Stock */}
+      <div className="sm:col-span-4 pb-2">
+        <label className="text-sm/6 font-medium text-gray-900">Stock:</label>
+        <div className="flex items-center w-full gap-2">
+          <div className="flex-[1] text-sm/6 font-medium text-gray-900">{product.stock}</div>
+          <button
+            onClick={isOpen ? () => setIsOpen(false) : () => setIsOpen(true)}
+            className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
+          >
+            {isOpen ? "Cerrar" : "Editar"}
+          </button>
+        </div>
+      </div>
+
+      {/* Guardando onKeyDown para despues */}
+      {/* <input
+              name="stock"
+              type="number"
+              value={form.stock}
+              className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
+              placeholder="Opcional"
+              onChange={handleChange}
+              onKeyDown={(e) => {
+                if (["e", "E", "+", "-"].includes(e.key)) {
+                  e.preventDefault();
+                }
+              }}
+            /> */}
+
+      {/* Description */}
+      <div className="sm:col-span-4 pb-2">
+        <label className="text-sm/6 font-medium text-gray-900">Stock:</label>
+        <div className="flex items-center w-full gap-2">
+          <div className="flex-[1] text-sm/6 font-medium text-gray-900">{product.description}</div>
           <button
             onClick={isOpen ? () => setIsOpen(false) : () => setIsOpen(true)}
             className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
@@ -161,78 +238,8 @@ const EditProduct = forwardRef(function EditProduct(
       )}
 
       <form ref={localRef} onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Nombre */}
-        <div className="sm:col-span-4 pb-2">
-          <label className="text-sm/6 font-medium text-gray-900">Nombre *</label>
-          <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
-            <input
-              name="name"
-              type="text"
-              value={form.name}
-              className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
-              onChange={handleChange}
-              required
-            />
-          </div>
-        </div>
-
-        {/* Precio */}
-        <div className="sm:col-span-4 pb-4">
-          <label className="text-sm/6 font-medium text-gray-900">Precio *</label>
-          <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
-            <input
-              name="price"
-              type="number"
-              value={form.price}
-              className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
-              onChange={handleChange}
-              required
-              onKeyDown={(e) => {
-                if (["e", "E", "+", "-"].includes(e.key)) {
-                  e.preventDefault();
-                }
-              }}
-            />
-          </div>
-        </div>
-
         {/* Imagen */}
         <ImageInput onUploaded={setImagePath} />
-
-        {/* Stock */}
-        <div className="sm:col-span-4">
-          <label className="text-sm/6 font-medium text-gray-900">Stock</label>
-          <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
-            <input
-              name="stock"
-              type="number"
-              value={form.stock}
-              className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
-              placeholder="Opcional"
-              onChange={handleChange}
-              onKeyDown={(e) => {
-                if (["e", "E", "+", "-"].includes(e.key)) {
-                  e.preventDefault();
-                }
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Description */}
-        <div className="sm:col-span-4 pb-4">
-          <label className="text-sm/6 font-medium text-gray-900">Descripción</label>
-          <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
-            <input
-              name="description"
-              type="text"
-              placeholder="Opcional"
-              value={form.description}
-              className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
-              onChange={handleChange}
-            />
-          </div>
-        </div>
       </form>
     </div>
   );
