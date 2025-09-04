@@ -3,9 +3,10 @@
 import React, { useImperativeHandle, useState, forwardRef, useRef } from "react";
 import { useRouter } from "next/navigation";
 import ImageInput from "../Modals/ImageInput";
+import { Product, Category } from "@/app/lib/types";
 
-const EditProduct = forwardRef(function AddProduct(
-  { onSuccess }: { onSuccess: () => void },
+const EditProduct = forwardRef(function EditProduct(
+  { onSuccess, product, categories }: { onSuccess: () => void; product: Product; categories: Category[] },
   ref: React.Ref<HTMLFormElement>
 ) {
   const [form, setForm] = useState({
@@ -123,14 +124,7 @@ const EditProduct = forwardRef(function AddProduct(
       <div className="sm:col-span-4 pb-2">
         <label className="text-sm/6 font-medium text-gray-900">Categoría</label>
         <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
-          <input
-            name="category_id"
-            type="text"
-            value={form.category_id}
-            className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
-            onChange={handleChange}
-            required
-          />
+          <div>{product.name}</div>
           <button
             onClick={isOpen ? () => setIsOpen(false) : () => setIsOpen(true)}
             className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"

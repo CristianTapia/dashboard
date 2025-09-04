@@ -184,10 +184,6 @@ export default function Products({
     };
   }, [openDropdownId]);
 
-  useEffect(() => {
-    console.log("products ejemplo:", products[0]);
-  }, [products]);
-
   // Renderizado
   return (
     <div className="flex flex-col">
@@ -309,24 +305,28 @@ export default function Products({
         onButtonBClickAction={closeModal}
       />
 
-      <Modal
-        isOpen={activeModal === "editProduct"}
-        onCloseAction={closeModal}
-        title={`Editar Producto ${selectedProduct?.id ?? ""}`}
-        body={
-          <EditProduct
-            ref={formRef}
-            onSuccess={() => {
-              onSuccess();
-              closeModal();
-            }}
-          />
-        }
-        buttonAName="Confirmar"
-        buttonBName="Cancelar"
-        onButtonAClickAction={closeModal}
-        onButtonBClickAction={closeModal}
-      />
+      {selectedProduct && (
+        <Modal
+          isOpen={activeModal === "editProduct"}
+          onCloseAction={closeModal}
+          title={`Editar Producto ${selectedProduct.id}`}
+          body={
+            <EditProduct
+              ref={formRef}
+              onSuccess={() => {
+                onSuccess();
+                closeModal();
+              }}
+              product={selectedProduct}
+              categories={initialCategories}
+            />
+          }
+          buttonAName="Confirmar"
+          buttonBName="Cancelar"
+          onButtonAClickAction={closeModal}
+          onButtonBClickAction={closeModal}
+        />
+      )}
 
       <Modal
         isOpen={activeModal === "confirmDelete"}
