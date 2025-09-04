@@ -47,9 +47,9 @@ export default async function ProductsPage() {
   const mapped = (products ?? []).map((p) => ({
     ...p,
     // p.category puede venir como objeto o array => extraemos el .name
-    category: Array.isArray(p.category)
-      ? p.category[0]?.name ?? null
-      : (p as any).category?.name ?? (p as any).category ?? null,
+    // category: Array.isArray(p.category)
+    //   ? p.category[0]?.name ?? null
+    //   : (p as any).category?.name ?? (p as any).category ?? null,
     image_url: p.image_path ? mapPathToUrl.get(p.image_path) ?? null : null,
   }));
 

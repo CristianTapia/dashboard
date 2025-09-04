@@ -1,63 +1,3 @@
-// import ImageInput from "./ImageInput";
-
-// export default function EditProduct() {
-//   return (
-//     <>
-//       <div className="sm:col-span-4 pb-4">
-//         <label className="text-sm/6 font-medium text-gray-900">Nombre</label>
-//         <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
-//           <input
-//             type="text"
-//             className="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
-//           />
-//         </div>
-//       </div>
-//       <div className="sm:col-span-4 pb-4">
-//         <label className="text-sm/6 font-medium text-gray-900">Precio</label>
-//         <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
-//           <input
-//             type="number"
-//             className="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
-//             // placeholder="Opcional"
-//             onKeyDown={(e) => {
-//               if (["e", "E", "+", "-"].includes(e.key)) {
-//                 e.preventDefault();
-//               }
-//             }}
-//           />
-//         </div>
-//       </div>
-//       <div className="sm:col-span-4 pb-4">
-//         <label className="text-sm/6 font-medium text-gray-900">Categoría</label>
-//         <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
-//           <input
-//             type="text"
-//             className="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
-//             // placeholder="Opcional"
-//           />
-//         </div>
-//       </div>
-
-//       <ImageInput />
-
-//       <div className="sm:col-span-4">
-//         <label className="text-sm/6 font-medium text-gray-900">Stock</label>
-//         <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
-//           <input
-//             type="number"
-//             className="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
-//             onKeyDown={(e) => {
-//               if (["e", "E", "+", "-"].includes(e.key)) {
-//                 e.preventDefault();
-//               }
-//             }}
-//           />
-//         </div>
-//       </div>
-//     </>
-//   );
-// }
-
 "use client";
 
 import React, { useImperativeHandle, useState, forwardRef, useRef } from "react";
@@ -180,28 +120,24 @@ const EditProduct = forwardRef(function AddProduct(
   return (
     <div>
       {/* Category */}
-      <div className="flex sm:col-span-4 pb-2 gap-2">
-        <select
-          className="cursor-pointer text-sm/6 font-medium text-gray-900 outline-1 rounded-md outline-gray-300 py-1.5"
-          name="category_id"
-          value={form.category_id}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Selecciona una categoría</option>
-          {/* {initialCategories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.name}
-            </option>
-          ))} */}
-        </select>
-
-        <button
-          onClick={isOpen ? () => setIsOpen(false) : () => setIsOpen(true)}
-          className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
-        >
-          {isOpen ? "Cerrar" : "Añadir"}
-        </button>
+      <div className="sm:col-span-4 pb-2">
+        <label className="text-sm/6 font-medium text-gray-900">Categoría</label>
+        <div className="flex items-center rounded-md bg-white pl-3 outline-1 outline-gray-300">
+          <input
+            name="category_id"
+            type="text"
+            value={form.category_id}
+            className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
+            onChange={handleChange}
+            required
+          />
+          <button
+            onClick={isOpen ? () => setIsOpen(false) : () => setIsOpen(true)}
+            className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
+          >
+            {isOpen ? "Cerrar" : "Editar"}
+          </button>
+        </div>
       </div>
 
       {/* Category Add Field*/}

@@ -10,21 +10,7 @@ import EditProduct from "./Modals/EditProduct";
 import Filtering from "./Modals/Filtering";
 import FilteringButton from "./Modals/FilteringButton";
 import Image from "next/image";
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  category: string;
-  stock?: number;
-  description?: string;
-  image_url?: string | null;
-}
-
-interface Category {
-  id: number;
-  name: string;
-}
+import { Product, Category } from "../lib/types";
 
 export default function Products({
   products,
@@ -85,7 +71,7 @@ export default function Products({
 
     // Filtro por categoría
     if (selectedCategories.length > 0) {
-      filtered = filtered.filter((product) => selectedCategories.includes(product.category));
+      filtered = filtered.filter((product) => selectedCategories.includes(product.category?.name ?? ""));
     }
 
     // Ordenamiento combinado según prioridad
@@ -198,6 +184,10 @@ export default function Products({
     };
   }, [openDropdownId]);
 
+  useEffect(() => {
+    console.log("products ejemplo:", products[0]);
+  }, [products]);
+
   // Renderizado
   return (
     <div className="flex flex-col">
@@ -274,7 +264,7 @@ export default function Products({
                 minimumFractionDigits: 0,
               }).format(option.price)}
             </div>
-            <div className="w-32 pb-1">{option.category ?? "—"}</div>
+            <div className="w-32 pb-1">{option.category?.name ?? "—"}</div>
             <div className="w-32 pb-3">Stock: {option.stock}</div>
             <div className="p-5 flex justify-center">
               {option.image_url ? (
