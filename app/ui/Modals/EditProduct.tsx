@@ -204,7 +204,18 @@ const EditProduct = forwardRef(function EditProduct(
               <button onClick={() => setIsActive(null)} className="cursor-pointer">
                 ❌
               </button>
-              <input type="number" placeholder="Nuevo precio" className="ml-2 border px-2 py-1 rounded" />
+              <input
+                name="price"
+                type="number"
+                className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
+                placeholder="Nuevo precio"
+                onChange={handleChange}
+                onKeyDown={(e) => {
+                  if (["e", "E", "+", "-"].includes(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
+              />
             </div>
           )}
         </div>
