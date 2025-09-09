@@ -198,6 +198,7 @@ const EditProduct = forwardRef(function EditProduct(
               Editar
             </button>
           )}
+
           {isActive === "price" && (
             <div className="flex gap-4 px-4 py-1.5 items-center text-sm transition">
               <button className="cursor-pointer">✅</button>
@@ -234,6 +235,7 @@ const EditProduct = forwardRef(function EditProduct(
               Editar
             </button>
           )}
+
           {isActive === "stock" && (
             <div className="flex gap-4 px-4 py-1.5 items-center text-sm transition">
               <button className="cursor-pointer">✅</button>
@@ -270,6 +272,7 @@ const EditProduct = forwardRef(function EditProduct(
               Editar
             </button>
           )}
+
           {isActive === "description" && (
             <div className="flex gap-4 px-4 py-1.5 items-center text-sm transition">
               <button className="cursor-pointer">✅</button>
