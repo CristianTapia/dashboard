@@ -323,7 +323,9 @@ export default function Products({
           }
           buttonAName="Confirmar"
           buttonBName="Cancelar"
-          onButtonAClickAction={closeModal}
+          onButtonAClickAction={() => {
+            formRef.current?.requestSubmit();
+          }}
           onButtonBClickAction={closeModal}
         />
       )}
