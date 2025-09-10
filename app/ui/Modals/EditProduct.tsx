@@ -4,7 +4,6 @@ import React, { useImperativeHandle, useState, forwardRef, useRef, useEffect } f
 import { useRouter } from "next/navigation";
 import ImageInput from "../Modals/ImageInput";
 import { Product, Category } from "@/app/lib/types";
-import { is } from "zod/locales";
 
 const EditProduct = forwardRef(function EditProduct(
   { onSuccess, product, categories }: { onSuccess: () => void; product: Product; categories: Category[] },
@@ -20,14 +19,10 @@ const EditProduct = forwardRef(function EditProduct(
 
   const router = useRouter();
   const localRef = useRef<HTMLFormElement>(null);
-  const [newCategory, setNewCategory] = useState("");
   const [imagePath, setImagePath] = useState<string | null>(null);
 
   // Edition mode
   const [isActive, setIsActive] = useState<string | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [draftValue, setDraftValue] = useState<string>("");
-  const [isSaving, setIssaving] = useState(false);
 
   // Normalize function to handle case and whitespace
   const normalize = (s: string) => s.trim().toLowerCase();
@@ -35,7 +30,8 @@ const EditProduct = forwardRef(function EditProduct(
   // POST DE PRODUCTOS A TRAVÉS DEL FORMULARIO
   // Maneja cambios en los inputs
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   useImperativeHandle(ref, () => localRef.current!);
@@ -51,15 +47,15 @@ const EditProduct = forwardRef(function EditProduct(
     });
 
     try {
-      const res = await fetch("/api/products/${product.id}", {
+      const res = await fetch(`/api/products/${product.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
           price: Number(form.price),
           stock: form.stock ? Number(form.stock) : 0,
-          description: form.description,
-          category_id: form.category_id,
+          description: form.description || null,
+          category_id: form.category_id ? Number(form.category_id) : null,
           // image_path: imagePath,
         }),
       });
@@ -74,12 +70,13 @@ const EditProduct = forwardRef(function EditProduct(
 
       console.log("✅ Producto editado:", result);
       setForm({ name: "", price: "", stock: "", description: "", category_id: "" });
+      setIsActive(null);
       onSuccess();
+      router.refresh();
     } catch (err: any) {
       console.error("🚨 Error de red:", err);
       alert("Error de red: " + err.message);
     }
-    router.refresh();
   };
 
   // Initialize form with product data
@@ -90,9 +87,11 @@ const EditProduct = forwardRef(function EditProduct(
       price: String(product.price ?? ""),
       stock: String(product.stock ?? ""),
       description: product.description ?? "",
-      category_id: String(product.category?.id ?? ""),
+      category_id: String(""),
     });
   }, [product]);
+
+  const selectedCategoryName = categories.find((c) => String(c.id) === form.category_id)?.name ?? product.category.name;
 
   return (
     <div>
@@ -100,9 +99,11 @@ const EditProduct = forwardRef(function EditProduct(
       <div className="sm:col-span-4 pb-2">
         <label className="text-sm/6 font-medium text-gray-900">Categoría:</label>
         <div className="flex items-center w-full gap-2">
-          <div className="flex-[1] text-sm/6 font-medium text-gray-900">{product.category.name}</div>
+          {/* <div className="flex-[1] text-sm/6 font-medium text-gray-900">{product.category.name}</div> */}
+          <div className="flex-[1] text-sm/6 font-medium text-gray-900">{selectedCategoryName}</div>
           {isActive !== "category" && (
             <button
+              type="button"
               onClick={() => setIsActive(isActive === "category" ? null : "category")}
               className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
             >
@@ -145,6 +146,7 @@ const EditProduct = forwardRef(function EditProduct(
             <div className="flex-[1] text-sm/6 font-medium text-gray-900">{product.name}</div>
             {isActive !== "name" && (
               <button
+                type="button"
                 onClick={() => setIsActive(isActive === "name" ? null : "name")}
                 className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
               >
@@ -185,6 +187,7 @@ const EditProduct = forwardRef(function EditProduct(
             </div>
             {isActive !== "price" && (
               <button
+                type="button"
                 onClick={() => setIsActive(isActive === "price" ? null : "price")}
                 className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
               >
@@ -225,6 +228,7 @@ const EditProduct = forwardRef(function EditProduct(
             <div className="flex-[1] text-sm/6 font-medium text-gray-900">{product.stock}</div>
             {isActive !== "stock" && (
               <button
+                type="button"
                 onClick={() => setIsActive(isActive === "stock" ? null : "stock")}
                 className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
               >
@@ -265,6 +269,7 @@ const EditProduct = forwardRef(function EditProduct(
             <div className="flex-[1] text-sm/6 font-medium text-gray-900">{product.description}</div>
             {isActive !== "description" && (
               <button
+                type="button"
                 onClick={() => setIsActive(isActive === "description" ? null : "description")}
                 className="cursor-pointer rounded bg-indigo-600 px-4 py-1.5 text-sm text-white hover:bg-indigo-700 transition"
               >
