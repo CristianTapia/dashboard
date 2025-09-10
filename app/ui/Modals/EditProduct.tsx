@@ -165,7 +165,7 @@ const EditProduct = forwardRef(function EditProduct(
                   value={form.name}
                   onChange={handleChange}
                   placeholder="Nuevo nombre"
-                  className="ml-2 border px-2 py-1 rounded"
+                  className="text-sm/6 font-medium text-gray-900 outline-1 rounded-md outline-gray-300 py-1.5"
                 />
               </div>
             )}
@@ -204,7 +204,7 @@ const EditProduct = forwardRef(function EditProduct(
                   name="price"
                   type="number"
                   value={form.price}
-                  className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
+                  className="text-sm/6 font-medium text-gray-900 outline-1 rounded-md outline-gray-300 py-1.5"
                   placeholder="Nuevo precio"
                   onChange={handleChange}
                   onKeyDown={(e) => {
@@ -244,7 +244,7 @@ const EditProduct = forwardRef(function EditProduct(
                   name="stock"
                   type="number"
                   value={form.stock}
-                  className="block grow py-1.5 pr-3 pl-1 text-base text-gray-900 focus:outline-none"
+                  className="text-sm/6 font-medium text-gray-900 outline-1 rounded-md outline-gray-300 py-1.5"
                   placeholder="Nuevo stock"
                   onChange={handleChange}
                   onKeyDown={(e) => {
@@ -285,7 +285,7 @@ const EditProduct = forwardRef(function EditProduct(
                   value={form.description}
                   onChange={handleChange}
                   placeholder="Nueva descripción"
-                  className="ml-2 border px-2 py-1 rounded"
+                  className="text-sm/6 font-medium text-gray-900 outline-1 rounded-md outline-gray-300 py-1.5"
                 />
               </div>
             )}
