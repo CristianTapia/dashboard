@@ -56,30 +56,30 @@ export async function POST(req: Request) {
   }
 }
 
-// [PUT] EDIT A PRODUCT IN THE DATABASE
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  const supabase = await createServer();
-  const id = Number(params.id);
-  const body = await req.json(); // { name, price, stock, description, category_id, image_path, ... }
+// // [PUT] EDIT A PRODUCT IN THE DATABASE
+// export async function PUT(req: Request, { params }: { params: { id: string } }) {
+//   const supabase = await createServer();
+//   const id = Number(params.id);
+//   const body = await req.json(); // { name, price, stock, description, category_id, image_path, ... }
 
-  // (opcional) valida body con Zod antes de seguir
+//   // (opcional) valida body con Zod antes de seguir
 
-  const { data, error } = await supabase
-    .from("products")
-    .update({
-      name: body.name,
-      price: Number(body.price),
-      stock: Number(body.stock) || 0,
-      description: body.description ?? null,
-      category_id: body.category_id ?? null,
-      // image_path: body.image_path ?? null,
-      // is_published: body.is_published ?? true,
-    })
-    .eq("id", id)
-    // .select("id,name,price,stock,description,category_id,image_path,updated_at")
-    .select("id, name, price, stock, description, category_id, updated_at")
-    .single();
+//   const { data, error } = await supabase
+//     .from("products")
+//     .update({
+//       name: body.name,
+//       price: Number(body.price),
+//       stock: Number(body.stock) || 0,
+//       description: body.description ?? null,
+//       category_id: body.category_id ?? null,
+//       // image_path: body.image_path ?? null,
+//       // is_published: body.is_published ?? true,
+//     })
+//     .eq("id", id)
+//     // .select("id,name,price,stock,description,category_id,image_path,updated_at")
+//     .select("id, name, price, stock, description, category_id, updated_at")
+//     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data); // o 204 No Content si no necesitas devolver nada
-}
+//   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+//   return NextResponse.json(data); // o 204 No Content si no necesitas devolver nada
+// }
