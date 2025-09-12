@@ -54,8 +54,8 @@ const EditProduct = forwardRef(function EditProduct(
           name: form.name,
           price: Number(form.price),
           stock: form.stock ? Number(form.stock) : 0,
-          description: form.description || null,
-          category_id: form.category_id ? Number(form.category_id) : null,
+          description: form.description,
+          category_id: form.category_id,
           // image_path: imagePath,
         }),
       });
@@ -80,18 +80,23 @@ const EditProduct = forwardRef(function EditProduct(
   };
 
   // Initialize form with product data
-  useEffect(() => {
-    if (!product) return;
-    setForm({
-      name: product.name ?? "",
-      price: String(product.price ?? ""),
-      stock: String(product.stock ?? ""),
-      description: product.description ?? "",
-      category_id: String(""),
-    });
-  }, [product]);
+  // useEffect(() => {
+  //   if (!product) return;
+  //   setForm({
+  //     name: product.name ?? "",
+  //     price: String(product.price ?? ""),
+  //     stock: String(product.stock ?? ""),
+  //     description: product.description ?? "",
+  //     category_id: String(""),
+  //   });
+  // }, [product]);
 
-  const selectedCategoryName = categories.find((c) => String(c.id) === form.category_id)?.name ?? product.category.name;
+  useEffect(() => {
+    setForm((prev) => ({
+      ...prev,
+      category_id: product.category?.id ? String(product.category.id) : "", // "" fuerza a elegir
+    }));
+  }, [product]);
 
   return (
     <div>
@@ -100,7 +105,7 @@ const EditProduct = forwardRef(function EditProduct(
         <label className="text-sm/6 font-medium text-gray-900">Categoría:</label>
         <div className="flex items-center w-full gap-2">
           {/* <div className="flex-[1] text-sm/6 font-medium text-gray-900">{product.category.name}</div> */}
-          <div className="flex-[1] text-sm/6 font-medium text-gray-900">{selectedCategoryName}</div>
+          <div className="flex-[1] text-sm/6 font-medium text-gray-900">{product.category.name}</div>
           {isActive !== "category" && (
             <button
               type="button"

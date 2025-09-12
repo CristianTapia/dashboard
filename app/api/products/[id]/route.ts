@@ -14,6 +14,10 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (!id) {
       return NextResponse.json({ error: "Missing product id in URL (/api/products/:id)" }, { status: 400 });
     }
+    const catId = Number(body.category_id);
+    if (!Number.isInteger(catId)) {
+      return NextResponse.json({ error: "category_id es obligatorio" }, { status: 400 });
+    }
 
     const { data, error } = await supabase
       .from("products")
@@ -22,7 +26,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         price: Number(body.price),
         stock: Number(body.stock) || 0,
         description: body.description ?? null,
-        category_id: body.category_id ?? null,
+        category_id: catId,
         // image_path: body.image_path ?? null,
         // is_published: body.is_published ?? true,) // 👈 los campos a actualizar
       })
