@@ -91,6 +91,8 @@ const EditProduct = forwardRef(function EditProduct(
       if (isActive === "price") draft.price = fieldDraft;
       if (isActive === "stock") draft.stock = fieldDraft;
       if (isActive === "description") draft.description = fieldDraft;
+      alert("Termina de editar este campo (✅ o ❌) antes de confirmar.");
+      return;
     }
 
     // Validaciones mínimas
