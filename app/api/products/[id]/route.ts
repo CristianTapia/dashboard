@@ -45,7 +45,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 // [DELETE] DELETE A PRODUCT IN THE DATABASE
 export async function DELETE(
   _req: Request,
-  ctx: { params: Promise<{ id: string }> } // 👈 en App Router, params es PROMESA
+  ctx: { params: Promise<{ id: string }> } // 👈 en App Router, params es promesa
 ) {
   try {
     const { id } = await ctx.params; // 👈 hay que await
