@@ -41,3 +41,26 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+
+// [DELETE] DELETE A PRODUCT IN THE DATABASE
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const body = await req.json(); // datos enviados desde el front
+    const { id } = await params;
+    if (!id) {
+      return NextResponse.json({ error: "Missing product id in URL (/api/products/:id)" }, { status: 400 });
+    }
+
+    const { error } = await supabase.from("products").delete().eq("id", Number(id)); // 👈 condición de qué registro eliminar
+
+    if (error) {
+      // SI la FK tiene DELETE RESTRICT podria verse un error aqui
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    // 204 = No Content (correcto para DELETE)
+    return new NextResponse(null, { status: 204 });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
