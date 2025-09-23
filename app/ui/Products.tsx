@@ -11,6 +11,7 @@ import Filtering from "./Modals/Filtering";
 import FilteringButton from "./Modals/FilteringButton";
 import Image from "next/image";
 import { Product, Category } from "../lib/types";
+import { useRouter } from "next/navigation";
 
 export default function Products({
   products,
@@ -19,7 +20,7 @@ export default function Products({
   products: Product[];
   initialCategories: Category[];
 }) {
-  // Estados principales
+  // ESTADOS PRINCIPALES
   const [sortedProducts, setSortedProducts] = useState<Product[]>(products);
   const [search, setSearch] = useState({ term: "" });
 
@@ -28,24 +29,23 @@ export default function Products({
   );
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
   const selectedProduct = products.find((product) => product.id === selectedProductId);
 
-  // Filtros
+  // ESTADOS DE FILTROS
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [showCategories, setShowCategories] = useState(true);
   const [activeAlphabeticalOrder, setActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
   const [activePriceOrder, setActivePriceOrder] = useState<"asc" | "desc" | null>(null);
   const [activeStockOrder, setActiveStockOrder] = useState<"asc" | "desc" | null>(null);
 
-  // Estados temporales para los filtros
+  // ESTADOS TEMPORALES DE FILTROS (EN MODAL)
   const [tempSelectedCategories, setTempSelectedCategories] = useState<string[]>([]);
   const [tempActivePriceOrder, setTempActivePriceOrder] = useState<"asc" | "desc" | null>(null);
   const [tempActiveStockOrder, setTempActiveStockOrder] = useState<"asc" | "desc" | null>(null);
   const [tempActiveAlphabeticalOrder, setTempActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
 
   // const uniqueCategories = [...new Set(products.map((p) => p.category ?? ""))].filter(Boolean);
-
+  const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -184,7 +184,24 @@ export default function Products({
     };
   }, [openDropdownId]);
 
-  // Renderizado
+  // ELIMINAR PRODUCTO
+  const handleDelete = async () => {
+    const ok = window.confirm("¿Eliminar este producto? Esta acción no se puede deshacer.");
+    if (!ok) return;
+
+    const res = await fetch(`/api/products/${selectedProductId}`, { method: "DELETE" });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      alert(err?.error ?? "No se pudo eliminar");
+      return;
+    }
+
+    // refresca la lista (SSR/Server Components)
+    router.refresh();
+  };
+
+  // RENDERIZADO
   return (
     <div className="flex flex-col">
       {/* Botonera */}
@@ -336,7 +353,10 @@ export default function Products({
         title={`¿Eliminar producto ${selectedProduct?.id ?? ""}?`}
         body={<div className="text-gray-900">Esta acción es irreversible</div>}
         buttonAName="Eliminar"
-        onButtonAClickAction={closeModal}
+        onButtonAClickAction={() => {
+          handleDelete();
+          closeModal();
+        }}
         buttonBName="Cancelar"
         onButtonBClickAction={closeModal}
       />

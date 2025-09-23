@@ -43,24 +43,38 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 }
 
 // [DELETE] DELETE A PRODUCT IN THE DATABASE
-export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  _req: Request,
+  ctx: { params: Promise<{ id: string }> } // 👈 en App Router, params es PROMESA
+) {
   try {
-    const body = await req.json(); // datos enviados desde el front
-    const { id } = await params;
+    const { id } = await ctx.params; // 👈 hay que await
     if (!id) {
       return NextResponse.json({ error: "Missing product id in URL (/api/products/:id)" }, { status: 400 });
     }
 
-    const { error } = await supabase.from("products").delete().eq("id", Number(id)); // 👈 condición de qué registro eliminar
+    // Intenta devolver la fila borrada para poder detectar 404
+    const { data, error } = await supabase
+      .from("products")
+      .delete()
+      .eq("id", Number(id))
+      .select("id") // devuelve id borrado
+      .maybeSingle(); // no lanza si no existe
 
     if (error) {
-      // SI la FK tiene DELETE RESTRICT podria verse un error aqui
+      console.error("DELETE /products error:", error);
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    // 204 = No Content (correcto para DELETE)
+    if (!data) {
+      // no había un producto con ese id
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
+    // 204 = No Content
     return new NextResponse(null, { status: 204 });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error("DELETE handler crash:", err);
+    return NextResponse.json({ error: err?.message ?? "Internal Server Error" }, { status: 500 });
   }
 }
