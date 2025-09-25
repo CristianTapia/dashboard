@@ -100,6 +100,7 @@ export default function Products({
     setSortedProducts(filtered);
   }, [search.term, selectedCategories, products, activePriceOrder, activeStockOrder, activeAlphabeticalOrder]);
 
+  // Reseteo de filtros
   function resetFilters() {
     setTempActivePriceOrder(null);
     setTempActiveStockOrder(null);
@@ -108,7 +109,7 @@ export default function Products({
     setShowCategories(true);
   }
 
-  // Botones toggle de filtros
+  // BOTONES TOGGLE DE FILTROS
   function toggleTempActivePriceOrder(value: "asc" | "desc") {
     setTempActivePriceOrder((prev) => (prev === value ? null : value));
   }
