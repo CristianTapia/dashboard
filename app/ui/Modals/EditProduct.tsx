@@ -3,6 +3,7 @@
 import React, { useImperativeHandle, useState, forwardRef, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Product, Category } from "@/app/lib/types";
+import ImageInput from "./ImageInput";
 
 type FieldKey = "category" | "name" | "price" | "stock" | "description" | null;
 
@@ -18,7 +19,8 @@ const EditProduct = forwardRef(function EditProduct(
     description: "",
     category_id: "",
   });
-
+  const [imagePath, setImagePath] = useState<string | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   // Edición inline
   const [isActive, setIsActive] = useState<FieldKey>(null); // campo activo
   const [fieldDraft, setFieldDraft] = useState<string>(""); // borrador del campo activo
@@ -37,6 +39,7 @@ const EditProduct = forwardRef(function EditProduct(
       description: product.description ?? "",
       category_id: product.category?.id ? String(product.category.id) : "", // "" fuerza a elegir en UI
     });
+    setImagePath(product.image_path ?? null);
   }, [product]);
 
   // Helpers de edición por campo
@@ -103,6 +106,11 @@ const EditProduct = forwardRef(function EditProduct(
     if (Number.isNaN(priceNum) || priceNum < 0) return alert("Precio inválido.");
     if (Number.isNaN(stockNum) || stockNum < 0) return alert("Stock inválido.");
 
+    if (isUploadingImage) {
+      alert("Espera a que termine la subida de la imagen.");
+      return;
+    }
+
     try {
       const res = await fetch(`/api/products/${product.id}`, {
         method: "PUT",
@@ -114,6 +122,7 @@ const EditProduct = forwardRef(function EditProduct(
           // Si tu columna es NOT NULL, manda "" en vez de null
           description: typeof draft.description === "string" ? draft.description : "",
           category_id: Number(draft.category_id),
+          image_path: imagePath ?? null,
         }),
       });
 
@@ -267,6 +276,13 @@ const EditProduct = forwardRef(function EditProduct(
             )}
           </div>
         </div>
+
+        {/* IMAGEN */}
+        <ImageInput
+          initialPath={imagePath}
+          onUploaded={setImagePath}
+          onUploadingChange={setIsUploadingImage}
+        />
 
         {/* STOCK */}
         <div className="sm:col-span-4 pb-2">

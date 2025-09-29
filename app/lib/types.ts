@@ -8,6 +8,7 @@ export type Product = {
     id: number;
     name: string;
   };
+  image_path?: string | null;
   image_url?: string | null;
 };
 
