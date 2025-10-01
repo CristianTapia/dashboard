@@ -61,12 +61,17 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string 
       return NextResponse.json({ error: "Missing product id in URL (/api/products/:id)" }, { status: 400 });
     }
 
+    const productId = Number(id);
+    if (!Number.isFinite(productId)) {
+      return NextResponse.json({ error: "Invalid product id" }, { status: 400 });
+    }
+
     const { data, error } = await supabase
       .from("products")
       .delete()
-      .eq("id", Number(id))
-      .select("id")
-      .maybeSingle();
+      .eq("id", productId)
+      .select("id, image_path")
+      .maybeSingle<{ id: number; image_path: string | null }>();
 
     if (error) {
       console.error("DELETE /products error:", error);
@@ -77,9 +82,18 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string 
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
+    if (data.image_path) {
+      const { error: storageError } = await supabase.storage.from("product-images").remove([data.image_path]);
+      if (storageError) {
+        console.error("DELETE /products storage error:", storageError);
+        return NextResponse.json({ error: "Product deleted but failed to remove associated image" }, { status: 500 });
+      }
+    }
+
     return new NextResponse(null, { status: 204 });
   } catch (err: any) {
     console.error("DELETE handler crash:", err);
     return NextResponse.json({ error: err?.message ?? "Internal Server Error" }, { status: 500 });
   }
 }
+
