@@ -16,7 +16,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <ul className="space-y-2">
             <DashboardButton name="Resumen" href="/dashboard" />
             <DashboardButton name="Mesa - Vista bloques" href="/dashboard/mesas-vista-bloques" />
-            <DashboardButton name="Mesa - Vista planta" href="/dashboard/mesas-vista-planta" />
+            <DashboardButton name="Ofertas" href="/dashboard/ofertas" />
             <DashboardButton name="Productos" href="/dashboard/productos" />
             <DashboardButton name="Configuración" href="/dashboard/configuracion" />
           </ul>

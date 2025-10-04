@@ -1,7 +1,6 @@
 "use client";
 
 import clsx from "clsx";
-
 import { useState, useEffect, useRef, FormEvent } from "react";
 import Modal from "./Modals/Modal";
 import Dropdown from "./Dropdown";
