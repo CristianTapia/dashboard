@@ -11,6 +11,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="flex">
       {/* Sidebar */}
       <aside className="w-[clamp(14rem,22vw,10rem)] shrink-0 sticky top-0 h-[100dvh] overflow-auto bg-[var(--color-foreground)] border-r border-[var(--color-line-limit)]">
+        {/* Bussiness's name */}
+        <div className="flex items-center justify-center h-18 border-b border-[var(--color-line-limit)] p-4">
+          <div className="w-12 h-12 border border-gray-300 rounded-xl flex items-center justify-center text-xs">
+            Foto
+          </div>
+          <h1 className="pl-3 font-semibold text-xl">Nombre local</h1>
+        </div>
         <nav>
           <ul className="gap-2 flex flex-col p-4">
             <DashboardNavButton icon={<ChartNoAxesColumn size={iconSize} />} name="Resumen" href="/dashboard" />
