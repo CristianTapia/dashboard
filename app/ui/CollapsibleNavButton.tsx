@@ -32,7 +32,7 @@ export default function CollapsibleNavButton({
         aria-expanded={open}
         aria-controls={panelId}
         // ✅ mismo layout que tus otros ítems: columna fija para el ícono, texto, caret
-        className="w-full flex items-center p-2 rounded-xl hover:bg-[var(--color-selected)]"
+        className="cursor-pointer w-full flex items-center p-2 rounded-xl hover:bg-[var(--color-selected)]"
       >
         <span className="pr-3">{icon}</span>
         <span className="text-md font-semibold">{label}</span>
