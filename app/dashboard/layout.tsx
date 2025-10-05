@@ -1,13 +1,10 @@
 "use client";
 
 import DashboardButton from "../ui/DashboardButton";
-import { ChartNoAxesColumn, Percent, UtensilsCrossed, Settings } from "lucide-react";
+import CollapsibleNavButton from "../ui/CollapsibleNavButton";
+import { ChartNoAxesColumn, Percent, UtensilsCrossed, Shapes, Settings } from "lucide-react";
 
-const size = 20;
-
-function iconProp(size: number) {
-  return size;
-}
+const iconSize = 20;
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -19,18 +16,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       >
         <nav>
           <ul className="gap-2 flex flex-col p-4">
-            <DashboardButton icon={<ChartNoAxesColumn size={iconProp(size)} />} name="Resumen" href="/dashboard" />
-            <DashboardButton icon={<Percent size={iconProp(size)} />} name="Destacados" href="/dashboard/destacados" />
-            <DashboardButton
-              icon={<UtensilsCrossed size={iconProp(size)} />}
-              name="Productos"
-              href="/dashboard/productos"
+            <DashboardButton icon={<ChartNoAxesColumn size={iconSize} />} name="Resumen" href="/dashboard" />
+            <DashboardButton icon={<Percent size={iconSize} />} name="Destacados" href="/dashboard/destacados" />
+
+            <CollapsibleNavButton
+              icon={<UtensilsCrossed size={iconSize} />}
+              label="Productos"
+              baseHref="/dashboard/productos"
+              items={[
+                { href: "/dashboard/productos/nuevo", label: "Agregar nuevos productos" },
+                { href: "/dashboard/productos", label: "Ver todos los productos" },
+              ]}
             />
-            <DashboardButton
-              icon={<Settings size={iconProp(size)} />}
-              name="Configuración"
-              href="/dashboard/configuracion"
-            />
+            <DashboardButton icon={<Shapes size={iconSize} />} name="Categorías" href="/dashboard/categorias" />
+            <DashboardButton icon={<Settings size={iconSize} />} name="Configuración" href="/dashboard/configuracion" />
           </ul>
         </nav>
       </aside>
