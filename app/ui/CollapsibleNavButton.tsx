@@ -49,8 +49,8 @@ export default function CollapsibleNavButton({
                 href={it.href}
                 className={`block rounded-lg px-3 py-1.5 text-sm ${
                   active
-                    ? "bg-[var(--color-selected)] font-medium"
-                    : "text-[var(--color-category)] hover:bg-[var(--color-selected)]"
+                    ? "bg-[var(--color-bg-selected)] text-[var(--color-txt-selected)] font-medium"
+                    : "text-[var(--color-category)] hover:bg-[var(--color-bg-selected)]"
                 }`}
               >
                 {it.label}

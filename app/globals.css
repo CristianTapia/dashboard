@@ -3,7 +3,8 @@
 :root {
   --color-background: #f6f7f8; /* Color para el fondo principal */
   --color-foreground: #ffffff; /* Color para el fondo de la barra lateral */
-  --color-selected: #e7f2fd; /* Color para el botón/texto seleccionado */
+  --color-bg-selected: #e7f2fd; /* Color para el botón/texto seleccionado */
+  --color-txt-selected: #137fec; /* Color para el botón/texto seleccionado */
   --color-button-send: #137fec; /* Azul vibrante para botones de envío */
   --color-line-limit: #e0e7f1; /* Color para líneas divisorias */
 }
