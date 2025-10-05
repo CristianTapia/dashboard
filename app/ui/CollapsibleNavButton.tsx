@@ -25,18 +25,17 @@ export default function CollapsibleNavButton({
   const panelId = useId();
 
   return (
-    // ✅ que sea <li> y ocupe todo el ancho
-    <li className="select-none">
+    <li>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-controls={panelId}
         // ✅ mismo layout que tus otros ítems: columna fija para el ícono, texto, caret
-        className="w-full flex items-center gap-2 p-2 rounded-xl hover:bg-[var(--color-selected)]"
+        className="w-full flex items-center p-2 rounded-xl hover:bg-[var(--color-selected)]"
       >
-        <span className="pr-1">{icon}</span>
-        <span className="text-sm font-semibold">{label}</span>
+        <span className="pr-3">{icon}</span>
+        <span className="text-md font-semibold">{label}</span>
         <ChevronDown className={`h-4 w-4 ml-auto transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
 
@@ -48,7 +47,7 @@ export default function CollapsibleNavButton({
             <li key={it.href}>
               <Link
                 href={it.href}
-                className={`block rounded-lg px-2 py-1.5 text-sm ${
+                className={`block rounded-lg px-3 py-1.5 text-sm ${
                   active
                     ? "bg-[var(--color-selected)] font-medium"
                     : "text-[var(--color-category)] hover:bg-[var(--color-selected)]"

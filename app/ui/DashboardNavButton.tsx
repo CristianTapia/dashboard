@@ -12,7 +12,7 @@ export default function DashboardNavButton({ href, name, icon }: DashboardNavBut
     <li>
       <Link
         href={href}
-        className="flex p-2 rounded-xl font-semibold text-sm hover:bg-[var(--color-selected)] items-center"
+        className="flex p-2 rounded-xl font-semibold text-md hover:bg-[var(--color-selected)] items-center"
       >
         <div className="pr-3">{icon}</div>
         <div>{name}</div>
