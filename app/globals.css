@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-background: #f6f7f8; /* Color para el fondo principal */
+  --color-foreground: #ffffff; /* Color para el fondo de la barra lateral */
+  --color-selected: #e7f2fd; /* Color para el botón/texto seleccionado */
+  --color-button-send: #137fec; /* Azul vibrante para botones de envío */
 }
 
 @theme inline {
