@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { ImageUp } from "lucide-react";
 
 type Props = {
   onUploaded?: (path: string | null) => void;
@@ -92,8 +93,6 @@ export default function ImageInput({ onUploaded, onUploadingChange, initialPath 
 
   return (
     <div className="sm:col-span-4 pb-4">
-      <label className="text-sm font-medium text-gray-900">Imagen (Opcional)</label>
-
       <input id="imageUpload" type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
 
       <div className="flex items-center gap-3 mt-1">
