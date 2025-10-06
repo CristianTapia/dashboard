@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
-import { ImageUp } from "lucide-react";
+import { ImageUp, Trash2, RefreshCw, Loader2 } from "lucide-react";
 
 type Props = {
   onUploaded?: (path: string | null) => void;
@@ -11,6 +11,8 @@ type Props = {
 };
 
 export default function ImageInput({ onUploaded, onUploadingChange, initialPath = null }: Props) {
+  const iconSize = 16;
+
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imagePath, setImagePath] = useState<string | null>(initialPath);
   const [uploading, setUploading] = useState(false);
@@ -139,7 +141,7 @@ export default function ImageInput({ onUploaded, onUploadingChange, initialPath 
                     ${uploading ? "opacity-60 pointer-events-none" : "hover:text-[#61A7ED]"}
                   `}
                 >
-                  <span>{uploading ? "Subiendo..." : "Carga la imagen"}</span>
+                  <span>{uploading ? "Subiendo..." : "Sube una imagen"}</span>
                 </label>
                 <p className="pl-1 text-[var(--color-txt-secondary)]">o arrástrala aquí</p>
               </div>
@@ -157,14 +159,26 @@ export default function ImageInput({ onUploaded, onUploadingChange, initialPath 
             className={`
               cursor-pointer inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium
               rounded-md border shadow-sm
-              text-text-light dark:text-text-dark bg-surface-light dark:bg-surface-dark
-              border-border-light dark:border-border-dark
+              text-text-light dark:text-text-dark bg-[var(--color-foreground)] dark:bg-surface-dark
+              border-[var(--color-border-box)] dark:border-border-dark
               ${
-                uploading ? "opacity-60 pointer-events-none" : "hover:bg-background-light dark:hover:bg-background-dark"
+                uploading
+                  ? "bg-[var(--color-foreground)] opacity-60 pointer-events-none"
+                  : "hover:bg-[var(--color-background)] dark:hover:bg-background-dark"
               }
             `}
           >
-            {uploading ? "Cargando..." : "Reemplazar"}
+            {uploading ? (
+              <>
+                <Loader2 size={iconSize} className="animate-spin" />
+                Cargando...
+              </>
+            ) : (
+              <>
+                <RefreshCw size={iconSize} />
+                Reemplazar
+              </>
+            )}
           </label>
 
           <button
@@ -172,15 +186,15 @@ export default function ImageInput({ onUploaded, onUploadingChange, initialPath 
             onClick={clearImage}
             disabled={uploading}
             className={`
-              inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md border shadow-sm
+              cursor-pointer inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md border shadow-sm
               ${
                 uploading
                   ? "text-red-400 bg-red-50/60 border-red-200/60 cursor-not-allowed"
-                  : "text-red-600 dark:text-red-500 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800/50 hover:bg-red-100 dark:hover:bg-red-900/30"
+                  : "text-[#DC2626] dark:text-[#DC2626] bg-[#FEF2F2] dark:bg-red-900/20 border-red-200 dark:border-red-800/50 hover:bg-red-100 dark:hover:bg-red-900/30"
               }
             `}
           >
-            Quitar
+            <Trash2 size={iconSize} /> Quitar
           </button>
         </div>
       )}
