@@ -8,14 +8,28 @@ type Props = {
   onUploaded?: (path: string | null) => void;
   onUploadingChange?: (v: boolean) => void;
   initialPath?: string | null;
+  /** A qué carpeta del bucket `images` subir: p.ej. "products" | "highlights" */
+  folder?: string;
+  /** Tamaño máx en MB */
+  maxSizeMB?: number;
+  /** Acept MIME */
+  accept?: string;
 };
 
-export default function ImageInput({ onUploaded, onUploadingChange, initialPath = null }: Props) {
+export default function ImageInput({
+  onUploaded,
+  onUploadingChange,
+  initialPath = null,
+  folder = "products",
+  maxSizeMB = 2,
+  accept = "image/*",
+}: Props) {
   const iconSize = 16;
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imagePath, setImagePath] = useState<string | null>(initialPath);
   const [uploading, setUploading] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
 
   const inputId = useId();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -33,17 +47,18 @@ export default function ImageInput({ onUploaded, onUploadingChange, initialPath 
   }
 
   async function uploadToServer(file: File) {
-    if (!file.type.startsWith("image/")) {
-      alert("Solo imagenes");
+    if (accept && !file.type.startsWith("image/")) {
+      alert("Solo imágenes");
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      alert("Maximo 2MB");
+    if (file.size > maxSizeMB * 1024 * 1024) {
+      alert(`Máximo ${maxSizeMB}MB`);
       return;
     }
 
     const fd = new FormData();
-    fd.append("file", file);
+    fd.append("file", file); // ✅ IMPORTANTE: enviar el archivo
+    fd.append("folder", folder); // ✅ para que el server guarde en la carpeta correcta
 
     try {
       setUploadingSafe(true);
@@ -76,6 +91,32 @@ export default function ImageInput({ onUploaded, onUploadingChange, initialPath 
     await uploadToServer(file);
   }
 
+  // Drag & drop
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!uploading) setDragActive(true);
+  };
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+  };
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (uploading) return;
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result as string);
+    reader.readAsDataURL(file);
+
+    await uploadToServer(file);
+  };
+
   useEffect(() => {
     if (!initialPath) {
       setImagePath(null);
@@ -101,7 +142,7 @@ export default function ImageInput({ onUploaded, onUploadingChange, initialPath 
         ref={fileInputRef}
         type="file"
         name="imageUpload"
-        accept="image/*"
+        accept={accept}
         onChange={handleImageChange}
         className="hidden"
         disabled={uploading}
@@ -110,14 +151,24 @@ export default function ImageInput({ onUploaded, onUploadingChange, initialPath 
       <div className="col-span-full">
         <label className="block text-sm font-md font-semibold">Imagen</label>
 
-        {/* Marco con tamaño fijo */}
+        {/* Marco con tamaño fijo + DnD */}
         <div
-          className="
+          onDragOver={handleDragOver}
+          onDragEnter={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={`
             group mt-2 relative flex items-center justify-center
             h-[180px] overflow-hidden rounded-lg
-            border-2 border-dashed border-[var(--color-border-box)]
+            border-2 border-dashed
+            ${
+              dragActive
+                ? "border-[var(--color-button-send)] bg-[var(--color-foreground)]/70"
+                : "border-[var(--color-border-box)]"
+            }
             bg-gray-50 dark:bg-neutral-900/30
-          "
+            transition-colors
+          `}
         >
           {imagePreview ? (
             <Image
@@ -130,22 +181,22 @@ export default function ImageInput({ onUploaded, onUploadingChange, initialPath 
               priority={false}
             />
           ) : (
-            <div className="text-center px-6">
+            <div className="text-center px-6 pointer-events-none">
               <ImageUp className="mx-auto" size={54} color="#82858a" />
-              <div className="mt-4 flex text-sm/6 text-gray-400">
+              <div className="mt-4 flex text-sm/6 text-gray-400 justify-center gap-1">
                 <label
                   htmlFor={inputId}
                   className={`
-                    transition relative cursor-pointer rounded-md bg-transparent font-semibold
+                    pointer-events-auto transition relative cursor-pointer rounded-md bg-transparent font-semibold
                     text-[var(--color-txt-selected)] focus-within:outline-2 focus-within:outline-offset-2
                     ${uploading ? "opacity-60 pointer-events-none" : "hover:text-[#61A7ED]"}
                   `}
                 >
                   <span>{uploading ? "Subiendo..." : "Sube una imagen"}</span>
                 </label>
-                <p className="pl-1 text-[var(--color-txt-secondary)]">o arrástrala aquí</p>
+                <span className="text-[var(--color-txt-secondary)]">o arrástrala aquí</span>
               </div>
-              <p className="text-xs text-gray-400">PNG, JPG, GIF hasta 2MB</p>
+              <p className="text-xs text-gray-400">PNG, JPG, GIF hasta {maxSizeMB}MB</p>
             </div>
           )}
         </div>
@@ -163,7 +214,7 @@ export default function ImageInput({ onUploaded, onUploadingChange, initialPath 
               border-[var(--color-border-box)] dark:border-border-dark
               ${
                 uploading
-                  ? "bg-[var(--color-foreground)] opacity-60 pointer-events-none"
+                  ? "opacity-60 pointer-events-none"
                   : "hover:bg-[var(--color-background)] dark:hover:bg-background-dark"
               }
             `}
