@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import ImageUpload from "@/app/ui/ImageUpload";
+import { Upload } from "lucide-react";
 
 export default function Highlights() {
   const [description, setDescription] = useState("");
@@ -92,8 +93,9 @@ export default function Highlights() {
         <button
           type="submit"
           disabled={saving || uploading}
-          className="p-2 bg-[var(--color-button-send)] text-white rounded-xl ml-2 cursor-pointer disabled:opacity-60"
+          className="p-2 bg-[var(--color-button-send)] text-white rounded-xl ml-2 cursor-pointer disabled:opacity-60 inline-flex items-center justify-center gap-2"
         >
+          <Upload />
           {saving ? "Creando..." : uploading ? "Subiendo imagen..." : "Crear"}
         </button>
       </form>
