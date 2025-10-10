@@ -90,6 +90,7 @@ export default function Highlights() {
           onUploadingChange={setUploading}
         />
 
+        {/* Boton para enviar el formulario */}
         <button
           type="submit"
           disabled={saving || uploading}
