@@ -31,7 +31,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               baseHref="/dashboard/productos"
               items={[
                 { href: "/dashboard/productos/nuevo", label: "Agregar nuevos productos" },
-                { href: "/dashboard/productos", label: "Ver todos los productos" },
+                { href: "/dashboard/productos/todos", label: "Ver todos los productos" },
               ]}
             />
             <DashboardNavButton icon={<Shapes size={iconSize} />} name="Categorías" href="/dashboard/categorias" />

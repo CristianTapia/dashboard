@@ -2,7 +2,7 @@ import Products from "@/app/ui/Products";
 import { createServer } from "@/app/lib/supabase/Server";
 import { createSupabaseAdmin } from "@/app/lib/supabase/Admin";
 
-export default async function ProductsPage() {
+export default async function AllProductsPage() {
   // [GET] TRAER PRODUCTOS DIRECTAMENTE DESDE LA BD
   const supabase = await createServer();
   // 1) Categorias - Leer datos con anon (SSR)
