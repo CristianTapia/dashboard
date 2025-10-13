@@ -1,14 +1,11 @@
 // (SERVER)
+import "server-only";
 import { createSupabaseAdmin } from "@/app/lib/supabase"; // tu factory
 import { CreateCategoryInput, UpdateCategoryInput } from "../validators";
 
-export async function listCategories({ limit = 20, offset = 0 } = {}) {
+export async function listCategories() {
   const db = createSupabaseAdmin();
-  const { data, error } = await db
-    .from("categories")
-    .select("id,name,created_at")
-    .order("created_at", { ascending: false })
-    .range(offset, offset + limit - 1);
+  const { data, error } = await db.from("categories").select("id,name").order("name", { ascending: false });
   if (error) throw new Error(error.message);
   return data ?? [];
 }
