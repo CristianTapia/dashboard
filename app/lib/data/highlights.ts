@@ -1,17 +1,43 @@
 import "server-only";
 import { createSupabaseAdmin } from "@/app/lib/supabase";
 import { CreateHighlightInput, UpdateHighlightInput } from "@/app/lib/validators";
+import { signPaths } from "@/app/lib/data/images"; // 👈 helper de firma en lote
 
 const db = () => createSupabaseAdmin();
 
-export async function listHighlights(limit = 20, offset = 0) {
-  const { data, error } = await db()
+export async function listHighlights({ limit = 20, offset = 0 }: { limit?: number; offset?: number } = {}) {
+  const db = createSupabaseAdmin();
+  const { data, error } = await db
     .from("highlights")
-    .select("id,description,image_url,created_at")
+    .select("id,description,image_path,created_at")
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
   if (error) throw new Error(error.message);
   return data ?? [];
+}
+
+/**
+ * Igual que listHighlights, pero devuelve cada item con `image_url` firmado (temporal).
+ * - Firma en lote para minimizar requests al storage.
+ * - `expires` en segundos (default 1h).
+ */
+
+export async function listHighlightsWithSigned({
+  limit = 20,
+  offset = 0,
+  expires = 3600,
+}: { limit?: number; offset?: number; expires?: number } = {}) {
+  const items = await listHighlights({ limit, offset });
+
+  // junta paths y firma en 1 llamada
+  const paths = items.map((p) => p.image_path).filter((x): x is string => !!x);
+  const urlMap = await signPaths(paths, expires);
+
+  // mapea el resultado agregando `image_url`
+  return items.map((p) => ({
+    ...p,
+    image_url: p.image_path ? urlMap.get(p.image_path) ?? null : null,
+  }));
 }
 
 export async function createHighlight(input: CreateHighlightInput) {
