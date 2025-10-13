@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { createServer } from "@/app/lib/supabase/Server";
-import { CreateProductSchema } from "@/app/lib/validators/product";
+import { createServer } from "@/app/lib/supabase/server";
+import { CreateProductSchema } from "@/app/lib/validators/products";
 
 // [GET] READ PRODUCTS FROM THE DATABASE
 export async function GET() {

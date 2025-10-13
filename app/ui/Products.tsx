@@ -9,7 +9,7 @@ import EditProduct from "./Modals/EditProduct";
 import Filtering from "./Modals/Filtering";
 import FilteringButton from "./Modals/FilteringButton";
 import Image from "next/image";
-import { Product, Category } from "../lib/types";
+import { Product, Category } from "../lib/validators/types";
 import { useRouter } from "next/navigation";
 
 export default function Products({

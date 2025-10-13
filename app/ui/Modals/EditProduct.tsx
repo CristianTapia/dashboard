@@ -2,7 +2,7 @@
 
 import React, { useImperativeHandle, useState, forwardRef, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Product, Category } from "@/app/lib/types";
+import { Product, Category } from "@/app/lib/validators/types";
 import ImageInput from "./ImageInput";
 
 type FieldKey = "category" | "name" | "price" | "stock" | "description" | null;
@@ -278,11 +278,7 @@ const EditProduct = forwardRef(function EditProduct(
         </div>
 
         {/* IMAGEN */}
-        <ImageInput
-          initialPath={imagePath}
-          onUploaded={setImagePath}
-          onUploadingChange={setIsUploadingImage}
-        />
+        <ImageInput initialPath={imagePath} onUploaded={setImagePath} onUploadingChange={setIsUploadingImage} />
 
         {/* STOCK */}
         <div className="sm:col-span-4 pb-2">

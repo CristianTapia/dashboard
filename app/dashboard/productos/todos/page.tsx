@@ -1,6 +1,6 @@
 import Products from "@/app/ui/Products";
-import { createServer } from "@/app/lib/supabase/Server";
-import { createSupabaseAdmin } from "@/app/lib/supabase/Admin";
+import { createServer } from "@/app/lib/supabase/server";
+import { createSupabaseAdmin } from "@/app/lib/supabase/admin";
 
 export default async function AllProductsPage() {
   // [GET] TRAER PRODUCTOS DIRECTAMENTE DESDE LA BD

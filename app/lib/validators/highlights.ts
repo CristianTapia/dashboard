@@ -1,4 +1,3 @@
-// app/lib/validators/highlights.ts
 import { z } from "zod";
 
 export const CreateHighlightSchema = z.object({
@@ -7,3 +6,5 @@ export const CreateHighlightSchema = z.object({
 });
 
 export type CreateHighlightInput = z.infer<typeof CreateHighlightSchema>;
+export const UpdateHighlightSchema = CreateHighlightSchema.partial();
+export type UpdateHighlightInput = z.infer<typeof UpdateHighlightSchema>;
