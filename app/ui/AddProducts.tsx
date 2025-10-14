@@ -11,15 +11,14 @@ export default function AddProducts({ categories }: { categories: Category[] }) 
   const [name, setName] = useState("");
   const [price, setPrice] = useState<number | "">("");
   const [stock, setStock] = useState<number | "">("");
-  const [categoryId, setCategoryId] = useState<number | "">("");
+  const [categoryId, setCategoryId] = useState<string>(""); // 👈 string para usar "" como placeholder
   const [description, setDescription] = useState("");
   const [imagePath, setImagePath] = useState<string | null>(null);
 
-  // State management for uploading and saving
+  // State management
   const [uploading, setUploading] = useState(false);
   const [uploaderKey, setUploaderKey] = useState(0);
   const [pending, startTransition] = useTransition();
-
   const saving = pending;
 
   const handleImageChange = (info: any) => {
@@ -32,7 +31,7 @@ export default function AddProducts({ categories }: { categories: Category[] }) 
 
     if (!name.trim()) return alert("El nombre es obligatorio");
     if (price === "" || Number(price) <= 0) return alert("Precio inválido");
-    if (categoryId === "" || Number.isNaN(Number(categoryId))) return alert("Selecciona una categoría");
+    if (categoryId === "") return alert("Selecciona una categoría");
     if (!description.trim()) return alert("La descripción es obligatoria");
     if (uploading) return alert("Espera a que termine la subida de la imagen 🙏");
 
@@ -42,7 +41,7 @@ export default function AddProducts({ categories }: { categories: Category[] }) 
           name: name.trim(),
           price: Number(price),
           stock: stock === "" ? 0 : Number(stock),
-          category_id: Number(categoryId),
+          category_id: Number(categoryId), // 👈 convertir a número aquí
           description: description.trim(),
           image_path: imagePath ?? null,
         });
@@ -57,7 +56,7 @@ export default function AddProducts({ categories }: { categories: Category[] }) 
           setUploaderKey((k) => k + 1);
         }
       } catch (err: any) {
-        alert(err?.message || "Error agregando el destacado");
+        alert(err?.message || "Error agregando el producto");
         console.error(err);
       }
     });
@@ -73,8 +72,8 @@ export default function AddProducts({ categories }: { categories: Category[] }) 
       </div>
 
       <form onSubmit={onSubmit} className="flex flex-col gap-6 mt-6">
+        {/* Nombre */}
         <div className="flex flex-col">
-          {/* Nombre */}
           <label className="text-sm pb-2 font-semibold">Nombre *</label>
           <input
             type="text"
@@ -84,81 +83,100 @@ export default function AddProducts({ categories }: { categories: Category[] }) 
             placeholder="Ej: Fideos con salsa"
             disabled={saving || uploading}
             className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
-               focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)]
-               p-3"
+                       focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
             required
           />
         </div>
 
-        <div></div>
-        {/* Precio */}
-        <div className="flex flex-col">
-          <label className="text-sm pb-2 font-semibold">Precio *</label>
-          <input
-            type="number"
-            name="price"
-            value={price}
-            onChange={(e) => setPrice(Number(e.target.value))}
-            placeholder="Ej: 5000"
-            disabled={saving || uploading}
-            className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
-               focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)]
-               p-3"
-            onKeyDown={(e) => {
-              if (["e", "E", "+", "-"].includes(e.key)) {
-                e.preventDefault();
-              }
-            }}
-            required
-          />
+        {/* Precio + Stock */}
+        <div className="flex flex-row flex-wrap gap-6">
+          <div className="flex flex-col flex-1 basis-0 min-w-[300px]">
+            <label className="text-sm pb-2 font-semibold">Precio *</label>
+            <input
+              type="number"
+              name="price"
+              value={price}
+              onChange={(e) => setPrice(e.target.value === "" ? "" : Number(e.target.value))}
+              placeholder="Ej: 5000"
+              disabled={saving || uploading}
+              className="w-full bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
+                         focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
+              onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+              required
+            />
+          </div>
+
+          <div className="flex flex-col flex-1 basis-0 min-w-[300px]">
+            <label className="text-sm pb-2 font-semibold">Stock</label>
+            <input
+              type="number"
+              name="stock"
+              value={stock}
+              onChange={(e) => setStock(e.target.value === "" ? "" : Number(e.target.value))}
+              placeholder="Ej: 20"
+              disabled={saving || uploading}
+              className="w-full bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
+                         focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
+              onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+            />
+          </div>
         </div>
-        {/* Categoría */}
+
+        {/* Categoría (placeholder gris, opciones negras) */}
         <div className="flex flex-col">
           <label className="text-sm pb-2 font-semibold">Categoría *</label>
-          <select
-            name="category_id"
-            value={categoryId}
-            onChange={(e) => setCategoryId(Number(e.target.value))}
-            disabled={saving || uploading}
-            // className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
-            //    focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)]
-            //    p-3"
-            className={`bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
-              focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3
-              ${categoryId === "" ? "text-[var(--color-txt-placeholder)]" : "text-black"}`}
-            required
-          >
-            <option value="" disabled hidden>
-              Selecciona una categoría
-            </option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
+          <div className="relative">
+            <select
+              name="category_id"
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)} // 👈 string
+              disabled={saving || uploading}
+              className={`w-full appearance-none
+                bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
+                focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)]
+                p-3
+                ${categoryId === "" ? "text-gray-500" : "text-black"}`}
+              required
+            >
+              <option value="" disabled hidden>
+                Selecciona una categoría
               </option>
-            ))}
-          </select>
+              {categories.map((cat) => (
+                <option key={cat.id} value={String(cat.id)}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+
+            {/* Flecha custom (opcional) */}
+            <svg
+              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 opacity-70"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <path
+                d="M7 10l5 5 5-5"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+
+          {/* Fuerza color negro en el desplegable */}
+          <style jsx>{`
+            select option {
+              color: #000;
+            }
+            select option[disabled] {
+              color: #9ca3af;
+            }
+          `}</style>
         </div>
-        {/* Stock */}
-        <div className="flex flex-col">
-          <label className="text-sm pb-2 font-semibold">Stock</label>
-          <input
-            type="number"
-            name="stock"
-            value={stock}
-            onChange={(e) => setStock(Number(e.target.value))}
-            placeholder="Ej: 20"
-            disabled={saving || uploading}
-            className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
-               focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)]
-               p-3"
-            onKeyDown={(e) => {
-              if (["e", "E", "+", "-"].includes(e.key)) {
-                e.preventDefault();
-              }
-            }}
-            required
-          />
-        </div>
+
         {/* Descripción */}
         <div className="flex flex-col">
           <label className="text-sm pb-2 font-semibold">Descripción *</label>
@@ -166,7 +184,8 @@ export default function AddProducts({ categories }: { categories: Category[] }) 
             name="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="form-textarea bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 h-24"
+            className="form-textarea bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
+                       focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 h-24"
             placeholder="Ej: Fideos con salsa de tomate casera"
             disabled={saving || uploading}
           />
@@ -180,12 +199,13 @@ export default function AddProducts({ categories }: { categories: Category[] }) 
           onUploadingChange={setUploading}
         />
 
-        {/* Boton para enviar el formulario */}
+        {/* Botón */}
         <div className="flex justify-end">
           <button
             type="submit"
             disabled={saving || uploading}
-            className="p-3 bg-[var(--color-button-send)] text-white rounded-xl ml-2 cursor-pointer disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
+            className="p-3 bg-[var(--color-button-send)] text-white rounded-xl ml-2 cursor-pointer
+                       disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
           >
             <Upload />
             {saving ? "Creando..." : uploading ? "Subiendo imagen..." : "Agregar"}
