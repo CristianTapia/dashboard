@@ -7,8 +7,7 @@ import { createHighlightAction } from "@/app/dashboard/destacados/nuevo/actions"
 
 export default function AddHighlights() {
   const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  // const [saving, setSaving] = useState(false);
+  const [imagePath, setImagePath] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploaderKey, setUploaderKey] = useState(0);
   const [pending, startTransition] = useTransition();
@@ -17,7 +16,7 @@ export default function AddHighlights() {
 
   const handleImageChange = (info: any) => {
     const val = typeof info === "string" ? info : info?.path ?? info?.url ?? null;
-    setImageUrl(val);
+    setImagePath(val);
   };
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -28,15 +27,15 @@ export default function AddHighlights() {
 
     startTransition(async () => {
       try {
-        const res = await createHighlightAction({ description: desc, image_url: imageUrl ?? null });
+        const res = await createHighlightAction({ description: desc, image_path: imagePath ?? null });
         if (res?.ok) {
           alert("Destacado creado ✅");
           setDescription("");
-          setImageUrl(null);
+          setImagePath(null);
           setUploaderKey((k) => k + 1);
         }
       } catch (err: any) {
-        alert(err?.message || "Error creando el destacado");
+        alert(err?.message || "Error agregando el destacado");
         console.error(err);
       }
     });
@@ -45,9 +44,9 @@ export default function AddHighlights() {
   return (
     <div className="mx-auto max-w-3xl pt-4 flex flex-col">
       <div className="flex flex-col items-start gap-2">
-        <h1 className="text-3xl font-bold">Crear Destacados</h1>
+        <h1 className="text-3xl font-bold">Agregar Destacados</h1>
         <p className="text-md text-[var(--color-txt-secondary)]">
-          Crea y administra tus ofertas y platos destacados para que se puedan visualizar en el menú del consumidor.
+          Agrega nuevas ofertas y/o productos destacados. Se visualizarán inmediatamente en el menú.
         </p>
       </div>
 
