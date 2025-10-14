@@ -1,63 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import ImageUpload from "@/app/ui/ImageUpload";
 import { Upload } from "lucide-react";
+import { createHighlightAction } from "@/app/dashboard/destacados/nuevo/actions";
 
-export default function Highlights() {
+export default function AddHighlights() {
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
+  // const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploaderKey, setUploaderKey] = useState(0);
+  const [pending, startTransition] = useTransition();
+
+  const saving = pending;
 
   const handleImageChange = (info: any) => {
     const val = typeof info === "string" ? info : info?.path ?? info?.url ?? null;
     setImageUrl(val);
   };
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
     const desc = description.trim();
-    if (!desc) {
-      alert("La descripción es obligatoria");
-      return;
-    }
-    if (uploading) {
-      alert("Espera a que termine la subida de la imagen 🙏");
-      return;
-    }
+    if (!desc) return alert("La descripción es obligatoria");
+    if (uploading) return alert("Espera a que termine la subida de la imagen 🙏");
 
-    try {
-      setSaving(true);
-      console.log("[POST] /api/highlights", { description: desc, image_url: imageUrl });
-      const res = await fetch("/api/highlights", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: desc, image_url: imageUrl ?? null }),
-      });
-
-      // para depurar rápido:
-      const text = await res.text();
-      let json: any = {};
+    startTransition(async () => {
       try {
-        json = text ? JSON.parse(text) : {};
-      } catch {}
-      console.log("Respuesta highlights:", res.status, json);
-
-      if (!res.ok) throw new Error(json?.error || `Error ${res.status}`);
-
-      alert("Destacado creado ✅");
-      setDescription("");
-      setImageUrl(null);
-      setUploaderKey((k) => k + 1);
-    } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Error creando el destacado");
-    } finally {
-      setSaving(false);
-    }
+        const res = await createHighlightAction({ description: desc, image_url: imageUrl ?? null });
+        if (res?.ok) {
+          alert("Destacado creado ✅");
+          setDescription("");
+          setImageUrl(null);
+          setUploaderKey((k) => k + 1);
+        }
+      } catch (err: any) {
+        alert(err?.message || "Error creando el destacado");
+        console.error(err);
+      }
+    });
   }
 
   return (
@@ -91,14 +73,16 @@ export default function Highlights() {
         />
 
         {/* Boton para enviar el formulario */}
-        <button
-          type="submit"
-          disabled={saving || uploading}
-          className="p-2 bg-[var(--color-button-send)] text-white rounded-xl ml-2 cursor-pointer disabled:opacity-60 inline-flex items-center justify-center gap-2"
-        >
-          <Upload />
-          {saving ? "Creando..." : uploading ? "Subiendo imagen..." : "Crear"}
-        </button>
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={saving || uploading}
+            className="p-3 bg-[var(--color-button-send)] text-white rounded-xl ml-2 cursor-pointer disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
+          >
+            <Upload />
+            {saving ? "Creando..." : uploading ? "Subiendo imagen..." : "Publicar"}
+          </button>
+        </div>
       </form>
     </div>
   );

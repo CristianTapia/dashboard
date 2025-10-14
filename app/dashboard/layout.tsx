@@ -23,7 +23,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <nav>
           <ul className="gap-2 flex flex-col p-4">
             <DashboardNavButton icon={<ChartNoAxesColumn size={iconSize} />} name="Resumen" href="/dashboard" />
-            <DashboardNavButton icon={<Percent size={iconSize} />} name="Destacados" href="/dashboard/destacados" />
+            <CollapsibleNavButton
+              icon={<Percent size={iconSize} />}
+              label="Destacados"
+              baseHref="/dashboard/destacados"
+              items={[
+                { href: "/dashboard/destacados/nuevo", label: "Agregar sección destacados" },
+                { href: "/dashboard/destacados/todos", label: "Ver todos los destacados" },
+              ]}
+            />
 
             <CollapsibleNavButton
               icon={<UtensilsCrossed size={iconSize} />}

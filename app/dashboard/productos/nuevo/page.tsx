@@ -1,3 +1,5 @@
-export default function Configuration() {
-  return <div>Config</div>;
+import AddProducts from "@/app/ui/AddProducts";
+
+export default function AddProductsPage() {
+  return <AddProducts />;
 }
