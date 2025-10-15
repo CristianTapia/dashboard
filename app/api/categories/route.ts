@@ -1,7 +1,7 @@
 // app/api/categories/route.ts
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { CategoryCreateSchema } from "@/app/lib/validators/categories";
+import { CreateCategorySchema } from "@/app/lib/validators/categories";
 
 // Inicializa el cliente de Supabase
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);

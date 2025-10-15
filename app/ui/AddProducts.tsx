@@ -131,7 +131,7 @@ export default function AddProducts({ categories }: { categories: Category[] }) 
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)} // 👈 string
               disabled={saving || uploading}
-              className={`w-full appearance-none
+              className={`cursor-pointer w-full appearance-none
                 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
                 focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)]
                 p-3
