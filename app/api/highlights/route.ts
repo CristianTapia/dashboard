@@ -31,7 +31,7 @@ export async function POST(req: Request) {
 
     const parsed = CreateHighlightSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: "Payload inválido", issues: parsed.error.flatten() }, { status: 400 });
+      return NextResponse.json({ error: "Payload inválido", issues: parsed.error.format() }, { status: 400 });
     }
 
     // ✅ ahora sí: tomamos los valores validados
