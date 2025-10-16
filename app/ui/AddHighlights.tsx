@@ -23,13 +23,14 @@ export default function AddHighlights() {
     e.preventDefault();
     const desc = description.trim();
     if (!desc) return alert("La descripción es obligatoria");
-    if (uploading) return alert("Espera a que termine la subida de la imagen 🙏");
+    if (!imagePath) return alert("La imagen es obligatoria");
+    if (uploading) return alert("Espera a que termine la subida de la imagen");
 
     startTransition(async () => {
       try {
-        const res = await createHighlightAction({ description: desc, image_url: imagePath ?? null });
+        const res = await createHighlightAction({ description: desc, image_path: imagePath });
         if (res?.ok) {
-          alert("Destacado creado ✅");
+          alert("Destacado creado.");
           setDescription("");
           setImagePath(null);
           setUploaderKey((k) => k + 1);
@@ -71,7 +72,7 @@ export default function AddHighlights() {
           onUploadingChange={setUploading}
         />
 
-        {/* Boton para enviar el formulario */}
+        {/* Botón para enviar el formulario */}
         <div className="flex justify-end">
           <button
             type="submit"
@@ -86,3 +87,4 @@ export default function AddHighlights() {
     </div>
   );
 }
+

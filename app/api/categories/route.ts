@@ -1,27 +1,43 @@
 // app/api/categories/route.ts
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createSupabaseAdmin } from "@/app/lib/supabase";
 import { CreateCategorySchema } from "@/app/lib/validators/categories";
 
-// Inicializa el cliente de Supabase
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+const corsHeaders = {
+  "Access-Control-Allow-Origin": process.env.CORS_ORIGIN ?? "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
 
-// Maneja las solicitudes GET y POST para categorías
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
+}
+
+// Maneja GET y POST de categorías (public GET)
 export async function GET() {
-  const { data, error } = await supabase.from("categories").select("id, name").order("name", { ascending: true });
+  const db = createSupabaseAdmin();
+  const { data, error } = await db.from("categories").select("id, name").order("name", { ascending: true });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data);
+  if (error) return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders });
+  return NextResponse.json(data, { status: 200, headers: corsHeaders });
 }
 
 export async function POST(request: Request) {
-  const { name } = (await request.json()) as { name: string };
-  const { data, error } = await supabase
-    .from("categories")
-    .upsert({ name }, { onConflict: "name" })
-    .select("id, name")
-    .single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data, { status: 200 });
+  try {
+    const body = await request.json();
+    const { name } = CreateCategorySchema.parse(body);
+    const db = createSupabaseAdmin();
+    const { data, error } = await db
+      .from("categories")
+      .upsert({ name }, { onConflict: "name" })
+      .select("id, name")
+      .single();
+    if (error) return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders });
+    return NextResponse.json(data, { status: 200, headers: corsHeaders });
+  } catch (err: any) {
+    const status = err?.name === "ZodError" ? 400 : 500;
+    const message = err?.message || (status === 400 ? "Payload inválido" : "Server error");
+    return NextResponse.json({ error: message }, { status, headers: corsHeaders });
+  }
 }
+

@@ -1,52 +1,44 @@
 // app/api/highlights/route.ts
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import { createServer } from "@/app/lib/supabase/server";
 import { CreateHighlightSchema } from "@/app/lib/validators/highlights";
+import { createHighlight, listHighlightsWithSigned } from "@/app/lib/data/highlights";
 
-// Asegura runtime Node (necesario para usar la Service Role)
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // solo en server
-);
+const corsHeaders = {
+  "Access-Control-Allow-Origin": process.env.CORS_ORIGIN ?? "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
 
-// [GET] READ HIGHLIGHTS FROM THE DATABASE
-export async function GET() {
-  const { data, error } = await supabase
-    .from("highlights")
-    .select("id, description, image_url, created_at")
-    .order("created_at", { ascending: false });
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data);
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
 }
 
-// [POST] WRITE HIGHLIGTHS TO THE DATABASE
+// [GET] READ HIGHLIGHTS (public API)
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const limit = Math.max(1, Math.min(100, Number(searchParams.get("limit") ?? 20)));
+  const offset = Math.max(0, Number(searchParams.get("offset") ?? 0));
+  try {
+    const items = await listHighlightsWithSigned({ limit, offset, expires: 3600 });
+    return NextResponse.json(items, { status: 200, headers: corsHeaders });
+  } catch (e: any) {
+    return NextResponse.json({ error: e?.message ?? "Server error" }, { status: 500, headers: corsHeaders });
+  }
+}
+
+// [POST] WRITE HIGHLIGHTS
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-
-    const parsed = CreateHighlightSchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json({ error: "Payload inválido", issues: parsed.error.format() }, { status: 400 });
-    }
-
-    // ✅ ahora sí: tomamos los valores validados
-    const { description, image_url } = parsed.data;
-
-    const { data, error } = await supabase.from("highlights").insert({ description, image_url }).select().single();
-
-    if (error) {
-      console.error("[SUPABASE INSERT ERROR]", error);
-      return NextResponse.json({ error: error.message }, { status: 400 });
-    }
-
-    return NextResponse.json(data, { status: 201 });
+    const parsed = CreateHighlightSchema.parse(body);
+    const data = await createHighlight(parsed);
+    return NextResponse.json(data, { status: 201, headers: corsHeaders });
   } catch (err: any) {
-    console.error("[API HIGHLIGHTS ERROR]", err);
-    return NextResponse.json({ error: err?.message ?? "Server error" }, { status: 500 });
+    const status = err?.name === "ZodError" ? 400 : 500;
+    const message = err?.message || (status === 400 ? "Payload inválido" : "Server error");
+    return NextResponse.json({ error: message }, { status, headers: corsHeaders });
   }
 }

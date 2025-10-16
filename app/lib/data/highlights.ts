@@ -30,11 +30,11 @@ export async function listHighlightsWithSigned({
   const items = await listHighlights({ limit, offset });
 
   // junta paths y firma en 1 llamada
-  const paths = items.map((p) => p.image_path).filter((x): x is string => !!x);
+  const paths = items.map((p: any) => p.image_path).filter((x: any): x is string => !!x);
   const urlMap = await signPaths(paths, expires);
 
-  // mapea el resultado agregando `image_url`
-  return items.map((p) => ({
+  // Mapea el resultado agregando `image_url` firmada y preservando path
+  return items.map((p: any) => ({
     ...p,
     image_url: p.image_path ? urlMap.get(p.image_path) ?? null : null,
   }));
