@@ -27,7 +27,7 @@ export default function AddHighlights() {
 
     startTransition(async () => {
       try {
-        const res = await createHighlightAction({ description: desc, image_path: imagePath ?? null });
+        const res = await createHighlightAction({ description: desc, image_url: imagePath ?? null });
         if (res?.ok) {
           alert("Destacado creado ✅");
           setDescription("");
