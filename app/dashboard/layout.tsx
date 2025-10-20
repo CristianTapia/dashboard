@@ -28,7 +28,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               label="Destacados"
               baseHref="/dashboard/destacados"
               items={[
-                { href: "/dashboard/destacados/nuevo", label: "Agregar sección destacados" },
+                { href: "/dashboard/destacados/nuevo", label: "Agregar nuevo destacado" },
                 { href: "/dashboard/destacados/todos", label: "Ver todos los destacados" },
               ]}
             />
@@ -38,11 +38,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               label="Productos"
               baseHref="/dashboard/productos"
               items={[
-                { href: "/dashboard/productos/nuevo", label: "Agregar nuevos productos" },
+                { href: "/dashboard/productos/nuevo", label: "Agregar nuevo producto" },
                 { href: "/dashboard/productos/todos", label: "Ver todos los productos" },
               ]}
             />
-            <DashboardNavButton icon={<Shapes size={iconSize} />} name="Categorías" href="/dashboard/categorias" />
+
+            <CollapsibleNavButton
+              icon={<Shapes size={iconSize} />}
+              label="Categorías"
+              baseHref="/dashboard/categorias"
+              items={[
+                { href: "/dashboard/categorias/nueva", label: "Agregar nueva categoría" },
+                { href: "/dashboard/categorias/todas", label: "Ver todas las categorías" },
+              ]}
+            />
             <DashboardNavButton
               icon={<Settings size={iconSize} />}
               name="Configuración"
