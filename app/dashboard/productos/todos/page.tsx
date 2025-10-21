@@ -1,5 +1,5 @@
 // app/dashboard/productos/todos/page.tsx
-import Products from "@/app/ui/Products";
+import ProductsClient from "@/app/ui/ProductsClient";
 import { listProductsWithSigned } from "@/app/lib/data/products";
 import { listCategories } from "@/app/lib/data/categories";
 
@@ -11,5 +11,5 @@ export default async function AllProductsPage() {
     listCategories(),
   ]);
 
-  return <Products products={products as any} initialCategories={categories as any} />;
+  return <ProductsClient products={products as any} initialCategories={categories as any} />;
 }
