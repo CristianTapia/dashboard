@@ -43,15 +43,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               ]}
             />
 
-            <CollapsibleNavButton
-              icon={<Shapes size={iconSize} />}
-              label="Categorías"
-              baseHref="/dashboard/categorias"
-              items={[
-                { href: "/dashboard/categorias/nueva", label: "Agregar nueva categoría" },
-                { href: "/dashboard/categorias/todas", label: "Ver todas las categorías" },
-              ]}
-            />
+            <DashboardNavButton icon={<Shapes size={iconSize} />} name="Categorías" href="/dashboard/categorias" />
+
             <DashboardNavButton
               icon={<Settings size={iconSize} />}
               name="Configuración"
