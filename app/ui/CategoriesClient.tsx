@@ -15,7 +15,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
     //   // setSelectedCategoryId(categoryId ?? null);
   }
   return (
-    <div className="mx-auto max-w-3xl pt-4 flex flex-col">
+    <div className="max-w-auto pt-4 flex flex-col">
       {/* Titulo */}
       <div className="flex flex-col items-start gap-2">
         <h1 className="text-3xl font-bold">Todas las Categorías</h1>
@@ -59,31 +59,31 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
         </div>
 
         {/* Categorias */}
-        <div className="flex flex-col gap-3 pb-3 bg-white dark:bg-slate-800/50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-          {categories.map((categories) => (
-            <div key={categories.id} className="flex flex-1 items-start justify-between">
-              <p className="text-[#0d141b] dark:text-white text-lg font-bold leading-normal">{categories.name}</p>
-              <div className="relative group">
-                <button className="flex items-center justify-center size-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
-                  <span className="material-symbols-outlined text-slate-500 dark:text-slate-400">more_vert</span>
-                </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl z-10 hidden group-hover:block">
-                  <a
-                    className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
-                    href="#"
-                  >
-                    <span className="material-symbols-outlined text-base">edit</span>Editar
-                  </a>
-                  <a
-                    className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-700"
-                    href="#"
-                  >
-                    <span className="material-symbols-outlined text-base">delete</span>Eliminar
-                  </a>
-                </div>
+        <div className="flex flex-col bg-white dark:bg-slate-800/50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+          {/* {categories.map((categories) => ( */}
+          <div className="flex pt-4items-start justify-between">
+            <p className="text-[#0d141b] dark:text-white text-lg font-bold">Vinos</p>
+            <div className="relative group gap-3">
+              <button className="flex items-center justify-center size-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
+                <span className="material-symbols-outlined text-slate-500 dark:text-slate-400">:</span>
+              </button>
+              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl z-10 hidden group-hover:block">
+                <a
+                  className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                  href="#"
+                >
+                  <span className="material-symbols-outlined text-base">edit</span>Editar
+                </a>
+                <a
+                  className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                  href="#"
+                >
+                  <span className="material-symbols-outlined text-base">delete</span>Eliminar
+                </a>
               </div>
             </div>
-          ))}
+          </div>
+          {/* ))} */}
         </div>
       </div>
     </div>
