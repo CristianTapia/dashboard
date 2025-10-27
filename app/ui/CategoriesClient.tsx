@@ -85,7 +85,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
                       optionB={
                         <div className="flex gap-2 align-middle">
                           <Trash size={14} />
-                          <span>Eliminar</span>
+                          <span>Eliminara</span>
                         </div>
                       }
                     />
