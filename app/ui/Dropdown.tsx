@@ -5,8 +5,8 @@ import { forwardRef } from "react";
 
 type DropdownProps = {
   isOpen: boolean;
-  optionA?: string;
-  optionB?: string;
+  optionA?: ReactNode;
+  optionB?: ReactNode;
   optionC?: string;
   onOptionAClickAction?: () => void;
   onOptionBClickAction?: () => void;
@@ -34,20 +34,20 @@ const Dropdown = forwardRef(function Dropdown(
   return (
     <div
       ref={ref}
-      className={`absolute right-0 z-50 w-40 bg-white rounded-md shadow-lg border transition-all duration-200 transform opacity-100 scale-100 ${
-        className ?? "top-[40px] mt-1"
+      className={`absolute right-0 z-10 w-48 bg-white rounded-xl shadow-lg transition-all duration-200 transform opacity-100 scale-100 ${
+        className ?? "mt-1"
       }`}
     >
       <ul className="py-1">
         <li
-          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+          className="flex px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
           onClick={onOptionAClickAction}
         >
           {optionA}
         </li>
         {optionB && (
           <li
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+            className="flex px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
             onClick={onOptionBClickAction}
           >
             {optionB}

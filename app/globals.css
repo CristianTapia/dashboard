@@ -10,6 +10,7 @@
   --color-button-send: #137fec; /* Azul vibrante para botones de envío */
   --color-line-limit: #e0e7f1; /* Color para líneas divisorias */
   --color-border-box: #d1d5dc; /* Color para bordes de cajas */
+  /* Opcion para la caja de los select */
   select option {
     color: black;
   }
