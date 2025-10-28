@@ -67,10 +67,10 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
               key={categories.id}
               className="w-52 bg-[var(--color-foreground)] dark:bg-slate-800/50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
             >
-              <div className="flex items-start justify-between align-middle">
+              <div className="flex justify-between items-center">
                 <p className="dark:text-white text-lg font-bold">{categories.name}</p>
                 <div className="relative group gap-3">
-                  <button className="cursor-pointer flex items-center justify-center size-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
+                  <button className="cursor-pointer flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
                     <EllipsisVertical size={16} />
                   </button>
                   <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl hidden group-hover:block">
