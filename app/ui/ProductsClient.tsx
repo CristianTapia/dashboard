@@ -153,8 +153,8 @@ export default function Products({
     setOpenDropdownId((prev) => (prev === id ? null : id));
   }
 
-  // Manejo de clics fuera del dropdown
   useEffect(() => {
+    // Manejo de clics fuera del dropdown
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setOpenDropdownId(null);

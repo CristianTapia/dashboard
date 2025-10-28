@@ -34,9 +34,10 @@ const Dropdown = forwardRef(function Dropdown(
   return (
     <div
       ref={ref}
-      className={`absolute right-0 z-10 w-48 bg-white rounded-xl shadow-lg transition-all duration-200 transform opacity-100 scale-100 ${
+      className={`absolute right-0 z-10 w-48 bg-white rounded-xl shadow-lg transition-all duration-200 ${
         className ?? "mt-1"
       }`}
+      data-role="dropdown-menu"
     >
       <ul className="py-1">
         <li

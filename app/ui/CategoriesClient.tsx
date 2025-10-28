@@ -3,18 +3,52 @@
 import AddCategories from "@/app/ui/AddCategories";
 import Modal from "@/app/ui/Modals/Modal";
 import Dropdown from "@/app/ui/Dropdown";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { CirclePlus, Search, EllipsisVertical, Pen, Trash } from "lucide-react";
 import { Category } from "@/app/lib/validators/types";
 
 export default function CategoriesPage({ categories }: { categories: Category[] }) {
+  // Modal handling
   const [activeModal, setActiveModal] = useState<null | "addCategory">(null);
+
+  // DROPDOWN HANDLING
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+
+  useEffect(() => {
+    // Manejo de clics fuera del dropdown
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpenDropdownId(null);
+      }
+    }
+    // Manejo de escape para cerrar el dropdown
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpenDropdownId(null);
+      }
+    }
+    // Manejo de scroll para cerrar el dropdown
+    function handleScroll() {
+      setOpenDropdownId(null);
+    }
+
+    if (openDropdownId !== null) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEscape);
+      window.addEventListener("scroll", handleScroll, true);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+      window.removeEventListener("scroll", handleScroll, true);
+    };
+  }, [openDropdownId]);
 
   // MODAL
   function openModal(modalName: "addCategory") {
     setActiveModal(modalName);
-    //   // setSelectedCategoryId(categoryId ?? null);
   }
   return (
     <div className="max-w-auto pt-4 flex flex-col">
@@ -69,21 +103,27 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
             >
               <div className="flex justify-between items-center">
                 <p className="dark:text-white text-lg font-bold">{categories.name}</p>
-                <div className="relative group gap-3">
-                  <button className="cursor-pointer flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
-                    <EllipsisVertical size={16} />
+                <div className="relative">
+                  <button
+                    className="cursor-pointer flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-700"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenDropdownId((prev) => (prev === categories.id ? null : categories.id));
+                    }}
+                  >
+                    <EllipsisVertical size={18} />
                   </button>
-                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl hidden group-hover:block">
+                  <div ref={openDropdownId === categories.id ? dropdownRef : null}>
                     <Dropdown
-                      isOpen={true}
+                      isOpen={openDropdownId === categories.id}
                       optionA={
-                        <div className="flex gap-2 vertical-center">
+                        <div className="flex gap-2 items-center">
                           <Pen size={14} />
                           <span>Editar</span>
                         </div>
                       }
                       optionB={
-                        <div className="flex gap-2 align-middle">
+                        <div className="flex gap-2 items-center text-[var(--color-delete)]">
                           <Trash size={14} />
                           <span>Eliminar</span>
                         </div>
