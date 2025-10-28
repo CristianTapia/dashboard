@@ -1,14 +1,14 @@
 "use client";
 
-import AddCategories from "@/app/ui/AddCategories";
-import Modal from "@/app/ui/Modals/Modal";
 import Dropdown from "@/app/ui/Dropdown";
+import Modal from "@/app/ui/Modals/Modal";
+import AddCategories from "@/app/ui/AddCategories";
 import { useState, useRef, useEffect } from "react";
-import { CirclePlus, Search, EllipsisVertical, Pen, Trash } from "lucide-react";
 import { Category } from "@/app/lib/validators/types";
+import { CirclePlus, Search, EllipsisVertical, Pen, Trash } from "lucide-react";
 
 export default function CategoriesPage({ categories }: { categories: Category[] }) {
-  // Modal handling
+  // MODAL HANDLING
   const [activeModal, setActiveModal] = useState<null | "addCategory">(null);
 
   // DROPDOWN HANDLING
@@ -103,7 +103,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
             >
               <div className="flex justify-between items-center">
                 <p className="dark:text-white text-lg font-bold">{categories.name}</p>
-                <div className="relative">
+                <div className="relative" ref={openDropdownId === categories.id ? dropdownRef : null}>
                   <button
                     className="cursor-pointer flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-700"
                     onClick={(e) => {
@@ -113,7 +113,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
                   >
                     <EllipsisVertical size={18} />
                   </button>
-                  <div ref={openDropdownId === categories.id ? dropdownRef : null}>
+                  <div>
                     <Dropdown
                       isOpen={openDropdownId === categories.id}
                       optionA={
