@@ -50,6 +50,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
   function openModal(modalName: "addCategory") {
     setActiveModal(modalName);
   }
+
   return (
     <div className="max-w-auto pt-4 flex flex-col">
       {/* Titulo */}

@@ -28,7 +28,7 @@ export default function Modal({
       {isOpen && (
         // Cierra el modal al hacer clic fuera
         <div
-          className="fixed inset-0 flex items-center justify-center bg-black/60 transition-opacity"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 transition-opacity"
           onClick={onCloseAction}
         >
           {/* Evita que el click dentro del modal lo cierre */}
