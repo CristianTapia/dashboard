@@ -3,11 +3,17 @@
 import Dropdown from "@/app/ui/Dropdown";
 import Modal from "@/app/ui/Modals/Modal";
 import AddCategories from "@/app/ui/AddCategories";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useTransition } from "react";
 import { Category } from "@/app/lib/validators/types";
 import { CirclePlus, Search, EllipsisVertical, Pen, Trash } from "lucide-react";
+import { deleteCategory } from "@/app/dashboard/categorias/actions";
+import { useRouter } from "next/navigation";
 
 export default function CategoriesPage({ categories }: { categories: Category[] }) {
+  //DELETE CATEGORY
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
   // MODAL HANDLING
   const [activeModal, setActiveModal] = useState<null | "addCategory">(null);
 
@@ -50,6 +56,14 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
   function openModal(modalName: "addCategory") {
     setActiveModal(modalName);
   }
+
+  // DELETE CATEGORY
+  const onDelete = (id: number) => {
+    startTransition(async () => {
+      await deleteCategory(id);
+      router.refresh(); // vuelve a renderizar con datos actualizados
+    });
+  };
 
   return (
     <div className="max-w-auto pt-4 flex flex-col">
@@ -97,26 +111,26 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
 
         {/* Categorias */}
         <div className="flex flex-wrap gap-8 justify-center">
-          {categories.map((categories) => (
+          {categories.map((category) => (
             <div
-              key={categories.id}
+              key={category.id}
               className="w-52 bg-[var(--color-foreground)] dark:bg-slate-800/50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="flex justify-between items-center">
-                <p className="dark:text-white text-lg font-bold">{categories.name}</p>
-                <div className="relative" ref={openDropdownId === categories.id ? dropdownRef : null}>
+                <p className="dark:text-white text-lg font-bold">{category.name}</p>
+                <div className="relative" ref={openDropdownId === category.id ? dropdownRef : null}>
                   <button
                     className="cursor-pointer flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-700"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setOpenDropdownId((prev) => (prev === categories.id ? null : categories.id));
+                      setOpenDropdownId((prev) => (prev === category.id ? null : category.id));
                     }}
                   >
                     <EllipsisVertical size={18} />
                   </button>
                   <div>
                     <Dropdown
-                      isOpen={openDropdownId === categories.id}
+                      isOpen={openDropdownId === category.id}
                       optionA={
                         <div className="flex gap-2 items-center">
                           <Pen size={14} />
@@ -124,7 +138,13 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
                         </div>
                       }
                       optionB={
-                        <div className="flex gap-2 items-center text-[var(--color-delete)]">
+                        <div
+                          className="flex gap-2 items-center text-[var(--color-delete)]"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete(category.id);
+                          }}
+                        >
                           <Trash size={14} />
                           <span>Eliminar</span>
                         </div>
