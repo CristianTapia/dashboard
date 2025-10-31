@@ -13,6 +13,7 @@ type DropdownProps = {
   onOptionCClickAction?: () => void;
   className?: string;
   submenu?: ReactNode;
+  dropUp?: boolean;
 };
 
 const Dropdown = forwardRef(function Dropdown(
@@ -26,6 +27,7 @@ const Dropdown = forwardRef(function Dropdown(
     onOptionCClickAction,
     className,
     submenu,
+    dropUp,
   }: DropdownProps,
   ref: React.ForwardedRef<HTMLDivElement>
 ) {
@@ -34,8 +36,8 @@ const Dropdown = forwardRef(function Dropdown(
   return (
     <div
       ref={ref}
-      className={`absolute right-0 z-10 w-48 bg-white rounded-xl shadow-lg transition-all duration-200 ${
-        className ?? "mt-1"
+      className={`absolute right-0 ${dropUp ? "bottom-full mb-1" : "top-full mt-1"} z-20 w-48 bg-white rounded-xl shadow-lg transition-all duration-200 ${
+        className ?? ""
       }`}
       data-role="dropdown-menu"
     >

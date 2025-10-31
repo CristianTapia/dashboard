@@ -21,6 +21,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
   // Dropdown
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+  const [dropUp, setDropUp] = useState(false);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -117,6 +118,11 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
                     className="cursor-pointer flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-700"
                     onClick={(e) => {
                       e.stopPropagation();
+                      // Calcula espacio disponible hacia abajo y decide si abrir hacia arriba
+                      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                      const spaceBelow = window.innerHeight - rect.bottom;
+                      const approxMenuHeight = 140; // altura aproximada del menú
+                      setDropUp(spaceBelow < approxMenuHeight);
                       setOpenDropdownId((prev) => (prev === category.id ? null : category.id));
                     }}
                   >
@@ -125,6 +131,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
                   <div>
                     <Dropdown
                       isOpen={openDropdownId === category.id}
+                      dropUp={dropUp}
                       optionA={
                         <div className="flex gap-2 items-center">
                           <Pen size={14} />
@@ -168,4 +175,3 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
     </div>
   );
 }
-
