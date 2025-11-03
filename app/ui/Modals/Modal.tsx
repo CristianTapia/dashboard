@@ -2,6 +2,8 @@
 
 import { X } from "lucide-react";
 
+const baseClassNameButton = "flex p-3 gap-2 text-white rounded-xl cursor-pointer";
+
 export default function Modal({
   isOpen,
   onCloseAction,
@@ -9,8 +11,12 @@ export default function Modal({
   body,
   fixedBody,
   buttonAName,
+  buttonAIcon,
+  buttonAOptionalClassName,
   onButtonAClickAction,
   buttonBName,
+  buttonBIcon,
+  buttonBOptionalClassName,
   onButtonBClickAction,
 }: {
   isOpen: boolean;
@@ -18,10 +24,14 @@ export default function Modal({
   title?: string;
   body?: React.ReactNode;
   fixedBody?: React.ReactNode;
-  buttonAName?: string;
-  buttonBName?: string;
+  buttonAName?: React.ReactNode;
+  buttonBName?: React.ReactNode;
+  buttonAIcon?: React.ReactNode;
+  buttonBIcon?: React.ReactNode;
   onButtonAClickAction?: () => void;
   onButtonBClickAction?: () => void;
+  buttonAOptionalClassName?: string;
+  buttonBOptionalClassName?: string;
 }) {
   return (
     <>
@@ -34,33 +44,36 @@ export default function Modal({
           {/* Evita que el click dentro del modal lo cierre */}
           <div className="bg-white p-6 rounded-lg w-96" onClick={(e) => e.stopPropagation()}>
             {/* Modal header */}
-            <div className="flex pl-4 justify-between text-xl">
-              <h1 className="text-2xl font-bold">{title}</h1>
-              <button className="pr-4 text-gray-900 cursor-pointer" onClick={onCloseAction}>
+            <div className="flex p-4 justify-between text-xl">
+              <h1 className="text-xl font-bold">{title}</h1>
+              <button className="text-gray-900 cursor-pointer" onClick={onCloseAction}>
                 <X size={30} />
               </button>
             </div>
             {/* Modal body scrolleable*/}
-            {body ? <div className="p-2 max-h-[70vh] overflow-y-auto">{body}</div> : null}
+            {body ? <div className="p-4 max-h-[70vh] overflow-y-auto">{body}</div> : null}
 
             {/* Model Body fijo */}
-            {fixedBody ? <div className="p-4">{fixedBody}</div> : null}
+            {fixedBody ? <div className="px-4">{fixedBody}</div> : null}
 
             {/* Modal footer buttons*/}
             {buttonAName || buttonBName ? (
-              <div className="pt-4 pl-4">
+              <div className="flex gap-4 p-4">
                 {buttonAName ? (
-                  <button onClick={onButtonAClickAction} className="p-2 bg-green-600 text-white rounded cursor-pointer">
-                    {buttonAName}
+                  <button
+                    onClick={onButtonAClickAction}
+                    className={`${baseClassNameButton} ${buttonAOptionalClassName ?? ""}`}
+                  >
+                    {buttonAIcon} {buttonAName}
                   </button>
                 ) : null}
 
                 {buttonBName ? (
                   <button
                     onClick={onButtonBClickAction}
-                    className="p-2 bg-red-600 text-white rounded ml-2 cursor-pointer"
+                    className={`${baseClassNameButton} ${buttonBOptionalClassName ?? ""}`}
                   >
-                    {buttonBName}
+                    {buttonBIcon} {buttonBName}
                   </button>
                 ) : null}
               </div>

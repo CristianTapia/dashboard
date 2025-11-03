@@ -5,7 +5,7 @@ import Modal from "@/app/ui/Modals/Modal";
 import AddCategories from "@/app/ui/AddCategories";
 import { useState, useRef, useEffect, useTransition } from "react";
 import { Category } from "@/app/lib/validators/types";
-import { CirclePlus, Search, EllipsisVertical, Pen, Trash } from "lucide-react";
+import { CirclePlus, Search, EllipsisVertical, Pen, Trash, Loader } from "lucide-react";
 import { deleteCategoryAction } from "@/app/dashboard/categorias/actions";
 import { useRouter } from "next/navigation";
 
@@ -94,7 +94,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
           isOpen={activeModal === "addCategory"}
           onCloseAction={() => setActiveModal(null)}
           title="Añadir categoría"
-          body={<AddCategories />}
+          fixedBody={<AddCategories />}
         />
 
         {/* Búsqueda */}
@@ -171,9 +171,11 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
           <Modal
             isOpen={activeModal === "confirmDelete"}
             onCloseAction={() => setActiveModal(null)}
-            title={`Eliminar categoría${selectedCategoryName ? ` "${selectedCategoryName}"` : ""}`}
-            body={<div className="text-gray-900">Esta acción es irreversible</div>}
+            title={`¿Eliminar categoría${selectedCategoryName ? ` "${selectedCategoryName}"` : ""}?`}
+            fixedBody={<p className="text-[var(--color-txt-secondary)] py-4">Esta acción es irreversible</p>}
             buttonAName={isPending ? "Eliminando..." : "Eliminar"}
+            buttonAIcon={isPending ? <Loader /> : <Trash />}
+            buttonAOptionalClassName="bg-[var(--color-delete)]"
             onButtonAClickAction={() => {
               if (selectedCategoryId != null) onDelete(selectedCategoryId);
             }}

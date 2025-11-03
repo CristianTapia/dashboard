@@ -34,7 +34,7 @@ export default function AddCategories() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl pt-4 flex flex-col">
+    <div className="mx-auto max-w-3xl flex flex-col">
       <div className="flex flex-col items-start gap-2">
         <p className="text-md text-[var(--color-txt-secondary)]">
           Añade nuevas categorías. Se visualizarán inmediatamente en el menú.
