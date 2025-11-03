@@ -90,7 +90,12 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
         </button>
 
         {/* Modal para añadir categoría */}
-        <Modal isOpen={activeModal === "addCategory"} onCloseAction={() => setActiveModal(null)} title="Añadir categoría" body={<AddCategories />} />
+        <Modal
+          isOpen={activeModal === "addCategory"}
+          onCloseAction={() => setActiveModal(null)}
+          title="Añadir categoría"
+          body={<AddCategories />}
+        />
 
         {/* Búsqueda */}
         <div className="flex w-full flex-1 items-stretch rounded-lg h-full mt-6 mb-6">
@@ -110,7 +115,10 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
         {/* Categorías */}
         <div className="flex flex-wrap gap-8 justify-center">
           {categories.map((category) => (
-            <div key={category.id} className="w-52 bg-[var(--color-foreground)] dark:bg-slate-800/50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+            <div
+              key={category.id}
+              className="w-52 bg-[var(--color-foreground)] dark:bg-slate-800/50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            >
               <div className="flex justify-between items-center">
                 <p className="dark:text-white text-lg font-bold">{category.name}</p>
                 <div className="relative" ref={openDropdownId === category.id ? dropdownRef : null}>
@@ -139,7 +147,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
                         </div>
                       }
                       optionB={
-                        <div className="flex gap-2 items-center">
+                        <div className="flex gap-2 items-center text-[var(--color-delete)]">
                           <Trash size={14} />
                           <span>Eliminar</span>
                         </div>
