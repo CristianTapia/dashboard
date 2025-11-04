@@ -5,7 +5,7 @@ import Modal from "@/app/ui/Modals/Modal";
 import AddCategories from "@/app/ui/AddCategories";
 import { useState, useRef, useEffect, useTransition } from "react";
 import { Category } from "@/app/lib/validators/types";
-import { CirclePlus, Search, EllipsisVertical, Pen, Trash, Loader } from "lucide-react";
+import { CirclePlus, Search, EllipsisVertical, Pen, Trash, Loader, TriangleAlert } from "lucide-react";
 import { deleteCategoryAction } from "@/app/dashboard/categorias/actions";
 import { useRouter } from "next/navigation";
 
@@ -171,12 +171,26 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
           <Modal
             isOpen={activeModal === "confirmDelete"}
             onCloseAction={() => setActiveModal(null)}
-            title={`¿Eliminar categoría${selectedCategoryName ? ` "${selectedCategoryName}"` : ""}?`}
-            fixedBody={<p className="text-[var(--color-txt-secondary)] pb-6">Esta acción es irreversible</p>}
-            buttonAName={isPending ? "Eliminando..." : "Eliminar"}
-            buttonAIcon={isPending ? <Loader /> : <Trash />}
-            buttonAOptionalClassName="bg-[var(--color-delete)]"
+            title={`Eliminar categoría${selectedCategoryName ? ` "${selectedCategoryName}"` : ""}`}
+            fixedBody={
+              <div className="text-[var(--color-txt-secondary)] pb-6 text-center text-sm flex flex-col gap-4 align-middle items-center">
+                <div className="bg-[#fee2e2] rounded-full p-3">
+                  <TriangleAlert color="#DC2626" />
+                </div>
+                <p>
+                  ¿Estás seguro/a de que quieres eliminar esta categoría? <br />
+                  Esta acción no se puede deshacer.
+                </p>
+              </div>
+            }
+            buttonAName={"Cancelar"}
+            buttonAOptionalClassName="bg-[var(--color-cancel)] text-black"
             onButtonAClickAction={() => {
+              setActiveModal(null);
+            }}
+            buttonBName={isPending ? "Eliminando..." : "Eliminar"}
+            buttonBOptionalClassName="bg-[var(--color-delete)]"
+            onButtonBClickAction={() => {
               if (selectedCategoryId != null) onDelete(selectedCategoryId);
             }}
           />

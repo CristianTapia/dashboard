@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 
-const baseClassNameButton = "flex p-3 gap-2 text-white rounded-xl cursor-pointer";
+const baseClassNameButton = "flex px-4 p-3 gap-2 text-white rounded-xl cursor-pointer";
 
 export default function Modal({
   isOpen,
@@ -42,12 +42,12 @@ export default function Modal({
           onClick={onCloseAction}
         >
           {/* Evita que el click dentro del modal lo cierre */}
-          <div className="bg-white p-6 rounded-lg w-96" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white p-6 rounded-lg w-auto" onClick={(e) => e.stopPropagation()}>
             {/* Modal header */}
-            <div className="flex p-4 justify-between text-xl">
-              <h1 className="text-xl font-bold">{title}</h1>
+            <div className="flex p-4 justify-between">
+              <h1 className="text-md font-bold">{title}</h1>
               <button className="text-gray-900 cursor-pointer" onClick={onCloseAction}>
-                <X size={30} />
+                <X size={24} />
               </button>
             </div>
             {/* Modal body scrolleable*/}
@@ -58,11 +58,12 @@ export default function Modal({
 
             {/* Modal footer buttons*/}
             {buttonAName || buttonBName ? (
-              <div className="flex gap-4 px-4">
+              <div className="flex gap-4 px-4 text-sm font-bold align-middle items-center">
                 {buttonAName ? (
                   <button
                     onClick={onButtonAClickAction}
                     className={`${baseClassNameButton} ${buttonAOptionalClassName ?? ""}`}
+                    // disabled={isPending}
                   >
                     {buttonAIcon} {buttonAName}
                   </button>

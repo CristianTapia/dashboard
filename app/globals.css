@@ -6,7 +6,8 @@
   --color-bg-selected: #e7f2fd; /* Color para el botón/texto seleccionado */
   --color-txt-selected: #137fec; /* Color para el botón/texto seleccionado */
   --color-txt-secondary: #52585d; /* Color gris claro para textos secundarios */
-  --color-delete: #d10000; /* Color rojo para acciones de eliminación */
+  --color-delete: #dc2626; /* Color rojo para acciones de eliminación */
+  --color-cancel: #f3f4f6 /* Color gris claro para botones de cancelar */
   --color-txt-placeholder: #9ca3af; /* Color gris para placeholders */
   --color-button-send: #137fec; /* Azul vibrante para botones de envío */
   --color-line-limit: #e0e7f1; /* Color para líneas divisorias */
