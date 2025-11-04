@@ -10,7 +10,6 @@ export default function AddCategories() {
 
   // State management
   const [pending, startTransition] = useTransition();
-  const saving = pending;
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -51,7 +50,7 @@ export default function AddCategories() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Ej: Pizzas"
-            disabled={saving}
+            disabled={pending}
             className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
                        focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
             required
@@ -62,12 +61,12 @@ export default function AddCategories() {
         <div className="flex justify-end">
           <button
             type="submit"
-            disabled={saving}
+            disabled={pending}
             className="p-3 bg-[var(--color-button-send)] text-white rounded-xl ml-2 cursor-pointer
                        disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
           >
             <Upload />
-            {saving ? "Creando..." : "Agregar"}
+            {pending ? "Creando..." : "Agregar"}
           </button>
         </div>
       </form>

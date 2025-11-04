@@ -172,7 +172,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
             isOpen={activeModal === "confirmDelete"}
             onCloseAction={() => setActiveModal(null)}
             title={`¿Eliminar categoría${selectedCategoryName ? ` "${selectedCategoryName}"` : ""}?`}
-            fixedBody={<p className="text-[var(--color-txt-secondary)] py-4">Esta acción es irreversible</p>}
+            fixedBody={<p className="text-[var(--color-txt-secondary)] pb-6">Esta acción es irreversible</p>}
             buttonAName={isPending ? "Eliminando..." : "Eliminar"}
             buttonAIcon={isPending ? <Loader /> : <Trash />}
             buttonAOptionalClassName="bg-[var(--color-delete)]"

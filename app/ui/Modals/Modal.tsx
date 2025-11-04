@@ -58,7 +58,7 @@ export default function Modal({
 
             {/* Modal footer buttons*/}
             {buttonAName || buttonBName ? (
-              <div className="flex gap-4 p-4">
+              <div className="flex gap-4 px-4">
                 {buttonAName ? (
                   <button
                     onClick={onButtonAClickAction}
