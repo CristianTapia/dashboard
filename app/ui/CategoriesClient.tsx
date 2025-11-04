@@ -189,7 +189,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
               setActiveModal(null);
             }}
             buttonBName={isPending ? "Eliminando..." : "Eliminar"}
-            buttonBOptionalClassName="bg-[var(--color-delete)]"
+            buttonBOptionalClassName="bg-[var(--color-delete)] text-white"
             onButtonBClickAction={() => {
               if (selectedCategoryId != null) onDelete(selectedCategoryId);
             }}

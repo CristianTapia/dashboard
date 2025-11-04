@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 
-const baseClassNameButton = "flex px-4 p-3 gap-2 text-white rounded-xl cursor-pointer";
+const baseClassNameButton = "flex px-4 p-3 gap-2 rounded-xl cursor-pointer";
 
 export default function Modal({
   isOpen,
@@ -58,12 +58,11 @@ export default function Modal({
 
             {/* Modal footer buttons*/}
             {buttonAName || buttonBName ? (
-              <div className="flex gap-4 px-4 text-sm font-bold align-middle items-center">
+              <div className="flex gap-4 px-4 text-sm font-bold justify-center">
                 {buttonAName ? (
                   <button
                     onClick={onButtonAClickAction}
                     className={`${baseClassNameButton} ${buttonAOptionalClassName ?? ""}`}
-                    // disabled={isPending}
                   >
                     {buttonAIcon} {buttonAName}
                   </button>
