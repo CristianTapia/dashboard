@@ -5,7 +5,7 @@ import Modal from "@/app/ui/Modals/Modal";
 import AddCategories from "@/app/ui/AddCategories";
 import { useState, useRef, useEffect, useTransition } from "react";
 import { Category } from "@/app/lib/validators/types";
-import { CirclePlus, Search, EllipsisVertical, Pen, Trash, Loader, TriangleAlert } from "lucide-react";
+import { CirclePlus, Search, EllipsisVertical, Pen, Trash, Pencil, TriangleAlert } from "lucide-react";
 import { deleteCategoryAction } from "@/app/dashboard/categorias/actions";
 import { useRouter } from "next/navigation";
 
@@ -14,7 +14,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
   const [isPending, startTransition] = useTransition();
 
   // Modals
-  const [activeModal, setActiveModal] = useState<null | "addCategory" | "confirmDelete">(null);
+  const [activeModal, setActiveModal] = useState<null | "addCategory" | "confirmDelete" | "editCategory">(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [selectedCategoryName, setSelectedCategoryName] = useState<string | null>(null);
 
@@ -48,14 +48,17 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
     };
   }, [openDropdownId]);
 
-  function openModal(modalName: "addCategory") {
+  function openModal(modalName: "addCategory" | "confirmDelete" | "editCategory", id?: number) {
     setActiveModal(modalName);
   }
 
-  function openConfirm(category: { id: number; name: string }) {
+  function openConfirm(
+    modalName: "addCategory" | "confirmDelete" | "editCategory",
+    category: { id: number; name: string }
+  ) {
     setSelectedCategoryId(category.id);
     setSelectedCategoryName(category.name);
-    setActiveModal("confirmDelete");
+    setActiveModal(modalName);
   }
 
   const onDelete = (id: number) => {
@@ -88,14 +91,6 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
         >
           <CirclePlus /> Añadir nueva categoría
         </button>
-
-        {/* Modal para añadir categoría */}
-        <Modal
-          isOpen={activeModal === "addCategory"}
-          onCloseAction={() => setActiveModal(null)}
-          title="Añadir categoría"
-          fixedBody={<AddCategories />}
-        />
 
         {/* Búsqueda */}
         <div className="flex w-full flex-1 items-stretch rounded-lg h-full mt-6 mb-6">
@@ -146,19 +141,19 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
                           <span>Editar</span>
                         </div>
                       }
+                      onOptionAClickAction={() => {
+                        setOpenDropdownId(null);
+                        openConfirm("editCategory", category);
+                      }}
                       optionB={
                         <div className="flex gap-2 items-center text-[var(--color-delete)]">
                           <Trash size={14} />
                           <span>Eliminar</span>
                         </div>
                       }
-                      onOptionAClickAction={() => {
-                        setOpenDropdownId(null);
-                        // abrir modal de edición si aplica
-                      }}
                       onOptionBClickAction={() => {
                         setOpenDropdownId(null);
-                        openConfirm(category);
+                        openConfirm("confirmDelete", category);
                       }}
                     />
                   </div>
@@ -167,7 +162,43 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
             </div>
           ))}
 
-          {/* Modal de confirmación global */}
+          {/* Modal para añadir categoría */}
+          <Modal
+            isOpen={activeModal === "addCategory"}
+            onCloseAction={() => setActiveModal(null)}
+            title="Añadir categoría"
+            fixedBody={<AddCategories />}
+          />
+
+          {/* Modal de edición de categoría */}
+          <Modal
+            isOpen={activeModal === "editCategory"}
+            onCloseAction={() => setActiveModal(null)}
+            title={`Editar categoría${selectedCategoryName ? ` "${selectedCategoryName}"` : ""}`}
+            fixedBody={
+              <div className="text-[var(--color-txt-secondary)] pb-6 text-center text-sm flex flex-col gap-4 align-middle items-center">
+                <div className="bg-[#fee2e2] rounded-full p-3">
+                  <Pencil color="#DC2626" />
+                </div>
+                <p>
+                  ¿Estás seguro/a de que quieres eliminar esta categoría? <br />
+                  Esta acción no se puede deshacer.
+                </p>
+              </div>
+            }
+            buttonAName={"Cancelar"}
+            buttonAOptionalClassName="bg-[var(--color-cancel)] text-black"
+            onButtonAClickAction={() => {
+              setActiveModal(null);
+            }}
+            buttonBName={isPending ? "Eliminando..." : "Eliminar"}
+            buttonBOptionalClassName="bg-[var(--color-delete)] text-white"
+            onButtonBClickAction={() => {
+              if (selectedCategoryId != null) onDelete(selectedCategoryId);
+            }}
+          />
+
+          {/* Modal de confirmación de eliminación */}
           <Modal
             isOpen={activeModal === "confirmDelete"}
             onCloseAction={() => setActiveModal(null)}
