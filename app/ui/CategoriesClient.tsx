@@ -178,7 +178,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
             fixedBody={
               <div className="text-[var(--color-txt-secondary)] pb-6 text-center text-sm flex flex-col gap-4 align-middle items-center">
                 <div className="bg-[#fee2e2] rounded-full p-3">
-                  <Pencil color="#DC2626" />
+                  <Pencil color="#137fec" />
                 </div>
                 <p>
                   ¿Estás seguro/a de que quieres eliminar esta categoría? <br />
@@ -191,8 +191,8 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
             onButtonAClickAction={() => {
               setActiveModal(null);
             }}
-            buttonBName={isPending ? "Eliminando..." : "Eliminar"}
-            buttonBOptionalClassName="bg-[var(--color-delete)] text-white"
+            buttonBName={isPending ? "Editando..." : "Editar"}
+            buttonBOptionalClassName="bg-[var(--color-button-send)] text-white"
             onButtonBClickAction={() => {
               if (selectedCategoryId != null) onDelete(selectedCategoryId);
             }}
