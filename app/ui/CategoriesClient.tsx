@@ -3,9 +3,10 @@
 import Dropdown from "@/app/ui/Dropdown";
 import Modal from "@/app/ui/Modals/Modal";
 import AddCategories from "@/app/ui/AddCategories";
+import EditCategories from "@/app/ui/EditCategories";
 import { useState, useRef, useEffect, useTransition } from "react";
 import { Category } from "@/app/lib/validators/types";
-import { CirclePlus, Search, EllipsisVertical, Pen, Trash, Pencil, TriangleAlert } from "lucide-react";
+import { CirclePlus, Search, EllipsisVertical, Pen, Trash, Pencil, TriangleAlert, Edit, Upload } from "lucide-react";
 import { deleteCategoryAction } from "@/app/dashboard/categorias/actions";
 import { useRouter } from "next/navigation";
 
@@ -165,6 +166,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
           {/* Modal para añadir categoría */}
           <Modal
             isOpen={activeModal === "addCategory"}
+            icon={<Upload color="#137fec" />}
             onCloseAction={() => setActiveModal(null)}
             title="Añadir categoría"
             fixedBody={<AddCategories />}
@@ -175,23 +177,23 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
             isOpen={activeModal === "editCategory"}
             onCloseAction={() => setActiveModal(null)}
             title={`Editar categoría${selectedCategoryName ? ` "${selectedCategoryName}"` : ""}`}
-            fixedBody={
-              <div className="text-[var(--color-txt-secondary)] pb-6 text-center text-sm flex flex-col gap-4 align-middle items-center">
-                <div className="bg-[#fee2e2] rounded-full p-3">
-                  <Pencil color="#137fec" />
-                </div>
-                <p>
-                  ¿Estás seguro/a de que quieres eliminar esta categoría? <br />
-                  Esta acción no se puede deshacer.
-                </p>
-              </div>
-            }
+            body={<EditCategories />}
+            // <div className="text-[var(--color-txt-secondary)] pb-6 text-center text-sm flex flex-col gap-4 align-middle items-center">
+            //   <div className="bg-[#137FEC1A] rounded-full p-3">
+            //     <Pencil color="#137fec" />
+            //   </div>
+            //   <p>
+            //     ¿Estás seguro/a de que quieres eliminar esta categoría? <br />
+            //     Esta acción no se puede deshacer.
+            //   </p>
+            // </div>
+            // }
             buttonAName={"Cancelar"}
             buttonAOptionalClassName="bg-[var(--color-cancel)] text-black"
             onButtonAClickAction={() => {
               setActiveModal(null);
             }}
-            buttonBName={isPending ? "Editando..." : "Editar"}
+            // buttonBName={isPending ? "Editando..." : "Editar"}
             buttonBOptionalClassName="bg-[var(--color-button-send)] text-white"
             onButtonBClickAction={() => {
               if (selectedCategoryId != null) onDelete(selectedCategoryId);

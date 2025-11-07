@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { Upload } from "lucide-react";
 import { createCategoryAction } from "@/app/dashboard/categorias/actions";
 
-export default function AddCategories() {
+export default function EditCategories() {
   // Form states
   const [name, setName] = useState("");
 
@@ -52,13 +52,12 @@ export default function AddCategories() {
         </div>
 
         {/* Botón */}
-        <div className="flex gap-4 px-4 text-sm font-bold justify-center">
-          <button className="bg-[var(--color-delete)] text-white">Cancelar</button>
+        <div className="flex justify-end">
           <button
             type="submit"
             disabled={pending}
-            className="p-3 px-4 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer
-                       disabled:opacity-60 inline-flex items-center justify-center gap-2 transition font-bold"
+            className="p-3 bg-[var(--color-button-send)] text-white rounded-xl ml-2 cursor-pointer
+                       disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
           >
             <Upload />
             {pending ? "Creando..." : "Agregar"}

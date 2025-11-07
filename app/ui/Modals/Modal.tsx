@@ -1,12 +1,13 @@
 "use client";
 
-import { X } from "lucide-react";
+import { X, Upload } from "lucide-react";
 
 const baseClassNameButton = "flex px-4 p-3 gap-2 rounded-xl cursor-pointer";
 
 export default function Modal({
   isOpen,
   onCloseAction,
+  icon,
   title,
   body,
   fixedBody,
@@ -21,6 +22,7 @@ export default function Modal({
 }: {
   isOpen: boolean;
   onCloseAction: () => void;
+  icon?: React.ReactNode;
   title?: string;
   body?: React.ReactNode;
   fixedBody?: React.ReactNode;
@@ -44,6 +46,9 @@ export default function Modal({
           {/* Evita que el click dentro del modal lo cierre */}
           <div className="bg-white p-6 rounded-lg w-auto" onClick={(e) => e.stopPropagation()}>
             {/* Modal header */}
+            <div className="flex pt-4 justify-center">
+              <div className="bg-[var(--color-bg-selected)] rounded-full p-3">{icon}</div>
+            </div>
             <div className="flex p-4 justify-between">
               <h1 className="text-md font-bold">{title}</h1>
               <button className="text-gray-900 cursor-pointer" onClick={onCloseAction}>
