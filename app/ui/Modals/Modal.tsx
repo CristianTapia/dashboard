@@ -8,6 +8,7 @@ export default function Modal({
   isOpen,
   onCloseAction,
   icon,
+  iconBgOptionalClassName,
   title,
   body,
   fixedBody,
@@ -23,6 +24,7 @@ export default function Modal({
   isOpen: boolean;
   onCloseAction: () => void;
   icon?: React.ReactNode;
+  iconBgOptionalClassName?: string;
   title?: string;
   body?: React.ReactNode;
   fixedBody?: React.ReactNode;
@@ -44,16 +46,19 @@ export default function Modal({
           onClick={onCloseAction}
         >
           {/* Evita que el click dentro del modal lo cierre */}
-          <div className="bg-white p-6 rounded-lg w-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white p-6 rounded-lg w-auto mx-auto max-w-3xl" onClick={(e) => e.stopPropagation()}>
             {/* Modal header */}
-            <div className="flex pt-4 justify-center">
-              <div className="bg-[var(--color-bg-selected)] rounded-full p-3">{icon}</div>
-            </div>
-            <div className="flex p-4 justify-between">
-              <h1 className="text-md font-bold">{title}</h1>
-              <button className="text-gray-900 cursor-pointer" onClick={onCloseAction}>
+            <div className="flex justify-end mb-2">
+              <button className=" text-gray-900 cursor-pointer" onClick={onCloseAction}>
                 <X size={24} />
               </button>
+            </div>
+
+            <div className="flex justify-center">
+              <div className={`${iconBgOptionalClassName} rounded-full p-3`}>{icon}</div>
+            </div>
+            <div className="flex p-4 justify-center items-center gap-4 border-b border-[var(--color-border-box)]">
+              <h1 className="text-md font-bold">{title}</h1>
             </div>
             {/* Modal body scrolleable*/}
             {body ? <div className="p-4 max-h-[70vh] overflow-y-auto">{body}</div> : null}

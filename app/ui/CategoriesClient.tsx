@@ -167,9 +167,18 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
           <Modal
             isOpen={activeModal === "addCategory"}
             icon={<Upload color="#137fec" />}
+            iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
             onCloseAction={() => setActiveModal(null)}
-            title="Añadir categoría"
-            fixedBody={<AddCategories />}
+            title="Añadir Categoría"
+            fixedBody={
+              <AddCategories
+                onCancel={() => setActiveModal(null)}
+                onSuccess={() => {
+                  setActiveModal(null);
+                  router.refresh();
+                }}
+              />
+            }
           />
 
           {/* Modal de edición de categoría */}

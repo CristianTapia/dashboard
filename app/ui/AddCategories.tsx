@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { Upload } from "lucide-react";
 import { createCategoryAction } from "@/app/dashboard/categorias/actions";
 
-export default function AddCategories() {
+export default function AddCategories({ onCancel, onSuccess }: { onCancel?: () => void; onSuccess?: () => void }) {
   // Form states
   const [name, setName] = useState("");
 
@@ -24,6 +24,7 @@ export default function AddCategories() {
         if (res?.ok) {
           alert("Categoría creada ✅");
           setName("");
+          onSuccess?.();
         }
       } catch (err: any) {
         alert(err?.message || "Error agregando la categoría");
@@ -46,22 +47,27 @@ export default function AddCategories() {
             placeholder="Ej: Pizzas"
             disabled={pending}
             className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
-                       focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
+                       focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm"
             required
           />
         </div>
 
         {/* Botón */}
         <div className="flex gap-4 px-4 text-sm font-bold justify-center">
-          <button className="bg-[var(--color-delete)] text-white">Cancelar</button>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-cancel)] text-black"
+          >
+            Cancelar
+          </button>
           <button
             type="submit"
             disabled={pending}
-            className="p-3 px-4 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer
-                       disabled:opacity-60 inline-flex items-center justify-center gap-2 transition font-bold"
+            className="flex px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-button-send)] text-white
+                       disabled:opacity-60 items-center justify-center transition font-bold"
           >
-            <Upload />
-            {pending ? "Creando..." : "Agregar"}
+            {pending ? "Añadiendo..." : "Añadir"}
           </button>
         </div>
       </form>
