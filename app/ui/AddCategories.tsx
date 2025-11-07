@@ -46,7 +46,7 @@ export default function AddCategories({ onCancel, onSuccess }: { onCancel?: () =
             placeholder="Ej: Pizzas"
             disabled={pending}
             className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
-                       focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm"
+                       focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm text-sm"
             required
           />
         </div>

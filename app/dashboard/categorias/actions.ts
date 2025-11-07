@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidateTag } from "next/cache";
-import { createCategory, listCategories, deleteCategory } from "@/app/lib/data/categories";
+import { createCategory, listCategories, deleteCategory, updateCategory } from "@/app/lib/data/categories";
 
 export async function createCategoryAction(payload: { name: string }) {
   const created = await createCategory(payload);
@@ -22,3 +22,11 @@ export async function deleteCategoryAction(id: number) {
   return { ok: true };
 }
 export { deleteCategory };
+
+export async function updateCategoryAction(id: number, name: { name: string }) {
+  const categories = await updateCategory(id, name);
+  // refresca el listado
+  revalidateTag("categories");
+  return { ok: true };
+}
+export { updateCategory };

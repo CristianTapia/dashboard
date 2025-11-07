@@ -1,10 +1,17 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Upload } from "lucide-react";
 import { createCategoryAction } from "@/app/dashboard/categorias/actions";
 
-export default function EditCategories() {
+export default function EditCategories({
+  categoryName,
+  onCancel,
+  onSuccess,
+}: {
+  categoryName: string;
+  onCancel?: () => void;
+  onSuccess?: () => void;
+}) {
   // Form states
   const [name, setName] = useState("");
 
@@ -24,6 +31,7 @@ export default function EditCategories() {
         if (res?.ok) {
           alert("Categoría creada ✅");
           setName("");
+          onSuccess?.();
         }
       } catch (err: any) {
         alert(err?.message || "Error agregando la categoría");
@@ -37,30 +45,41 @@ export default function EditCategories() {
       <form onSubmit={onSubmit} className="flex flex-col gap-6 mt-6">
         {/* Nombre */}
         <div className="flex flex-col">
-          <label className="text-sm pb-2 font-semibold">Nombre *</label>
+          <label className="text-sm pb-2 font-semibold">Nombre Actual</label>
+          <div className="flex w-full items-center rounded-lg border border-gray-300 dark:border-gray-600 bg-[var(--color-cancel)] dark:bg-gray-700/50 p-3 mb-4">
+            <p className="text-sm font-normal leading-normal text-gray-500 dark:text-gray-400">{categoryName}</p>
+          </div>
+
+          <label className="text-sm pb-2 font-semibold">Nuevo Nombre *</label>
           <input
             type="text"
             name="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Ej: Pizzas"
+            placeholder="Introduce nuevo nombre"
             disabled={pending}
             className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
-                       focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
+                       focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm text-sm"
             required
           />
         </div>
 
         {/* Botón */}
-        <div className="flex justify-end">
+        <div className="flex gap-4 px-4 text-sm font-bold justify-center">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-cancel)] text-black hover:bg-[var(--color-cancel-hover)]"
+          >
+            Cancelar
+          </button>
           <button
             type="submit"
             disabled={pending}
-            className="p-3 bg-[var(--color-button-send)] text-white rounded-xl ml-2 cursor-pointer
-                       disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
+            className="flex px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-button-send)] text-white
+                       disabled:opacity-60 items-center justify-center transition font-bold hover:bg-[var(--color-button-send-hover)]"
           >
-            <Upload />
-            {pending ? "Creando..." : "Agregar"}
+            {pending ? "Añadiendo..." : "Añadir"}
           </button>
         </div>
       </form>

@@ -184,31 +184,20 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
           {/* Modal de edición de categoría */}
           <Modal
             isOpen={activeModal === "editCategory"}
-            onCloseAction={() => setActiveModal(null)}
             icon={<Pencil color="#137fec" />}
             iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
-            title={`Editar categoría${selectedCategoryName ? ` "${selectedCategoryName}"` : ""}`}
-            fixedBody={<EditCategories />}
-            // <div className="text-[var(--color-txt-secondary)] pb-6 text-center text-sm flex flex-col gap-4 align-middle items-center">
-            //   <div className="bg-[#137FEC1A] rounded-full p-3">
-            //     <Pencil color="#137fec" />
-            //   </div>
-            //   <p>
-            //     ¿Estás seguro/a de que quieres eliminar esta categoría? <br />
-            //     Esta acción no se puede deshacer.
-            //   </p>
-            // </div>
-            // }
-            buttonAName={"Cancelar"}
-            buttonAOptionalClassName="bg-[var(--color-cancel)] text-black"
-            onButtonAClickAction={() => {
-              setActiveModal(null);
-            }}
-            // buttonBName={isPending ? "Editando..." : "Editar"}
-            buttonBOptionalClassName="bg-[var(--color-button-send)] text-white"
-            onButtonBClickAction={() => {
-              if (selectedCategoryId != null) onDelete(selectedCategoryId);
-            }}
+            onCloseAction={() => setActiveModal(null)}
+            title={"Editar Categoría"}
+            fixedBody={
+              <EditCategories
+                categoryName={selectedCategoryName ?? ""}
+                onCancel={() => setActiveModal(null)}
+                onSuccess={() => {
+                  setActiveModal(null);
+                  router.refresh();
+                }}
+              />
+            }
           />
 
           {/* Modal de confirmación de eliminación */}
