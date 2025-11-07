@@ -56,7 +56,7 @@ export default function AddCategories({ onCancel, onSuccess }: { onCancel?: () =
           <button
             type="button"
             onClick={onCancel}
-            className="flex px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-cancel)] text-black"
+            className="flex px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-cancel)] text-black hover:bg-[var(--color-cancel-hover)]"
           >
             Cancelar
           </button>
@@ -64,7 +64,7 @@ export default function AddCategories({ onCancel, onSuccess }: { onCancel?: () =
             type="submit"
             disabled={pending}
             className="flex px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-button-send)] text-white
-                       disabled:opacity-60 items-center justify-center transition font-bold"
+                       disabled:opacity-60 items-center justify-center transition font-bold hover:bg-[var(--color-button-send-hover)]"
           >
             {pending ? "Añadiendo..." : "Añadir"}
           </button>

@@ -8,7 +8,9 @@
   --color-txt-secondary: #52585d; /* Color gris claro para textos secundarios */
   --color-delete: #dc2626; /* Color rojo para acciones de eliminación */
   --color-cancel: #f3f4f6; /* Color gris claro para botones de cancelar */
+  --color-cancel-hover: #e5e7eb; /* Color gris más oscuro para hover de botones de cancelar */
   --color-button-send: #137fec; /* Azul vibrante para botones de envío */
+  --color-button-send-hover: #2d92f7; /* Azul más claro para hover de botones de envío */
   --color-txt-placeholder: #9ca3af; /* Color gris para placeholders */
   --color-line-limit: #e0e7f1; /* Color para líneas divisorias */
   --color-border-box: #d1d5dc; /* Color para bordes de cajas */
