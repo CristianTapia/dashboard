@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Upload } from "lucide-react";
 import { createCategoryAction } from "@/app/dashboard/categorias/actions";
 
 export default function AddCategories({ onCancel, onSuccess }: { onCancel?: () => void; onSuccess?: () => void }) {

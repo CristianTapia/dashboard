@@ -185,8 +185,10 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
           <Modal
             isOpen={activeModal === "editCategory"}
             onCloseAction={() => setActiveModal(null)}
+            icon={<Pencil color="#137fec" />}
+            iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
             title={`Editar categoría${selectedCategoryName ? ` "${selectedCategoryName}"` : ""}`}
-            body={<EditCategories />}
+            fixedBody={<EditCategories />}
             // <div className="text-[var(--color-txt-secondary)] pb-6 text-center text-sm flex flex-col gap-4 align-middle items-center">
             //   <div className="bg-[#137FEC1A] rounded-full p-3">
             //     <Pencil color="#137fec" />
