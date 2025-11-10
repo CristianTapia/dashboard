@@ -21,12 +21,9 @@ export async function deleteCategoryAction(id: number) {
   revalidateTag("categories");
   return { ok: true };
 }
-export { deleteCategory };
 
-export async function updateCategoryAction(id: number, name: { name: string }) {
-  const categories = await updateCategory(id, name);
-  // refresca el listado
+export async function updateCategoryAction(id: number, payload: { name: string }) {
+  const updated = await updateCategory(id, payload);
   revalidateTag("categories");
-  return { ok: true };
+  return { ok: true, updated };
 }
-export { updateCategory };

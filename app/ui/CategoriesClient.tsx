@@ -190,6 +190,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
             title={"Editar Categoría"}
             fixedBody={
               <EditCategories
+                categoryId={selectedCategoryId!}
                 categoryName={selectedCategoryName ?? ""}
                 onCancel={() => setActiveModal(null)}
                 onSuccess={() => {

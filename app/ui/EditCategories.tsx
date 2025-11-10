@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createCategoryAction } from "@/app/dashboard/categorias/actions";
+import { updateCategoryAction } from "@/app/dashboard/categorias/actions";
 
 export default function EditCategories({
+  categoryId,
   categoryName,
   onCancel,
   onSuccess,
 }: {
+  categoryId: number;
   categoryName: string;
   onCancel?: () => void;
   onSuccess?: () => void;
@@ -25,16 +27,14 @@ export default function EditCategories({
 
     startTransition(async () => {
       try {
-        const res = await createCategoryAction({
-          name: name.trim(),
-        });
+        const res = await updateCategoryAction(categoryId, { name: name.trim() });
         if (res?.ok) {
-          alert("Categoría creada ✅");
+          alert("Categoría editada ✅");
           setName("");
           onSuccess?.();
         }
       } catch (err: any) {
-        alert(err?.message || "Error agregando la categoría");
+        alert(err?.message || "Error editando la categoría");
         console.error(err);
       }
     });
@@ -79,7 +79,7 @@ export default function EditCategories({
             className="flex px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-button-send)] text-white
                        disabled:opacity-60 items-center justify-center transition font-bold hover:bg-[var(--color-button-send-hover)]"
           >
-            {pending ? "Añadiendo..." : "Añadir"}
+            {pending ? "Guardando..." : "Guardar Cambios"}
           </button>
         </div>
       </form>
