@@ -65,7 +65,7 @@ export default function AddProducts({ categories }: { categories: Category[] }) 
   return (
     <div className="mx-auto max-w-3xl pt-4 flex flex-col">
       <div className="flex flex-col items-start gap-2">
-        <h1 className="text-3xl font-bold">Agregar Productos</h1>
+        <h1 className="text-3xl font-bold">Añadir Productos</h1>
         <p className="text-md text-[var(--color-txt-secondary)]">
           Agrega nuevos productos. Se visualizarán inmediatamente en el menú.
         </p>

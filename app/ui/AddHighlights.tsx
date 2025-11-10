@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import ImageUpload from "@/app/ui/ImageUpload";
 import { Upload } from "lucide-react";
-import { createHighlightAction } from "@/app/dashboard/destacados/nuevo/actions";
+import { createHighlightAction } from "@/app/dashboard/destacados/actions";
 
 export default function AddHighlights() {
   const [description, setDescription] = useState("");
@@ -45,7 +45,7 @@ export default function AddHighlights() {
   return (
     <div className="mx-auto max-w-3xl pt-4 flex flex-col">
       <div className="flex flex-col items-start gap-2">
-        <h1 className="text-3xl font-bold">Agregar Destacados</h1>
+        <h1 className="text-3xl font-bold">Añadir Destacados</h1>
         <p className="text-md text-[var(--color-txt-secondary)]">
           Agrega nuevas ofertas y/o productos destacados. Se visualizarán inmediatamente en el menú.
         </p>
@@ -80,11 +80,10 @@ export default function AddHighlights() {
             className="p-3 bg-[var(--color-button-send)] text-white rounded-xl ml-2 cursor-pointer disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
           >
             <Upload />
-            {saving ? "Creando..." : uploading ? "Subiendo imagen..." : "Publicar"}
+            {saving ? "Creando..." : uploading ? "Subiendo imagen..." : "Añadir"}
           </button>
         </div>
       </form>
     </div>
   );
 }
-

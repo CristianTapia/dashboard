@@ -28,7 +28,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               label="Destacados"
               baseHref="/dashboard/destacados"
               items={[
-                { href: "/dashboard/destacados/nuevo", label: "Agregar nuevo destacado" },
+                { href: "/dashboard/destacados/nuevo", label: "Añadir nuevo destacado" },
                 { href: "/dashboard/destacados/todos", label: "Ver todos los destacados" },
               ]}
             />
@@ -38,7 +38,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               label="Productos"
               baseHref="/dashboard/productos"
               items={[
-                { href: "/dashboard/productos/nuevo", label: "Agregar nuevo producto" },
+                { href: "/dashboard/productos/nuevo", label: "Añadir nuevo producto" },
                 { href: "/dashboard/productos/todos", label: "Ver todos los productos" },
               ]}
             />

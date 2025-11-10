@@ -1,3 +1,5 @@
+import AllHighlights from "@/app/ui/AllHighlights";
+
 export default function HighlightsPage() {
-  return <div className="p-4">Todos</div>;
+  return <AllHighlights />;
 }
