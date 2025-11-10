@@ -67,7 +67,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
       await deleteCategoryAction(id);
       setActiveModal(null);
       setOpenDropdownId(null);
-      router.refresh();
+      // router.refresh();
     });
   };
 
@@ -205,12 +205,11 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
           <Modal
             isOpen={activeModal === "confirmDelete"}
             onCloseAction={() => setActiveModal(null)}
-            title={`Eliminar categoría${selectedCategoryName ? ` "${selectedCategoryName}"` : ""}`}
+            icon={<TriangleAlert color="#DC2626" />}
+            iconBgOptionalClassName="bg-[#fee2e2]"
+            title={`Eliminar categoría ${selectedCategoryName ? `${selectedCategoryName}` : ""}`}
             fixedBody={
-              <div className="text-[var(--color-txt-secondary)] pb-6 text-center text-sm flex flex-col gap-4 align-middle items-center">
-                <div className="bg-[#fee2e2] rounded-full p-3">
-                  <TriangleAlert color="#DC2626" />
-                </div>
+              <div className="text-[var(--color-txt-secondary)] py-6 text-center text-sm flex flex-col gap-4 align-middle items-center">
                 <p>
                   ¿Estás seguro/a de que quieres eliminar esta categoría? <br />
                   Esta acción no se puede deshacer.
