@@ -72,7 +72,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
   };
 
   return (
-    <div className="max-w-auto pt-4 flex flex-col">
+    <div className="max-w-auto p-4 flex flex-col">
       {/* Título */}
       <div className="flex flex-col items-start gap-2">
         <h1 className="text-3xl font-bold">Todas las Categorías</h1>

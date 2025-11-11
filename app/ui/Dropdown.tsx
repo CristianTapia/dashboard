@@ -36,21 +36,21 @@ const Dropdown = forwardRef(function Dropdown(
   return (
     <div
       ref={ref}
-      className={`absolute right-0 ${dropUp ? "bottom-full mb-1" : "top-full mt-1"} z-20 w-48 bg-white rounded-xl shadow-lg transition-all duration-200 ${
-        className ?? ""
-      }`}
+      className={`absolute right-0 ${
+        dropUp ? "bottom-full mb-1" : "top-full mt-1"
+      } z-20 w-48 bg-white rounded-xl shadow-lg transition-all duration-200 ${className ?? ""}`}
       data-role="dropdown-menu"
     >
       <ul className="py-1">
         <li
-          className="flex px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+          className="flex px-4 py-2 text-sm text-[var(--color-light)] hover:bg-gray-100 cursor-pointer"
           onClick={onOptionAClickAction}
         >
           {optionA}
         </li>
         {optionB && (
           <li
-            className="flex px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+            className="flex px-4 py-2 text-sm text-[var(--color-light)] hover:bg-gray-100 cursor-pointer"
             onClick={onOptionBClickAction}
           >
             {optionB}

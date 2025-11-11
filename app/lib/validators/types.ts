@@ -16,3 +16,10 @@ export type Category = {
   id: number;
   name: string;
 };
+
+export type Highlight = {
+  id: number;
+  description: string;
+  image_path?: string | null;
+  image_url?: string | null;
+};
