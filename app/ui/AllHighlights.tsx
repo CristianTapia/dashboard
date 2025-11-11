@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Pencil, Trash } from "lucide-react";
 import { Highlight } from "../lib/validators/types";
+import Image from "next/image";
 
 export default function AllHighlights({ highlights }: { highlights: Highlight[] }) {
   const [pending, startTransition] = useTransition();
@@ -22,11 +23,18 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
             className="dark:bg-surface-dark rounded-xl shadow-card overflow-hidden flex flex-col bg-[var(--color-foreground)]"
           >
             <div className="relative">
-              <img
-                alt="Elegancia en Acero Inoxidable"
-                className="w-full h-48 object-cover"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDK1_yG3f_rHpH6jJbRIHwz4vsHhcEstnV6x7OTAK9mMZg4JPYackyCxHWPH6UPvIkxGlDg3_2Ck7FPx6cHa2wssVZdpEXd4uKSzQn9KljMs96F5tmsA_4wCLFhF1AhUTZnKr7XmM-OtidSIfgnWmd7F-U2ryVTPbKv8KPEkQ66L-nays4WH3l9uzDfc24SExRGwqaHQ1tAVc0_kSfRacx2cGCnXhg04YShIprmi-CMc9rM-ZJP4o_HrlzSYo3tRXAjp60JmQr9Pd5T"
-              />
+              {highlight.image_url ? (
+                <Image
+                  alt={highlight.description || "Highlight Image"}
+                  className="w-full h-48 object-cover"
+                  src={highlight.image_url ?? ""}
+                  width={400}
+                  height={300}
+                  unoptimized
+                />
+              ) : (
+                <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500">Sin imagen</div>
+              )}
             </div>
             <div className="p-4 flex flex-col flex-grow ">
               {/* <h3 className="text-md font-bold text-text-light dark:text-text-dark"></h3> */}

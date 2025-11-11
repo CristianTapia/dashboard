@@ -1,7 +1,7 @@
 import AllHighlights from "@/app/ui/AllHighlights";
-import { listHighlights } from "@/app/lib/data/highlights";
+import { listHighlightsWithSigned } from "@/app/lib/data/highlights";
 
-const highlights = await listHighlights(); // server-only helper
+const highlights = await listHighlightsWithSigned(); // incluye image_url firmado
 
 export default function HighlightsPage() {
   return <AllHighlights highlights={highlights} />;
