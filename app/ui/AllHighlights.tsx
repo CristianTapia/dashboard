@@ -4,9 +4,15 @@ import { useState, useTransition } from "react";
 import { Pencil, Trash } from "lucide-react";
 import { Highlight } from "../lib/validators/types";
 import Image from "next/image";
+import Modal from "@/app/ui/Modals/Modal";
 
 export default function AllHighlights({ highlights }: { highlights: Highlight[] }) {
+  const [activeModal, setActiveModal] = useState<null | "editHighlight" | "confirmDelete">(null);
   const [pending, startTransition] = useTransition();
+
+  function openModal(modalName: "editHighlight" | "confirmDelete", id?: number) {
+    setActiveModal(modalName);
+  }
 
   return (
     <div className="p-4 max-w-3xl flex flex-col">
@@ -42,7 +48,10 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
                 {highlight.description}
               </p>
               <div className="mt-4 pt-4 border-t border-[var(--color-border-box)] dark:border-border-dark flex items-center justify-end gap-2">
-                <button className="cursor-pointer p-2 rounded-2xl text-[var(--color-light)] hover:text-[var(--color-light-hover)] hover:bg-[var(--color-cancel)] transition-colors">
+                <button
+                  onClick={() => openModal("editHighlight", highlight.id)}
+                  className="cursor-pointer p-2 rounded-2xl text-[var(--color-light)] hover:text-[var(--color-light-hover)] hover:bg-[var(--color-cancel)] transition-colors"
+                >
                   <Pencil size={18} />
                 </button>
                 <button className="cursor-pointer p-2 rounded-2xl text-[var(--color-delete)] hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-[var(--color-delete-hover)] transition-colors">
@@ -53,6 +62,15 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
           </div>
         ))}
       </div>
+
+      {/* Modal de edición de destacado */}
+      <Modal
+        isOpen={activeModal === "editHighlight"}
+        icon={<Pencil color="#137fec" />}
+        iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
+        onCloseAction={() => setActiveModal(null)}
+        title={"Editar Destacado"}
+      />
     </div>
   );
 }
