@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Pencil, Trash } from "lucide-react";
+import { Edit, Pencil, Trash } from "lucide-react";
 import { Highlight } from "../lib/validators/types";
 import Image from "next/image";
 import Modal from "@/app/ui/Modals/Modal";
+import EditHighlights from "./EditHighlights";
 
 export default function AllHighlights({ highlights }: { highlights: Highlight[] }) {
   const [activeModal, setActiveModal] = useState<null | "editHighlight" | "confirmDelete">(null);
@@ -70,6 +71,7 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
         iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
         onCloseAction={() => setActiveModal(null)}
         title={"Editar Destacado"}
+        fixedBody={<EditHighlights />}
       />
     </div>
   );
