@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createHighlight, listHighlights, updateHighlight, deleteHighlight } from "@/app/lib/data/highlights";
 
 export async function createHighlightAction(payload: { description: string; image_path: string }) {
@@ -23,8 +23,13 @@ export async function deleteHighlightAction(id: number) {
   return { ok: true };
 }
 
-export async function updateHighlightAction(id: number, payload: { description: string }) {
-  const updated = await updateHighlight(id, payload);
-  // revalidateTag("Highlights");
+export async function updateHighlightAction(id: number, payload: { description?: string; image_path?: string | null }) {
+  const cleanedPayload = {
+    ...payload,
+    image_path: payload.image_path === null ? undefined : payload.image_path,
+  };
+  const updated = await updateHighlight(id, cleanedPayload);
+  revalidateTag("Highlights");
+  revalidatePath("/dashboard/destacados/todos");
   return { ok: true, updated };
 }

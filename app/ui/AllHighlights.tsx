@@ -13,12 +13,14 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
   const [selectedHighlightId, setSelectedHighlightId] = useState<number | null>(null);
   const [selectedHighlightDescription, setSelectedHighlightDescription] = useState<string | null>(null);
   const [selectedHighlightImageUrl, setSelectedHighlightImageUrl] = useState<string | null>(null);
+  const [selectedHighlightImagePath, setSelectedHighlightImagePath] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   function openModal(modalName: "editHighlight" | "confirmDelete", highlight: Highlight) {
     setSelectedHighlightId(highlight.id);
     setSelectedHighlightDescription(highlight.description);
     setSelectedHighlightImageUrl(highlight.image_url ?? null);
+    setSelectedHighlightImagePath(highlight.image_path ?? null);
     setActiveModal(modalName);
   }
 
@@ -82,6 +84,8 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
             highlightId={selectedHighlightId!}
             highlightDescription={selectedHighlightDescription!}
             highlightImageUrl={selectedHighlightImageUrl}
+            highlightImagePath={selectedHighlightImagePath}
+            onSuccess={() => setActiveModal(null)}
           />
         }
       />

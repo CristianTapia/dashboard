@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { RefObject, useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
 import { ImageUp, Trash2, RefreshCw, Loader2 } from "lucide-react";
 
@@ -14,6 +14,7 @@ type Props = {
   maxSizeMB?: number;
   /** Acept MIME */
   accept?: string;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
 };
 
 export default function ImageInput({
@@ -23,6 +24,7 @@ export default function ImageInput({
   folder = "products",
   maxSizeMB = 2,
   accept = "image/*",
+  inputRef: externalInputRef,
 }: Props) {
   const iconSize = 16;
 
@@ -33,6 +35,10 @@ export default function ImageInput({
 
   const inputId = useId();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const assignFileInputRef = (node: HTMLInputElement | null) => {
+    fileInputRef.current = node;
+    if (externalInputRef) externalInputRef.current = node;
+  };
 
   const setUploadingSafe = (v: boolean) => {
     setUploading(v);
@@ -139,7 +145,7 @@ export default function ImageInput({
       {/* input único */}
       <input
         id={inputId}
-        ref={fileInputRef}
+        ref={assignFileInputRef}
         type="file"
         name="imageUpload"
         accept={accept}
