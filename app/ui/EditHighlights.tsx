@@ -24,6 +24,7 @@ export default function EditHighlights({
 }) {
   const [description, setDescription] = useState(highlightDescription ?? "");
   const [imagePath, setImagePath] = useState<string | null>(highlightImagePath ?? null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(highlightImageUrl ?? null);
   const [uploading, setUploading] = useState(false);
   const [uploaderKey, setUploaderKey] = useState(0);
   const [pending, startTransition] = useTransition();
@@ -38,9 +39,34 @@ export default function EditHighlights({
     setImagePath(highlightImagePath ?? null);
   }, [highlightImagePath]);
 
+  useEffect(() => {
+    setPreviewUrl(highlightImageUrl ?? null);
+  }, [highlightImageUrl]);
+
+  const updatePreviewFromPath = async (path: string | null) => {
+    if (!path) {
+      setPreviewUrl(null);
+      return;
+    }
+    if (/^https?:\/\//i.test(path)) {
+      setPreviewUrl(path);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/signed?path=${encodeURIComponent(path)}`);
+      const { url, error } = await res.json();
+      if (error) throw new Error(error);
+      setPreviewUrl(url);
+    } catch (err) {
+      console.error(err);
+      setPreviewUrl(null);
+    }
+  };
+
   const handleImageChange = (info: any) => {
     const val = typeof info === "string" ? info : info?.path ?? info?.url ?? null;
     setImagePath(val);
+    updatePreviewFromPath(val);
   };
 
   const triggerImageUpload = () => {
@@ -50,6 +76,7 @@ export default function EditHighlights({
 
   const clearImage = () => {
     setImagePath(null);
+    setPreviewUrl(null);
     if (uploadInputRef.current) {
       uploadInputRef.current.value = "";
     }
@@ -81,6 +108,7 @@ export default function EditHighlights({
           alert("Destacado editado");
           setDescription(finalDescription);
           setImagePath(imagePath ?? null);
+          updatePreviewFromPath(imagePath ?? null);
           setUploaderKey((k) => k + 1);
           router.refresh();
           onSuccess?.();
@@ -100,9 +128,9 @@ export default function EditHighlights({
             <div className="flex flex-col gap-4">
               <p className="dark:text-gray-200 text-sm font-bold leading-normal font-display">Imagen Actual</p>
               <div className="flex items-center gap-4">
-                {highlightImageUrl ? (
+                {previewUrl ? (
                   <Image
-                    src={highlightImageUrl ?? ""}
+                    src={previewUrl}
                     alt={highlightId.toString()}
                     width={400}
                     height={400}
@@ -172,8 +200,7 @@ export default function EditHighlights({
             className="flex px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-button-send)] text-white
                        disabled:opacity-60 items-center justify-center transition hover:bg-[var(--color-button-send-hover)]"
           >
-            <Upload size={16} />
-            {pending ? "Creando..." : uploading ? "Subiendo imagen..." : "Guardar Cambios"}
+            {pending ? "Creando..." : uploading ? "Guardar Cambios" : "Guardar Cambios"}
           </button>
         </div>
       </form>
