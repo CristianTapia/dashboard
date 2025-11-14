@@ -9,9 +9,13 @@ import EditHighlights from "./EditHighlights";
 
 export default function AllHighlights({ highlights }: { highlights: Highlight[] }) {
   const [activeModal, setActiveModal] = useState<null | "editHighlight" | "confirmDelete">(null);
+  const [selectedHighlightId, setSelectedHighlightId] = useState<number | null>(null);
+  const [selectedHighlightDescription, setSelectedHighlightDescription] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  function openModal(modalName: "editHighlight" | "confirmDelete", id?: number) {
+  function openModal(modalName: "editHighlight" | "confirmDelete", highlight: { id: number; description: string }) {
+    setSelectedHighlightId(highlight.id);
+    setSelectedHighlightDescription(highlight.description);
     setActiveModal(modalName);
   }
 
@@ -50,7 +54,7 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
               </p>
               <div className="mt-4 pt-4 border-t border-[var(--color-border-box)] dark:border-border-dark flex items-center justify-end gap-2">
                 <button
-                  onClick={() => openModal("editHighlight", highlight.id)}
+                  onClick={() => openModal("editHighlight", highlight)}
                   className="cursor-pointer p-2 rounded-2xl text-[var(--color-light)] hover:text-[var(--color-light-hover)] hover:bg-[var(--color-cancel)] transition-colors"
                 >
                   <Pencil size={18} />
@@ -71,7 +75,9 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
         iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
         onCloseAction={() => setActiveModal(null)}
         title={"Editar Destacado"}
-        fixedBody={<EditHighlights />}
+        fixedBody={
+          <EditHighlights highlightId={selectedHighlightId!} highlightDescription={selectedHighlightDescription!} />
+        }
       />
     </div>
   );

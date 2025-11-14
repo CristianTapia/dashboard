@@ -25,6 +25,6 @@ export async function deleteCategoryAction(id: number) {
 
 export async function updateCategoryAction(id: number, payload: { name: string }) {
   const updated = await updateCategory(id, payload);
-  // revalidateTag("categories");
+  revalidateTag("categories");
   return { ok: true, updated };
 }
