@@ -3,16 +3,19 @@
 import { useState, useTransition } from "react";
 import ImageUpload from "@/app/ui/ImageUpload";
 import { Upload } from "lucide-react";
-import { createHighlightAction } from "@/app/dashboard/destacados/actions";
+import { updateHighlightAction } from "@/app/dashboard/destacados/actions";
+import Image from "next/image";
 
 export default function EditHighlights({
   highlightId,
   highlightDescription,
+  highlightImageUrl,
   onCancel,
   onSuccess,
 }: {
   highlightId: number;
   highlightDescription: string;
+  highlightImageUrl: string | null;
   onCancel?: () => void;
   onSuccess?: () => void;
 }) {
@@ -37,7 +40,7 @@ export default function EditHighlights({
 
     startTransition(async () => {
       try {
-        const res = await createHighlightAction({ description: desc, image_path: imagePath });
+        const res = await updateHighlightAction(highlightId, { description: desc, image_path: imagePath } as any);
         if (res?.ok) {
           alert("Destacado editado");
           setDescription("");
@@ -59,13 +62,23 @@ export default function EditHighlights({
             <div className="flex flex-col gap-4">
               <p className="dark:text-gray-200 text-sm font-bold leading-normal font-display">Imagen del producto</p>
               <div className="flex items-center gap-4">
-                <div className="relative h-24 w-24 flex-shrink-0">
-                  <img
-                    alt="Product image"
-                    className="h-full w-full rounded-lg object-cover"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAleaZrCEIT3Ur1vbmHNg8T0kV21f8SFLMZWdKBm7BCVBVBOxS2qNUvWDppzDQTjetzbIj-M9uKgSs0poU6O0X8B4agTf21vlAX6ujJpSXn_-pnfUcazLbHrymGm1KPUtru858H7G3MxTFoyVtdd5OxM0T2UrLC0SSPB0cHiwG5iw4LMCUH_bCJPnV_hecCQQZPcE0-4HAec9BOCEy7EGeK_c_51MRBgLueIW0d1NK3MvNqHCPAo63j97IU0JJXoTIMnR3i1znmNpRd"
+                {/* <div className="relative h-24 w-24 flex-shrink-0"> */}
+                {highlightImageUrl ? (
+                  <Image
+                    src={highlightImageUrl ?? ""}
+                    alt={highlightId.toString()}
+                    width={400}
+                    height={400}
+                    // className="relative w-34 h-34 object-cover rounded border"
+                    className="relative h-24 w-24 flex-shrink-0"
+                    unoptimized
                   />
-                </div>
+                ) : (
+                  <div className="w-24 h-24 border border-gray-300 rounded flex items-center justify-center text-sm">
+                    Sin foto
+                  </div>
+                )}
+                {/* </div> */}
                 <div className="flex flex-col gap-2">
                   <button className="flex h-9 cursor-pointer items-center justify-center overflow-hidden rounded-md bg-gray-100 dark:bg-gray-700 px-3 text-sm font-semibold text-gray-800 dark:text-gray-200 transition-colors hover:bg-gray-200 dark:hover:bg-gray-600">
                     Reemplazar
