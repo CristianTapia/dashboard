@@ -83,7 +83,7 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
       </div>
 
       {/* Añadir y buscar */}
-      <div className="pt-6">
+      <div className="mt-4">
         {/* Botón añadir */}
         <button
           type="button"
@@ -92,143 +92,143 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
         >
           <CirclePlus /> Añadir nueva categoría
         </button>
-
-        {/* Búsqueda */}
-        <div className="flex w-full flex-1 items-stretch rounded-lg h-full mt-6 mb-6">
-          <div className="text-slate-500 dark:text-slate-400 flex bg-[var(--color-foreground)] dark:bg-background-dark items-center justify-center p-2 rounded-l-lg border border-[var(--color-border-box)] border-r-0">
-            <Search />
-          </div>
-          <input
-            type="text"
-            name="search"
-            className="w-full bg-[var(--color-foreground)] rounded-r-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
-            placeholder="Buscar categorías por nombre"
-            value=""
-            onChange={() => {}}
-          />
+      </div>
+      {/* Búsqueda */}
+      <div className="flex w-full flex-1 items-stretch rounded-lg h-full mt-6 mb-6">
+        <div className="text-slate-500 dark:text-slate-400 flex bg-[var(--color-foreground)] dark:bg-background-dark items-center justify-center p-2 rounded-l-lg border border-[var(--color-border-box)] border-r-0">
+          <Search />
         </div>
-
-        {/* Categorías */}
-        <div className="flex flex-wrap gap-8 justify-center">
-          {categories.map((category) => (
-            <div
-              key={category.id}
-              className="w-52 bg-[var(--color-foreground)] dark:bg-slate-800/50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="flex justify-between items-center">
-                <p className="dark:text-white text-lg font-bold">{category.name}</p>
-                <div className="relative" ref={openDropdownId === category.id ? dropdownRef : null}>
-                  <button
-                    className="cursor-pointer flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-700"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Calcula espacio disponible hacia abajo y decide si abrir hacia arriba
-                      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                      const spaceBelow = window.innerHeight - rect.bottom;
-                      const approxMenuHeight = 140; // altura aproximada del menú
-                      setDropUp(spaceBelow < approxMenuHeight);
-                      setOpenDropdownId((prev) => (prev === category.id ? null : category.id));
+        <input
+          type="text"
+          name="search"
+          className="w-full bg-[var(--color-foreground)] rounded-r-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
+          placeholder="Buscar categorías por nombre"
+          value=""
+          onChange={() => {}}
+        />
+      </div>
+      {/* </div> */}
+      {/* Categorías */}
+      <div className="flex flex-wrap gap-8 justify-center">
+        {categories.map((category) => (
+          <div
+            key={category.id}
+            className="w-52 bg-[var(--color-foreground)] dark:bg-slate-800/50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div className="flex justify-between items-center">
+              <p className="dark:text-white text-lg font-bold">{category.name}</p>
+              <div className="relative" ref={openDropdownId === category.id ? dropdownRef : null}>
+                <button
+                  className="cursor-pointer flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-700"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Calcula espacio disponible hacia abajo y decide si abrir hacia arriba
+                    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                    const spaceBelow = window.innerHeight - rect.bottom;
+                    const approxMenuHeight = 140; // altura aproximada del menú
+                    setDropUp(spaceBelow < approxMenuHeight);
+                    setOpenDropdownId((prev) => (prev === category.id ? null : category.id));
+                  }}
+                >
+                  <EllipsisVertical size={18} />
+                </button>
+                <div>
+                  <Dropdown
+                    isOpen={openDropdownId === category.id}
+                    dropUp={dropUp}
+                    optionA={
+                      <div className="flex gap-2 items-center">
+                        <Pen size={14} />
+                        <span>Editar</span>
+                      </div>
+                    }
+                    onOptionAClickAction={() => {
+                      setOpenDropdownId(null);
+                      openConfirm("editCategory", category);
                     }}
-                  >
-                    <EllipsisVertical size={18} />
-                  </button>
-                  <div>
-                    <Dropdown
-                      isOpen={openDropdownId === category.id}
-                      dropUp={dropUp}
-                      optionA={
-                        <div className="flex gap-2 items-center">
-                          <Pen size={14} />
-                          <span>Editar</span>
-                        </div>
-                      }
-                      onOptionAClickAction={() => {
-                        setOpenDropdownId(null);
-                        openConfirm("editCategory", category);
-                      }}
-                      optionB={
-                        <div className="flex gap-2 items-center text-[var(--color-delete)]">
-                          <Trash size={14} />
-                          <span>Eliminar</span>
-                        </div>
-                      }
-                      onOptionBClickAction={() => {
-                        setOpenDropdownId(null);
-                        openConfirm("confirmDelete", category);
-                      }}
-                    />
-                  </div>
+                    optionB={
+                      <div className="flex gap-2 items-center text-[var(--color-delete)]">
+                        <Trash size={14} />
+                        <span>Eliminar</span>
+                      </div>
+                    }
+                    onOptionBClickAction={() => {
+                      setOpenDropdownId(null);
+                      openConfirm("confirmDelete", category);
+                    }}
+                  />
                 </div>
               </div>
             </div>
-          ))}
+          </div>
+        ))}
 
-          {/* Modal para añadir categoría */}
-          <Modal
-            isOpen={activeModal === "addCategory"}
-            icon={<Upload color="#137fec" />}
-            iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
-            onCloseAction={() => setActiveModal(null)}
-            title="Añadir Categoría"
-            fixedBody={
-              <AddCategories
-                onCancel={() => setActiveModal(null)}
-                onSuccess={() => {
-                  setActiveModal(null);
-                  router.refresh();
-                }}
-              />
-            }
-          />
+        {/* Modal para añadir categoría */}
+        <Modal
+          isOpen={activeModal === "addCategory"}
+          icon={<Upload color="#137fec" />}
+          iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
+          onCloseAction={() => setActiveModal(null)}
+          title="Añadir Categoría"
+          fixedBody={
+            <AddCategories
+              onCancel={() => setActiveModal(null)}
+              onSuccess={() => {
+                setActiveModal(null);
+                router.refresh();
+              }}
+            />
+          }
+        />
 
-          {/* Modal de edición de categoría */}
-          <Modal
-            isOpen={activeModal === "editCategory"}
-            icon={<Pencil color="#137fec" />}
-            iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
-            onCloseAction={() => setActiveModal(null)}
-            title={"Editar Categoría"}
-            fixedBody={
-              <EditCategories
-                categoryId={selectedCategoryId!}
-                categoryName={selectedCategoryName ?? ""}
-                onCancel={() => setActiveModal(null)}
-                onSuccess={() => {
-                  setActiveModal(null);
-                  router.refresh();
-                }}
-              />
-            }
-          />
+        {/* Modal de edición de categoría */}
+        <Modal
+          isOpen={activeModal === "editCategory"}
+          icon={<Pencil color="#137fec" />}
+          iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
+          onCloseAction={() => setActiveModal(null)}
+          title={"Editar Categoría"}
+          fixedBody={
+            <EditCategories
+              categoryId={selectedCategoryId!}
+              categoryName={selectedCategoryName ?? ""}
+              onCancel={() => setActiveModal(null)}
+              onSuccess={() => {
+                setActiveModal(null);
+                router.refresh();
+              }}
+            />
+          }
+        />
 
-          {/* Modal de confirmación de eliminación */}
-          <Modal
-            isOpen={activeModal === "confirmDelete"}
-            onCloseAction={() => setActiveModal(null)}
-            icon={<TriangleAlert color="#DC2626" />}
-            iconBgOptionalClassName="bg-[#fee2e2]"
-            title={`Eliminar categoría ${selectedCategoryName ? `${selectedCategoryName}` : ""}`}
-            fixedBody={
-              <div className="text-[var(--color-txt-secondary)] py-6 text-center text-sm flex flex-col gap-4 align-middle items-center">
-                <p>
-                  ¿Estás seguro/a de que quieres eliminar esta categoría? <br />
-                  Esta acción no se puede deshacer.
-                </p>
-              </div>
-            }
-            buttonAName={"Cancelar"}
-            buttonAOptionalClassName="bg-[var(--color-cancel)] text-black"
-            onButtonAClickAction={() => {
-              setActiveModal(null);
-            }}
-            buttonBName={isPending ? "Eliminando..." : "Eliminar"}
-            buttonBOptionalClassName="bg-[var(--color-delete)] text-white"
-            onButtonBClickAction={() => {
-              if (selectedCategoryId != null) onDelete(selectedCategoryId);
-            }}
-          />
-        </div>
+        {/* Modal de confirmación de eliminación */}
+        <Modal
+          isOpen={activeModal === "confirmDelete"}
+          onCloseAction={() => setActiveModal(null)}
+          icon={<TriangleAlert color="#DC2626" />}
+          iconBgOptionalClassName="bg-[#fee2e2]"
+          title={`Eliminar categoría ${selectedCategoryName ? `${selectedCategoryName}` : ""}`}
+          fixedBody={
+            <div className="text-[var(--color-txt-secondary)] py-6 text-center text-sm flex flex-col gap-4 align-middle items-center">
+              <p>
+                ¿Estás seguro/a de que quieres eliminar esta categoría? <br />
+                Esta acción no se puede deshacer.
+              </p>
+            </div>
+          }
+          buttonAName={"Cancelar"}
+          buttonAOptionalClassName="bg-[var(--color-cancel)] text-black"
+          onButtonAClickAction={() => {
+            setActiveModal(null);
+          }}
+          buttonBName={isPending ? "Eliminando..." : "Eliminar"}
+          buttonBOptionalClassName="bg-[var(--color-delete)] text-white"
+          onButtonBClickAction={() => {
+            if (selectedCategoryId != null) onDelete(selectedCategoryId);
+          }}
+        />
       </div>
     </div>
+    // </div>
   );
 }

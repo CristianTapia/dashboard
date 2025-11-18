@@ -1,4 +1,4 @@
-import AllHighlights from "@/app/ui/AllHighlights";
+import AllHighlights from "@/app/ui/HighlightsClient";
 import { listHighlightsWithSigned } from "@/app/lib/data/highlights";
 
 export default async function HighlightsPage() {
