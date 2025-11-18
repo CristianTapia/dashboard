@@ -6,6 +6,7 @@ import { Highlight } from "../lib/validators/types";
 import Image from "next/image";
 import Modal from "@/app/ui/Modals/Modal";
 import EditHighlights from "./EditHighlights";
+import AddHighlights from "./AddHighlights";
 import { useRouter } from "next/navigation";
 import { deleteHighlightAction } from "@/app/dashboard/destacados/actions";
 
@@ -102,7 +103,7 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
         ))}
       </div>
 
-      {/* Modal para añadir categoría */}
+      {/* Modal para añadir destacado */}
       <Modal
         isOpen={activeModal === "addHighlight"}
         icon={<Upload color="#137fec" />}
@@ -110,14 +111,13 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
         onCloseAction={() => setActiveModal(null)}
         title="Añadir Destacado"
         fixedBody={
-          "adf"
-          // <AddCategories
-          //   onCancel={() => setActiveModal(null)}
-          //   onSuccess={() => {
-          //     setActiveModal(null);
-          //     router.refresh();
-          //   }}
-          // />
+          <AddHighlights
+            onCancel={() => setActiveModal(null)}
+            onSuccess={() => {
+              setActiveModal(null);
+              router.refresh();
+            }}
+          />
         }
       />
 

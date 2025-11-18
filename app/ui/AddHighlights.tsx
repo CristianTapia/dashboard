@@ -5,7 +5,7 @@ import ImageUpload from "@/app/ui/ImageUpload";
 import { Upload } from "lucide-react";
 import { createHighlightAction } from "@/app/dashboard/destacados/actions";
 
-export default function AddHighlights() {
+export default function AddHighlights({ onSuccess, onCancel }: { onSuccess?: () => void; onCancel?: () => void }) {
   const [description, setDescription] = useState("");
   const [imagePath, setImagePath] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -34,6 +34,7 @@ export default function AddHighlights() {
           setDescription("");
           setImagePath(null);
           setUploaderKey((k) => k + 1);
+          onSuccess?.();
         }
       } catch (err: any) {
         alert(err?.message || "Error agregando el destacado");
@@ -43,14 +44,7 @@ export default function AddHighlights() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl pt-4 flex flex-col">
-      <div className="flex flex-col items-start gap-2">
-        <h1 className="text-3xl font-bold">Añadir Destacados</h1>
-        <p className="text-md text-[var(--color-txt-secondary)]">
-          Agrega nuevas ofertas y/o productos destacados. Se visualizarán inmediatamente en el menú.
-        </p>
-      </div>
-
+    <div className="mx-auto max-w-3xl flex flex-col">
       <form onSubmit={onSubmit} className="flex flex-col gap-6 mt-6">
         <div className="flex flex-col">
           <label className="text-sm pb-2 font-semibold">Descripción *</label>
@@ -73,13 +67,20 @@ export default function AddHighlights() {
         />
 
         {/* Botón para enviar el formulario */}
-        <div className="flex justify-end">
+        <div className="flex gap-4 px-4 text-sm font-bold justify-center">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-cancel)] text-black hover:bg-[var(--color-cancel-hover)]"
+          >
+            Cancelar
+          </button>
           <button
             type="submit"
             disabled={saving || uploading}
-            className="p-3 bg-[var(--color-button-send)] text-white rounded-xl ml-2 cursor-pointer disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
+            className="flex px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-button-send)] text-white
+                       disabled:opacity-60 items-center justify-center transition font-bold hover:bg-[var(--color-button-send-hover)]"
           >
-            <Upload />
             {saving ? "Creando..." : uploading ? "Subiendo imagen..." : "Añadir"}
           </button>
         </div>
