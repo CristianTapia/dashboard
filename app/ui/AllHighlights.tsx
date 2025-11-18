@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { TriangleAlert, Pencil, Trash } from "lucide-react";
+import { TriangleAlert, Pencil, Trash, CirclePlus, Upload } from "lucide-react";
 import { Highlight } from "../lib/validators/types";
 import Image from "next/image";
 import Modal from "@/app/ui/Modals/Modal";
@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { deleteHighlightAction } from "@/app/dashboard/destacados/actions";
 
 export default function AllHighlights({ highlights }: { highlights: Highlight[] }) {
-  const [activeModal, setActiveModal] = useState<null | "editHighlight" | "confirmDelete">(null);
+  const [activeModal, setActiveModal] = useState<null | "addHighlight" | "editHighlight" | "confirmDelete">(null);
   const [selectedHighlightId, setSelectedHighlightId] = useState<number | null>(null);
   const [selectedHighlightDescription, setSelectedHighlightDescription] = useState<string | null>(null);
   const [selectedHighlightImageUrl, setSelectedHighlightImageUrl] = useState<string | null>(null);
@@ -18,11 +18,18 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  function openModal(modalName: "editHighlight" | "confirmDelete", highlight: Highlight) {
-    setSelectedHighlightId(highlight.id);
-    setSelectedHighlightDescription(highlight.description);
-    setSelectedHighlightImageUrl(highlight.image_url ?? null);
-    setSelectedHighlightImagePath(highlight.image_path ?? null);
+  function openModal(modalName: "addHighlight" | "editHighlight" | "confirmDelete", highlight?: Highlight | null) {
+    if (highlight) {
+      setSelectedHighlightId(highlight.id);
+      setSelectedHighlightDescription(highlight.description);
+      setSelectedHighlightImageUrl(highlight.image_url ?? null);
+      setSelectedHighlightImagePath(highlight.image_path ?? null);
+    } else {
+      setSelectedHighlightId(null);
+      setSelectedHighlightDescription(null);
+      setSelectedHighlightImageUrl(null);
+      setSelectedHighlightImagePath(null);
+    }
     setActiveModal(modalName);
   }
 
@@ -42,6 +49,16 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
           Visualiza las ofertas y destacados existentes. Los cambios se reflejarán inmediatamente en el menú.
         </p>
       </div>
+      <div className="flex mt-4 items-center align-middle gap-4">
+        {/* Botón añadir */}
+        <button
+          type="button"
+          onClick={() => openModal("addHighlight")}
+          className="p-2 pl-5 pr-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
+        >
+          <CirclePlus /> Añadir nuevo destacado
+        </button>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 mt-6">
         {highlights.map((highlight) => (
           <div
@@ -52,7 +69,7 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
               {highlight.image_url ? (
                 <Image
                   alt={highlight.description || "Highlight Image"}
-                  className="w-full h-48 object-cover"
+                  className="w-full h-36 object-cover"
                   src={highlight.image_url ?? ""}
                   width={400}
                   height={400}
@@ -84,6 +101,25 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
           </div>
         ))}
       </div>
+
+      {/* Modal para añadir categoría */}
+      <Modal
+        isOpen={activeModal === "addHighlight"}
+        icon={<Upload color="#137fec" />}
+        iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
+        onCloseAction={() => setActiveModal(null)}
+        title="Añadir Destacado"
+        fixedBody={
+          "adf"
+          // <AddCategories
+          //   onCancel={() => setActiveModal(null)}
+          //   onSuccess={() => {
+          //     setActiveModal(null);
+          //     router.refresh();
+          //   }}
+          // />
+        }
+      />
 
       {/* Modal de edición de destacado */}
       <Modal
