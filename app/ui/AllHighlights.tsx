@@ -49,7 +49,7 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
           Visualiza las ofertas y destacados existentes. Los cambios se reflejarán inmediatamente en el menú.
         </p>
       </div>
-      <div className="flex mt-4 items-center align-middle gap-4">
+      <div className="mt-4">
         {/* Botón añadir */}
         <button
           type="button"
