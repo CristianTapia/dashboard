@@ -23,15 +23,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <nav>
           <ul className="gap-2 flex flex-col p-4">
             <DashboardNavButton icon={<ChartNoAxesColumn size={iconSize} />} name="Resumen" href="/dashboard" />
-            <CollapsibleNavButton
-              icon={<Percent size={iconSize} />}
-              label="Destacados"
-              baseHref="/dashboard/destacados"
-              items={[
-                { href: "/dashboard/destacados/nuevo", label: "Añadir nuevo destacado" },
-                { href: "/dashboard/destacados/todos", label: "Ver todos los destacados" },
-              ]}
-            />
+
+            <DashboardNavButton icon={<Shapes size={iconSize} />} name="Destacados" href="/dashboard/destacados" />
 
             <CollapsibleNavButton
               icon={<UtensilsCrossed size={iconSize} />}
@@ -58,4 +51,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <main className="w-full p-4 overflow-y-auto bg-[var(--color-background)]">{children}</main>
     </div>
   );
+}
+
+// Ejemplo de boton colapsable
+{
+  /*        <CollapsibleNavButton
+              icon={<Percent size={iconSize} />}
+              label="Destacados"
+              baseHref="/dashboard/destacados"
+              items={[
+                { href: "/dashboard/destacados/nuevo", label: "Añadir nuevo destacado" },
+                { href: "/dashboard/destacados/todos", label: "Ver todos los destacados" },
+              ]}
+            /> */
 }
