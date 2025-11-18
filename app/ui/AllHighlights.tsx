@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Edit, Pencil, Trash } from "lucide-react";
+import { TriangleAlert, Pencil, Trash } from "lucide-react";
 import { Highlight } from "../lib/validators/types";
 import Image from "next/image";
 import Modal from "@/app/ui/Modals/Modal";
 import EditHighlights from "./EditHighlights";
-import { set } from "zod";
+import { useRouter } from "next/navigation";
+import { deleteHighlightAction } from "@/app/dashboard/destacados/actions";
 
 export default function AllHighlights({ highlights }: { highlights: Highlight[] }) {
   const [activeModal, setActiveModal] = useState<null | "editHighlight" | "confirmDelete">(null);
@@ -14,7 +15,8 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
   const [selectedHighlightDescription, setSelectedHighlightDescription] = useState<string | null>(null);
   const [selectedHighlightImageUrl, setSelectedHighlightImageUrl] = useState<string | null>(null);
   const [selectedHighlightImagePath, setSelectedHighlightImagePath] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   function openModal(modalName: "editHighlight" | "confirmDelete", highlight: Highlight) {
     setSelectedHighlightId(highlight.id);
@@ -23,6 +25,14 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
     setSelectedHighlightImagePath(highlight.image_path ?? null);
     setActiveModal(modalName);
   }
+
+  const onDelete = (id: number) => {
+    startTransition(async () => {
+      await deleteHighlightAction(id);
+      setActiveModal(null);
+      // router.refresh();
+    });
+  };
 
   return (
     <div className="max-w-auto p-4 flex flex-col">
@@ -63,7 +73,10 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
                 >
                   <Pencil size={18} />
                 </button>
-                <button className="cursor-pointer p-2 rounded-2xl text-[var(--color-delete)] hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-[var(--color-delete-hover)] transition-colors">
+                <button
+                  onClick={() => openModal("confirmDelete", highlight)}
+                  className="cursor-pointer p-2 rounded-2xl text-[var(--color-delete)] hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-[var(--color-delete-hover)] transition-colors"
+                >
                   <Trash size={18} />
                 </button>
               </div>
@@ -88,6 +101,33 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
             onSuccess={() => setActiveModal(null)}
           />
         }
+      />
+
+      {/* Modal de confirmación de eliminación */}
+      <Modal
+        isOpen={activeModal === "confirmDelete"}
+        onCloseAction={() => setActiveModal(null)}
+        icon={<TriangleAlert color="#DC2626" />}
+        iconBgOptionalClassName="bg-[#fee2e2]"
+        title={"Eliminar destacado"}
+        fixedBody={
+          <div className="text-[var(--color-txt-secondary)] py-6 text-center text-sm flex flex-col gap-4 align-middle items-center">
+            <p>
+              ¿Estás seguro/a de que quieres eliminar este destacado? <br />
+              Esta acción no se puede deshacer.
+            </p>
+          </div>
+        }
+        buttonAName={"Cancelar"}
+        buttonAOptionalClassName="bg-[var(--color-cancel)] text-black"
+        onButtonAClickAction={() => {
+          setActiveModal(null);
+        }}
+        buttonBName={isPending ? "Eliminando..." : "Eliminar"}
+        buttonBOptionalClassName="bg-[var(--color-delete)] text-white"
+        onButtonBClickAction={() => {
+          if (selectedHighlightId != null) onDelete(selectedHighlightId);
+        }}
       />
     </div>
   );
