@@ -52,7 +52,7 @@ export default function AddHighlights({ onSuccess, onCancel }: { onSuccess?: () 
             name="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="form-textarea bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 h-24"
+            className="text-sm form-textarea bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 h-24"
             placeholder="Ej: 2x1 en pizzas este fin de semana"
             disabled={saving || uploading}
           />

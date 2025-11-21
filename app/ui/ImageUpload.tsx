@@ -141,7 +141,7 @@ export default function ImageInput({
   };
 
   return (
-    <div className="sm:col-span-4 pb-4">
+    <div className="sm:col-span-4">
       {/* input único */}
       <input
         id={inputId}
@@ -202,7 +202,7 @@ export default function ImageInput({
                 </label>
                 <span className="text-[var(--color-txt-secondary)]">o arrástrala aquí</span>
               </div>
-              <p className="text-xs text-gray-400">PNG, JPG, GIF hasta {maxSizeMB}MB</p>
+              <p className="text-xs text-gray-400">PNG, JPG, GIF hasta {maxSizeMB} MB</p>
             </div>
           )}
         </div>
