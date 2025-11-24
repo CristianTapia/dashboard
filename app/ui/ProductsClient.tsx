@@ -11,6 +11,7 @@ import FilteringButton from "./Modals/FilteringButton";
 import Image from "next/image";
 import { Product, Category } from "../lib/validators/types";
 import { useRouter } from "next/navigation";
+import { CirclePlus, Trash, Pencil, Search } from "lucide-react";
 
 export default function Products({
   products,
@@ -203,13 +204,84 @@ export default function Products({
 
   // RENDERIZADO
   return (
-    <div className="flex flex-col">
+    <div className="max-w-auto p-4 flex flex-col">
+      <div className="flex flex-col items-start gap-2">
+        <h1 className="text-3xl font-bold">Todos los Productos</h1>
+        <p className="text-md text-[var(--color-txt-secondary)]">
+          Visualiza los productos existentes. Los cambios se reflejarán inmediatamente en el menú.
+        </p>
+      </div>
+      {/* Añadir y buscar */}
+      <div className="mt-4">
+        {/* Botón añadir */}
+        <button
+          type="button"
+          onClick={() => openModal("addProduct")}
+          className="p-2 pl-5 pr-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
+        >
+          <CirclePlus /> Añadir nuevo producto
+        </button>
+      </div>
+      {/* Búsqueda */}
+      <div className="flex w-full flex-1 items-stretch rounded-lg h-full mt-6 mb-6">
+        <div className="text-slate-500 dark:text-slate-400 flex bg-[var(--color-foreground)] dark:bg-background-dark items-center justify-center p-2 rounded-l-lg border border-[var(--color-border-box)] border-r-0">
+          <Search />
+        </div>
+        <input
+          type="text"
+          name="search"
+          className="w-full bg-[var(--color-foreground)] rounded-r-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
+          placeholder="Buscar categorías por nombre"
+          value=""
+          onChange={() => {}}
+        />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
+        {sortedProducts.map((product) => (
+          <div
+            key={product.id}
+            className="dark:bg-surface-dark rounded-xl shadow-card overflow-hidden flex flex-col bg-[var(--color-foreground)]"
+          >
+            <div className="relative">
+              {product.image_url ? (
+                <Image
+                  alt={product.description || "Highlight Image"}
+                  alt="asf"
+                  className="w-full h-36 object-cover"
+                  src={product.image_url ?? ""}
+                  src={"asdf"}
+                  width={400}
+                  height={400}
+                  unoptimized
+                />
+              ) : (
+                <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500">Sin imagen</div>
+              )}
+            </div>
+            <div className="p-4 flex flex-col flex-grow">
+              <p className="mt-1 text-sm text-text-light/70 dark:text-text-dark/70 flex-grow">
+                {/* {product.description} */}
+              </p>
+              <div className="mt-4 pt-4 border-t border-[var(--color-border-box)] dark:border-border-dark flex items-center justify-end gap-2">
+                <button
+                  // onClick={() => openModal("editHighlight", highlight)}
+                  className="cursor-pointer p-2 rounded-2xl text-[var(--color-light)] hover:text-[var(--color-light-hover)] hover:bg-[var(--color-cancel)] transition-colors"
+                >
+                  <Pencil size={18} />
+                </button>
+                <button
+                  // onClick={() => openModal("confirmDelete", highlight)}
+                  className="cursor-pointer p-2 rounded-2xl text-[var(--color-delete)] hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-[var(--color-delete-hover)] transition-colors"
+                >
+                  <Trash size={18} />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
       {/* Botonera */}
       <div className="text-white flex items-center gap-4 pb-8">
-        <button onClick={() => openModal("addProduct")} className="bg-red-500 border-1 p-2 rounded cursor-pointer">
-          Agregar Producto
-        </button>
-
         <input
           className="border-1 p-2 rounded"
           type="text"
