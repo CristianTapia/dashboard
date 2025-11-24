@@ -246,10 +246,8 @@ export default function Products({
               {product.image_url ? (
                 <Image
                   alt={product.description || "Highlight Image"}
-                  alt="asf"
                   className="w-full h-36 object-cover"
                   src={product.image_url ?? ""}
-                  src={"asdf"}
                   width={400}
                   height={400}
                   unoptimized
