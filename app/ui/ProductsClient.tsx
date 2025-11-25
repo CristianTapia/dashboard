@@ -1,9 +1,8 @@
 "use client";
 
 import clsx from "clsx";
-import { useState, useEffect, useRef, FormEvent } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import Modal from "./Modals/Modal";
-import Dropdown from "./Dropdown";
 import AddProduct from "./Modals/AddProduct";
 import EditProduct from "./Modals/EditProduct";
 import Filtering from "./Modals/Filtering";
@@ -11,7 +10,7 @@ import FilteringButton from "./Modals/FilteringButton";
 import Image from "next/image";
 import { Product, Category } from "../lib/validators/types";
 import { useRouter } from "next/navigation";
-import { CirclePlus, Trash, Pencil, Search } from "lucide-react";
+import { CirclePlus, Trash, Pencil, Search, TriangleAlert } from "lucide-react";
 
 export default function Products({
   products,
@@ -30,6 +29,7 @@ export default function Products({
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const selectedProduct = products.find((product) => product.id === selectedProductId);
+  const [isPending, startTransition] = useTransition();
 
   // ESTADOS DE FILTROS
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -286,19 +286,12 @@ export default function Products({
                   minimumFractionDigits: 0,
                 }).format(product.price)}
               </p>
-              <p className="text-sm font-medium text-green-600 dark:text-green-400 mt-4">Stock: 50</p>
+              <p className="text-sm font-medium text-green-600 dark:text-green-400 mt-4">Stock: {product.stock}</p>
 
               <p className="mt-1 text-sm text-text-light/70 dark:text-text-dark/70 flex-grow">
                 {/* {product.description} */}
               </p>
               <div className="mt-4 pt-4 border-t border-[var(--color-border-box)] dark:border-border-dark flex items-center justify-end gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">Oferta</span>
-                  <button className="relative inline-flex items-center h-6 rounded-full w-11 transition-colors">
-                    <span className="sr-only">Activar oferta</span>
-                    <span className="inline-block w-4 h-4 transform bg-white rounded-full transition-transform"></span>
-                  </button>
-                </div>
                 <button
                   // onClick={() => openModal("editHighlight", highlight)}
                   className="cursor-pointer p-2 rounded-2xl text-[var(--color-light)] hover:text-[var(--color-light-hover)] hover:bg-[var(--color-cancel)] transition-colors"
@@ -306,7 +299,7 @@ export default function Products({
                   <Pencil size={18} />
                 </button>
                 <button
-                  // onClick={() => openModal("confirmDelete", highlight)}
+                  onClick={() => openModal("confirmDelete", product.id)}
                   className="cursor-pointer p-2 rounded-2xl text-[var(--color-delete)] hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-[var(--color-delete-hover)] transition-colors"
                 >
                   <Trash size={18} />
@@ -365,7 +358,7 @@ export default function Products({
         />
       )}
 
-      <Modal
+      {/* <Modal
         isOpen={activeModal === "confirmDelete"}
         onCloseAction={closeModal}
         title={`¿Eliminar producto ${selectedProduct?.id ?? ""}?`}
@@ -377,6 +370,33 @@ export default function Products({
         }}
         buttonBName="Cancelar"
         onButtonBClickAction={closeModal}
+      /> */}
+
+      {/* Modal de confirmación de eliminación */}
+      <Modal
+        isOpen={activeModal === "confirmDelete"}
+        onCloseAction={() => setActiveModal(null)}
+        icon={<TriangleAlert color="#DC2626" />}
+        iconBgOptionalClassName="bg-[#fee2e2]"
+        title={"Eliminar destacado"}
+        fixedBody={
+          <div className="text-[var(--color-txt-secondary)] py-6 text-center text-sm flex flex-col gap-4 align-middle items-center">
+            <p>
+              ¿Estás seguro/a de que quieres eliminar este destacado? <br />
+              Esta acción no se puede deshacer.
+            </p>
+          </div>
+        }
+        buttonAName={"Cancelar"}
+        buttonAOptionalClassName="bg-[var(--color-cancel)] text-black"
+        onButtonAClickAction={() => {
+          setActiveModal(null);
+        }}
+        buttonBName={isPending ? "Eliminando..." : "Eliminar"}
+        buttonBOptionalClassName="bg-[var(--color-delete)] text-white"
+        // onButtonBClickAction={() => {
+        //   if (selectedHighlightId != null) onDelete(selectedHighlightId);
+        // }}
       />
 
       <Modal
