@@ -211,6 +211,7 @@ export default function Products({
           Visualiza los productos existentes. Los cambios se reflejarán inmediatamente en el menú.
         </p>
       </div>
+
       {/* Añadir y buscar */}
       <div className="mt-4">
         {/* Botón añadir */}
@@ -231,11 +232,12 @@ export default function Products({
           type="text"
           name="search"
           className="w-full bg-[var(--color-foreground)] rounded-r-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
-          placeholder="Buscar categorías por nombre"
+          placeholder="Buscar productos por nombre"
           value=""
           onChange={() => {}}
         />
       </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
         {sortedProducts.map((product) => (
           <div
@@ -253,10 +255,27 @@ export default function Products({
                   unoptimized
                 />
               ) : (
-                <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500">Sin imagen</div>
+                <div className="w-full h-36 bg-gray-200 flex items-center justify-center text-gray-500">Sin imagen</div>
               )}
             </div>
             <div className="p-4 flex flex-col flex-grow">
+              <h3 className="text-lg font-semibold text-text-light dark:text-text-dark">{product.name}</h3>
+              <p className="text-sm text-red-300 mt-1 flex-grow">{product.description}</p>
+              {/* <div className="mt-4">
+                <div className="flex items-baseline gap-2">
+                  <p className="text-md font-bold text-red-500">$75.00</p>
+                  <p className="text-base text-text-light/50 dark:text-text-dark/50 line-through">$89.99</p>
+                </div>
+              </div> */}
+              <p className="text-lg font-bold text-primary mt-4">
+                {new Intl.NumberFormat("es-CL", {
+                  style: "currency",
+                  currency: "CLP",
+                  minimumFractionDigits: 0,
+                }).format(product.price)}
+              </p>
+              <p className="text-sm font-medium text-green-600 dark:text-green-400 mt-4">Stock: 50</p>
+
               <p className="mt-1 text-sm text-text-light/70 dark:text-text-dark/70 flex-grow">
                 {/* {product.description} */}
               </p>
