@@ -222,6 +222,18 @@ export default function Products({
         >
           <CirclePlus /> Añadir nuevo producto
         </button>
+        {/* Botonera */}
+        <div className="text-white flex items-center gap-4 pb-8">
+          <div className="relative inline-block">
+            <button
+              type="button"
+              className="cursor-pointer inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
+              onClick={() => openModal("useFilter")}
+            >
+              Filtrar
+            </button>
+          </div>
+        </div>
       </div>
       {/* Búsqueda */}
       <div className="flex w-full flex-1 items-stretch rounded-lg h-full mt-6 mb-6">
@@ -233,8 +245,8 @@ export default function Products({
           name="search"
           className="w-full bg-[var(--color-foreground)] rounded-r-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
           placeholder="Buscar productos por nombre"
-          value=""
-          onChange={() => {}}
+          value={search.term}
+          onChange={(e) => setSearch((prev) => ({ ...prev, term: e.target.value }))}
         />
       </div>
 
@@ -280,6 +292,13 @@ export default function Products({
                 {/* {product.description} */}
               </p>
               <div className="mt-4 pt-4 border-t border-[var(--color-border-box)] dark:border-border-dark flex items-center justify-end gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Oferta</span>
+                  <button className="relative inline-flex items-center h-6 rounded-full w-11 transition-colors">
+                    <span className="sr-only">Activar oferta</span>
+                    <span className="inline-block w-4 h-4 transform bg-white rounded-full transition-transform"></span>
+                  </button>
+                </div>
                 <button
                   // onClick={() => openModal("editHighlight", highlight)}
                   className="cursor-pointer p-2 rounded-2xl text-[var(--color-light)] hover:text-[var(--color-light-hover)] hover:bg-[var(--color-cancel)] transition-colors"
@@ -293,96 +312,6 @@ export default function Products({
                   <Trash size={18} />
                 </button>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      {/* Botonera */}
-      <div className="text-white flex items-center gap-4 pb-8">
-        <input
-          className="border-1 p-2 rounded"
-          type="text"
-          placeholder="Buscar Producto"
-          value={search.term}
-          onChange={(e) => setSearch((prev) => ({ ...prev, term: e.target.value }))}
-        />
-
-        <div className="relative inline-block">
-          <button
-            type="button"
-            className="cursor-pointer inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
-            onClick={() => openModal("useFilter")}
-          >
-            Filtrar
-          </button>
-        </div>
-      </div>
-
-      {/* Lista de productos */}
-      <div className="flex flex-wrap gap-8 justify-center">
-        {sortedProducts.map((option) => (
-          <div key={option.id} className="relative box-border border p-4 rounded shadow-md bg-gray w-[200px]">
-            <div className="flex justify-between items-center">
-              <div className="w-32">Producto {option.id}</div>
-              <div className="relative">
-                {openDropdownId === option.id ? (
-                  // Simulación visual: se ve igual pero no reacciona
-                  <div className="text-white p-2 py-1 rounded cursor-pointer select-none">⋮</div>
-                ) : (
-                  <button
-                    onClick={() => {
-                      toggleDropdown(option.id);
-                    }}
-                    className="text-white p-2 py-1 rounded cursor-pointer"
-                  >
-                    ⋮
-                  </button>
-                )}
-                {openDropdownId === option.id && (
-                  <div ref={dropdownRef}>
-                    <Dropdown
-                      isOpen={true}
-                      optionA="Editar"
-                      onOptionAClickAction={() => {
-                        setOpenDropdownId(null);
-                        openModal("editProduct", option.id);
-                      }}
-                      optionB="Eliminar"
-                      onOptionBClickAction={() => {
-                        setOpenDropdownId(null);
-                        openModal("confirmDelete", option.id);
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="w-32 pb-1 pt-3">{option.name}</div>
-            <div className="w-32 pb-1">
-              {new Intl.NumberFormat("es-CL", {
-                style: "currency",
-                currency: "CLP",
-                minimumFractionDigits: 0,
-              }).format(option.price)}
-            </div>
-            <div className="w-32 pb-1">{option.category?.name ?? "—"}</div>
-            <div className="w-32 pb-3">Stock: {option.stock}</div>
-            <div className="p-5 flex justify-center">
-              {option.image_url ? (
-                <Image
-                  src={option.image_url ?? ""}
-                  alt={option.name}
-                  width={96}
-                  height={96}
-                  className="w-34 h-34 object-cover rounded border"
-                  unoptimized
-                />
-              ) : (
-                <div className="w-34 h-34 border border-gray-300 rounded flex items-center justify-center text-sm">
-                  Sin foto
-                </div>
-              )}
             </div>
           </div>
         ))}
