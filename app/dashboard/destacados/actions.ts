@@ -6,7 +6,7 @@ import { createHighlight, listHighlights, updateHighlight, deleteHighlight } fro
 export async function createHighlightAction(payload: { description: string; image_path: string }) {
   const created = await createHighlight(payload);
   // refresca el listado
-  revalidateTag("/dashboard/destacados/todos");
+  revalidateTag("/dashboard/destacados");
   return { ok: true, created };
 }
 
@@ -30,6 +30,6 @@ export async function updateHighlightAction(id: number, payload: { description?:
   };
   const updated = await updateHighlight(id, cleanedPayload);
   revalidateTag("Highlights");
-  revalidatePath("/dashboard/destacados/todos");
+  revalidatePath("/dashboard/destacados");
   return { ok: true, updated };
 }

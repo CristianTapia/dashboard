@@ -11,6 +11,7 @@ import Image from "next/image";
 import { Product, Category } from "../lib/validators/types";
 import { useRouter } from "next/navigation";
 import { CirclePlus, Trash, Pencil, Search, TriangleAlert } from "lucide-react";
+import { deleteProductAction } from "@/app/dashboard/productos/actions";
 
 export default function Products({
   products,
@@ -48,6 +49,14 @@ export default function Products({
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  const onDelete = (id: number) => {
+    startTransition(async () => {
+      await deleteProductAction(id);
+      setActiveModal(null);
+      // router.refresh();
+    });
+  };
 
   // FILTROS
   useEffect(() => {
@@ -394,9 +403,9 @@ export default function Products({
         }}
         buttonBName={isPending ? "Eliminando..." : "Eliminar"}
         buttonBOptionalClassName="bg-[var(--color-delete)] text-white"
-        // onButtonBClickAction={() => {
-        //   if (selectedHighlightId != null) onDelete(selectedHighlightId);
-        // }}
+        onButtonBClickAction={() => {
+          if (selectedProductId != null) onDelete(selectedProductId);
+        }}
       />
 
       <Modal
