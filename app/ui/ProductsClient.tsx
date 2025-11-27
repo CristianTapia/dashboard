@@ -367,31 +367,17 @@ export default function Products({
         />
       )}
 
-      {/* <Modal
-        isOpen={activeModal === "confirmDelete"}
-        onCloseAction={closeModal}
-        title={`¿Eliminar producto ${selectedProduct?.id ?? ""}?`}
-        body={<div className="text-gray-900">Esta acción es irreversible</div>}
-        buttonAName="Eliminar"
-        onButtonAClickAction={() => {
-          handleDelete();
-          closeModal();
-        }}
-        buttonBName="Cancelar"
-        onButtonBClickAction={closeModal}
-      /> */}
-
       {/* Modal de confirmación de eliminación */}
       <Modal
         isOpen={activeModal === "confirmDelete"}
         onCloseAction={() => setActiveModal(null)}
         icon={<TriangleAlert color="#DC2626" />}
         iconBgOptionalClassName="bg-[#fee2e2]"
-        title={"Eliminar destacado"}
+        title={"Eliminar producto"}
         fixedBody={
           <div className="text-[var(--color-txt-secondary)] py-6 text-center text-sm flex flex-col gap-4 align-middle items-center">
             <p>
-              ¿Estás seguro/a de que quieres eliminar este destacado? <br />
+              ¿Estás seguro/a de que quieres eliminar este producto? <br />
               Esta acción no se puede deshacer.
             </p>
           </div>

@@ -53,9 +53,29 @@ export async function updateHighlight(id: number, input: UpdateHighlightInput) {
   return data;
 }
 
+const IMAGE_BUCKET = process.env.SB_BUCKET_NAME ?? "images";
+
 export async function deleteHighlight(id: number) {
   const db = createSupabaseAdmin();
-  const { error } = await db.from("highlights").delete().eq("id", id);
+  const { data, error } = await db
+    .from("highlights")
+    .delete()
+    .eq("id", id)
+    .select("id, image_path")
+    .maybeSingle<{ id: number; image_path: string | null }>();
   if (error) throw new Error(error.message);
+
+  if (!data) {
+    return { ok: true };
+  }
+
+  if (data.image_path) {
+    const { error: storageError } = await db.storage.from(IMAGE_BUCKET).remove([data.image_path]);
+    if (storageError) {
+      console.error("deleteHighlight storage error:", storageError);
+      throw new Error("Destacado eliminado pero no se pudo eliminar la imagen asociada");
+    }
+  }
+
   return { ok: true };
 }

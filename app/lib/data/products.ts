@@ -52,9 +52,29 @@ export async function updateProduct(id: number, input: UpdateProductInput) {
   return data;
 }
 
+const IMAGE_BUCKET = process.env.SB_BUCKET_NAME ?? "images";
+
 export async function deleteProduct(id: number) {
   const db = createSupabaseAdmin();
-  const { error } = await db.from("products").delete().eq("id", id);
+  const { data, error } = await db
+    .from("products")
+    .delete()
+    .eq("id", id)
+    .select("id, image_path")
+    .maybeSingle<{ id: number; image_path: string | null }>();
   if (error) throw new Error(error.message);
+
+  if (!data) {
+    return { ok: true };
+  }
+
+  if (data.image_path) {
+    const { error: storageError } = await db.storage.from(IMAGE_BUCKET).remove([data.image_path]);
+    if (storageError) {
+      console.error("deleteProduct storage error:", storageError);
+      throw new Error("Producto eliminado pero no se pudo eliminar la imagen asociada");
+    }
+  }
+
   return { ok: true };
 }
