@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { useState, useEffect, useRef, useTransition } from "react";
 import Modal from "./Modals/Modal";
 import AddProduct from "./Modals/AddProduct";
-import EditProduct from "./Modals/EditProduct";
+import EditProducts from "@/app/ui/EditProducts";
 import Filtering from "./Modals/Filtering";
 import FilteringButton from "./Modals/FilteringButton";
 import Image from "next/image";
@@ -27,9 +27,13 @@ export default function Products({
   const [activeModal, setActiveModal] = useState<null | "addProduct" | "confirmDelete" | "editProduct" | "useFilter">(
     null
   );
-  const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
-  const selectedProduct = products.find((product) => product.id === selectedProductId);
+  const [selectedProductName, setSelectedProductName] = useState<string | null>(null);
+  const [selectedProductPrice, setSelectedProductPrice] = useState<number | null>(null);
+  const [selectedProductStock, setSelectedProductStock] = useState<number | null>(null);
+  const [selectedProductDescription, setSelectedProductDescription] = useState<string | null>(null);
+  const [selectedProductImageUrl, setSelectedProductImageUrl] = useState<string | null>(null);
+  const [selectedProductImagePath, setSelectedProductImagePath] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   // ESTADOS DE FILTROS
@@ -45,11 +49,10 @@ export default function Products({
   const [tempActiveStockOrder, setTempActiveStockOrder] = useState<"asc" | "desc" | null>(null);
   const [tempActiveAlphabeticalOrder, setTempActiveAlphabeticalOrder] = useState<"asc" | "desc" | null>(null);
 
-  // const uniqueCategories = [...new Set(products.map((p) => p.category ?? ""))].filter(Boolean);
   const router = useRouter();
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
+  // Delete product logic
   const onDelete = (id: number) => {
     startTransition(async () => {
       await deleteProductAction(id);
@@ -132,10 +135,25 @@ export default function Products({
   }
 
   // MODALES
-  function openModal(modalName: "addProduct" | "confirmDelete" | "editProduct" | "useFilter", productId?: number) {
+  function openModal(
+    modalName: "addProduct" | "confirmDelete" | "editProduct" | "useFilter",
+    product?: Product | null
+  ) {
     setActiveModal(modalName);
-    setSelectedProductId(productId ?? null);
-
+    if (product) {
+      setSelectedProductId(product.id);
+      setSelectedProductName(product.name);
+      setSelectedProductPrice(product.price);
+      setSelectedProductStock(product.stock ?? 0);
+      setSelectedProductDescription(product.description ?? null);
+      setSelectedProductImageUrl(product.image_url ?? null);
+      setSelectedProductImagePath(product.image_path ?? null);
+    } else {
+      setSelectedProductId(null);
+      setSelectedProductDescription(null);
+      setSelectedProductImageUrl(null);
+      setSelectedProductImagePath(null);
+    }
     if (modalName === "useFilter") {
       setTempSelectedCategories([...selectedCategories]);
       setTempActivePriceOrder(activePriceOrder);
@@ -157,58 +175,6 @@ export default function Products({
   const onSuccess = () => {
     console.log("Categoría agregada con éxito. Aquí podrías refrescar los datos.");
     // router.refresh(); // si usas App Router con fetch server-side
-  };
-
-  function toggleDropdown(id: number) {
-    setOpenDropdownId((prev) => (prev === id ? null : id));
-  }
-
-  useEffect(() => {
-    // Manejo de clics fuera del dropdown
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOpenDropdownId(null);
-      }
-    }
-    // Manejo de escape para cerrar el dropdown
-    function handleEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setOpenDropdownId(null);
-      }
-    }
-    // Manejo de scroll para cerrar el dropdown
-    function handleScroll() {
-      setOpenDropdownId(null);
-    }
-
-    if (openDropdownId !== null) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleEscape);
-      window.addEventListener("scroll", handleScroll, true);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscape);
-      window.removeEventListener("scroll", handleScroll, true);
-    };
-  }, [openDropdownId]);
-
-  // ELIMINAR PRODUCTO
-  const handleDelete = async () => {
-    const ok = window.confirm("¿Eliminar este producto? Esta acción no se puede deshacer.");
-    if (!ok) return;
-
-    const res = await fetch(`/api/products/${selectedProductId}`, { method: "DELETE" });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      alert(err?.error ?? "No se pudo eliminar");
-      return;
-    }
-
-    // refresca la lista (SSR/Server Components)
-    router.refresh();
   };
 
   // RENDERIZADO
@@ -260,7 +226,7 @@ export default function Products({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
-        {sortedProducts.map((product) => (
+        {products.map((product) => (
           <div
             key={product.id}
             className="dark:bg-surface-dark rounded-xl shadow-card overflow-hidden flex flex-col bg-[var(--color-foreground)]"
@@ -268,7 +234,7 @@ export default function Products({
             <div className="relative">
               {product.image_url ? (
                 <Image
-                  alt={product.description || "Highlight Image"}
+                  alt={product.description || "Product Image"}
                   className="w-full h-36 object-cover"
                   src={product.image_url ?? ""}
                   width={400}
@@ -302,13 +268,13 @@ export default function Products({
               </p>
               <div className="mt-4 pt-4 border-t border-[var(--color-border-box)] dark:border-border-dark flex items-center justify-end gap-2">
                 <button
-                  // onClick={() => openModal("editHighlight", highlight)}
+                  onClick={() => openModal("editProduct", product)}
                   className="cursor-pointer p-2 rounded-2xl text-[var(--color-light)] hover:text-[var(--color-light-hover)] hover:bg-[var(--color-cancel)] transition-colors"
                 >
                   <Pencil size={18} />
                 </button>
                 <button
-                  onClick={() => openModal("confirmDelete", product.id)}
+                  onClick={() => openModal("confirmDelete", product)}
                   className="cursor-pointer p-2 rounded-2xl text-[var(--color-delete)] hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-[var(--color-delete-hover)] transition-colors"
                 >
                   <Trash size={18} />
@@ -342,7 +308,7 @@ export default function Products({
         onButtonBClickAction={closeModal}
       />
 
-      {selectedProduct && (
+      {/* {selectedProduct && (
         <Modal
           isOpen={activeModal === "editProduct"}
           onCloseAction={closeModal}
@@ -365,7 +331,28 @@ export default function Products({
           }}
           onButtonBClickAction={closeModal}
         />
-      )}
+      )} */}
+
+      {/* Modal de edición de producto */}
+      <Modal
+        isOpen={activeModal === "editProduct"}
+        icon={<Pencil color="#137fec" />}
+        iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
+        onCloseAction={() => setActiveModal(null)}
+        title={"Editar Destacado"}
+        fixedBody={
+          <EditProducts
+            productId={selectedProductId!}
+            productName={selectedProductName!}
+            productPrice={selectedProductPrice!}
+            productStock={selectedProductStock!}
+            productDescription={selectedProductDescription!}
+            productImageUrl={selectedProductImageUrl}
+            productImagePath={selectedProductImagePath}
+            onSuccess={() => setActiveModal(null)}
+          />
+        }
+      />
 
       {/* Modal de confirmación de eliminación */}
       <Modal
