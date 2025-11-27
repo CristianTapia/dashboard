@@ -84,7 +84,7 @@ export default function EditHighlights({
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const desc = description.trim();
+    // const desc = description.trim();
     const finalDescription = description.trim() || highlightDescription;
     if (!imagePath) return alert("La imagen es obligatoria");
     if (uploading) return alert("Espera a que termine la subida de la imagen");

@@ -3,12 +3,14 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@/app/ui/ImageUpload";
-import { Upload } from "lucide-react";
 import { updateProductAction } from "@/app/dashboard/productos/actions";
 import Image from "next/image";
 
 export default function EditProducts({
   productId,
+  productName,
+  productPrice,
+  productStock,
   productDescription,
   productImageUrl,
   productImagePath,
@@ -25,6 +27,9 @@ export default function EditProducts({
   onCancel?: () => void;
   onSuccess?: () => void;
 }) {
+  const [name, setName] = useState(productName);
+  const [price, setPrice] = useState(productPrice.toString());
+  const [stock, setStock] = useState(productStock.toString());
   const [description, setDescription] = useState(productDescription ?? "");
   const [imagePath, setImagePath] = useState<string | null>(productImagePath ?? null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(productImageUrl ?? null);
@@ -35,8 +40,11 @@ export default function EditProducts({
   const router = useRouter();
 
   useEffect(() => {
+    setName(productName);
+    setPrice(productPrice.toString());
+    setStock(productStock.toString());
     setDescription(productDescription ?? "");
-  }, [productDescription]);
+  }, [productName, productPrice, productStock, productDescription]);
 
   useEffect(() => {
     setImagePath(productImagePath ?? null);
@@ -87,21 +95,38 @@ export default function EditProducts({
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const desc = description.trim();
+    const nextName = name.trim() || productName;
+    const nextPrice = Number(price) || productPrice;
+    const nextStock = Number(stock) || productStock;
     const finalDescription = description.trim() || productDescription;
     if (!imagePath) return alert("La imagen es obligatoria");
     if (uploading) return alert("Espera a que termine la subida de la imagen");
 
     startTransition(async () => {
       try {
-        const payload: { description?: string; image_path?: string | null } = {};
+        const payload: {
+          name?: string;
+          price?: number;
+          stock?: number;
+          description?: string;
+          image_path?: string | null;
+        } = {};
+        if (nextName !== productName) {
+          payload.name = nextName;
+        }
+        if (nextPrice !== productPrice) {
+          payload.price = nextPrice;
+        }
+        if (nextStock !== productStock) {
+          payload.stock = nextStock;
+        }
         if (finalDescription !== productDescription) {
           payload.description = finalDescription;
         }
         if (imagePath !== productImagePath) {
           payload.image_path = imagePath;
         }
-        if (!payload.description && payload.image_path === undefined) {
+        if (Object.keys(payload).length === 0) {
           alert("No hay cambios para guardar");
           return;
         }
@@ -109,6 +134,9 @@ export default function EditProducts({
         const res = await updateProductAction(productId, payload);
         if (res?.ok) {
           alert("Destacado editado");
+          setName(nextName);
+          setPrice(nextPrice.toString());
+          setStock(nextStock.toString());
           setDescription(finalDescription);
           setImagePath(imagePath ?? null);
           updatePreviewFromPath(imagePath ?? null);
@@ -166,14 +194,42 @@ export default function EditProducts({
               </div>
             </div>
           </div>
-
-          <label className="text-sm pb-2 font-semibold">Descripción Actual</label>
-          <div className="flex w-full items-center rounded-lg border border-gray-300 dark:border-gray-600 bg-[var(--color-cancel)] dark:bg-gray-700/50 p-3 mb-4">
-            <p className="text-sm font-normal leading-normal text-gray-500 dark:text-gray-400">{productDescription}</p>
-          </div>
+          <label className="text-sm pb-2 font-semibold">Nuevo Nombre</label>
+          <input
+            // name={productName}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="form-input text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 mb-4"
+            placeholder="Introduce el nombre del producto"
+            disabled={pending || uploading}
+          />
+          <label className="text-sm pb-2 font-semibold">Nuevo Precio</label>
+          <input
+            type="number"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            onKeyDown={(e) => {
+              if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault();
+            }}
+            className="form-input text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 mb-4"
+            placeholder="Introduce el precio del producto"
+            disabled={pending || uploading}
+          />
+          <label className="text-sm pb-2 font-semibold">Nuevo Stock</label>
+          <input
+            type="number"
+            value={stock}
+            onChange={(e) => setStock(e.target.value)}
+            onKeyDown={(e) => {
+              if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault();
+            }}
+            className="form-input text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 mb-4"
+            placeholder="Introduce el precio del producto"
+            disabled={pending || uploading}
+          />
           <label className="text-sm pb-2 font-semibold">Nueva Descripción</label>
           <textarea
-            name="description"
+            name={productDescription}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="form-textarea text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 h-24"
