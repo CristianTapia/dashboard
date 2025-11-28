@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@/app/ui/ImageUpload";
-import { Upload } from "lucide-react";
 import { updateHighlightAction } from "@/app/dashboard/destacados/actions";
 import Image from "next/image";
 
@@ -86,8 +85,8 @@ export default function EditHighlights({
     e.preventDefault();
     // const desc = description.trim();
     const finalDescription = description.trim() || highlightDescription;
-    if (!imagePath) return alert("La imagen es obligatoria");
     if (uploading) return alert("Espera a que termine la subida de la imagen");
+    // imagePath ya es opcional; si no se cambió, no se manda
 
     startTransition(async () => {
       try {
@@ -138,8 +137,8 @@ export default function EditHighlights({
                     unoptimized
                   />
                 ) : (
-                  <div className="w-24 h-24 border-xl border-gray-300 rounded flex items-center justify-center text-sm">
-                    Sin foto
+                  <div className="w-24 h-24 border border-gray-300 rounded-xl flex items-center justify-center text-sm">
+                    Sin imagen
                   </div>
                 )}
                 <div className="flex flex-col gap-2">

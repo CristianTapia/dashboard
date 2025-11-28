@@ -41,10 +41,12 @@ export async function updateProductAction(
     image_path?: string | null;
   }
 ) {
-  const cleanedPayload = {
-    ...payload,
-    image_path: payload.image_path === null ? undefined : payload.image_path,
-  };
+  const cleanedPayload: typeof payload = { ...payload };
+  if (payload.image_path === undefined) {
+    delete cleanedPayload.image_path;
+  } else if (payload.image_path === null) {
+    cleanedPayload.image_path = null;
+  }
   const updated = await updateProduct(id, cleanedPayload);
   revalidateTag("Products");
   revalidatePath("/dashboard/destacados/todos");

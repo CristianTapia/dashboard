@@ -11,5 +11,5 @@ export default async function AllProductsPage() {
     listCategories(),
   ]);
 
-  return <ProductsClient products={products as any} initialCategories={categories as any} />;
+  return <ProductsClient products={products as any} categories={categories as any} />;
 }

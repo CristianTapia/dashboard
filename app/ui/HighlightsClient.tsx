@@ -77,7 +77,7 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
                   unoptimized
                 />
               ) : (
-                <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500">Sin imagen</div>
+                <div className="w-full h-36 bg-gray-200 flex items-center justify-center text-gray-500">Sin imagen</div>
               )}
             </div>
             <div className="p-4 flex flex-col flex-grow">

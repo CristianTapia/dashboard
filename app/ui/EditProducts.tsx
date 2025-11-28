@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import ImageUpload from "@/app/ui/ImageUpload";
 import { updateProductAction } from "@/app/dashboard/productos/actions";
 import Image from "next/image";
+import type { Category } from "@/app/lib/validators/types";
 
 export default function EditProducts({
   productId,
@@ -14,6 +15,8 @@ export default function EditProducts({
   productDescription,
   productImageUrl,
   productImagePath,
+  productCategoryId,
+  categories,
   onCancel,
   onSuccess,
 }: {
@@ -24,6 +27,8 @@ export default function EditProducts({
   productDescription: string;
   productImageUrl: string | null;
   productImagePath: string | null;
+  productCategoryId: number | null;
+  categories: Category[];
   onCancel?: () => void;
   onSuccess?: () => void;
 }) {
@@ -33,6 +38,7 @@ export default function EditProducts({
   const [description, setDescription] = useState(productDescription ?? "");
   const [imagePath, setImagePath] = useState<string | null>(productImagePath ?? null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(productImageUrl ?? null);
+  const [categoryId, setCategoryId] = useState<string>(productCategoryId?.toString() ?? "");
   const [uploading, setUploading] = useState(false);
   const [uploaderKey, setUploaderKey] = useState(0);
   const [pending, startTransition] = useTransition();
@@ -53,6 +59,10 @@ export default function EditProducts({
   useEffect(() => {
     setPreviewUrl(productImageUrl ?? null);
   }, [productImageUrl]);
+
+  useEffect(() => {
+    setCategoryId(productCategoryId?.toString() ?? "");
+  }, [productCategoryId]);
 
   const updatePreviewFromPath = async (path: string | null) => {
     if (!path) {
@@ -99,7 +109,15 @@ export default function EditProducts({
     const nextPrice = Number(price) || productPrice;
     const nextStock = Number(stock) || productStock;
     const finalDescription = description.trim() || productDescription;
-    if (!imagePath) return alert("La imagen es obligatoria");
+    if (!categoryId) {
+      alert("Selecciona una categoría");
+      return;
+    }
+    const nextCategoryId = Number(categoryId);
+    if (!Number.isFinite(nextCategoryId)) {
+      alert("Categoría inválida");
+      return;
+    }
     if (uploading) return alert("Espera a que termine la subida de la imagen");
 
     startTransition(async () => {
@@ -110,6 +128,7 @@ export default function EditProducts({
           stock?: number;
           description?: string;
           image_path?: string | null;
+          category_id?: number;
         } = {};
         if (nextName !== productName) {
           payload.name = nextName;
@@ -126,6 +145,9 @@ export default function EditProducts({
         if (imagePath !== productImagePath) {
           payload.image_path = imagePath;
         }
+        if (nextCategoryId !== productCategoryId) {
+          payload.category_id = nextCategoryId;
+        }
         if (Object.keys(payload).length === 0) {
           alert("No hay cambios para guardar");
           return;
@@ -133,19 +155,20 @@ export default function EditProducts({
 
         const res = await updateProductAction(productId, payload);
         if (res?.ok) {
-          alert("Destacado editado");
+          alert("Producto editado");
           setName(nextName);
           setPrice(nextPrice.toString());
           setStock(nextStock.toString());
           setDescription(finalDescription);
           setImagePath(imagePath ?? null);
+          setCategoryId(nextCategoryId.toString());
           updatePreviewFromPath(imagePath ?? null);
           setUploaderKey((k) => k + 1);
           router.refresh();
           onSuccess?.();
         }
       } catch (err: any) {
-        alert(err?.message || "Error agregando el destacado");
+        alert(err?.message || "Error agregando el producto");
         console.error(err);
       }
     });
@@ -169,8 +192,8 @@ export default function EditProducts({
                     unoptimized
                   />
                 ) : (
-                  <div className="w-24 h-24 border-xl border-gray-300 rounded flex items-center justify-center text-sm">
-                    Sin foto
+                  <div className="w-24 h-24 border border-gray-300 rounded-xl flex items-center justify-center text-sm">
+                    Sin imagen
                   </div>
                 )}
                 <div className="flex flex-col gap-2">
@@ -194,6 +217,24 @@ export default function EditProducts({
               </div>
             </div>
           </div>
+
+          <label className="text-sm pb-2 font-semibold">Categoría</label>
+          <select
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+            disabled={pending || uploading}
+            className="form-select text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 mb-4"
+          >
+            <option value="" disabled>
+              Selecciona una categoría
+            </option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+
           <label className="text-sm pb-2 font-semibold">Nuevo Nombre</label>
           <input
             // name={productName}
@@ -233,7 +274,7 @@ export default function EditProducts({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="form-textarea text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 h-24"
-            placeholder="Introduce la descripción del destacado"
+            placeholder="Introduce la descripción del producto"
             disabled={pending || uploading}
           />
         </div>

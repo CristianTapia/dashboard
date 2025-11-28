@@ -6,6 +6,7 @@ export const CreateHighlightSchema = z.object({
 });
 
 export type CreateHighlightInput = z.infer<typeof CreateHighlightSchema>;
-export const UpdateHighlightSchema = CreateHighlightSchema.partial();
+export const UpdateHighlightSchema = CreateHighlightSchema.partial().extend({
+  image_path: z.string().min(1).nullable().optional(),
+});
 export type UpdateHighlightInput = z.infer<typeof UpdateHighlightSchema>;
-

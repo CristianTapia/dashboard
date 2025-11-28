@@ -8,7 +8,7 @@ export async function listProducts({ limit = 20, offset = 0 }: { limit?: number;
   const db = createSupabaseAdmin();
   const { data, error } = await db
     .from("products")
-    .select("id,name,price,stock,image_path,created_at,category:categories(id,name)")
+    .select("id,name,price,stock,description,image_path,created_at,category:categories(id,name)")
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
   if (error) throw new Error(error.message);
