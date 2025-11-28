@@ -1,6 +1,5 @@
 "use client";
 
-import clsx from "clsx";
 import { useState, useTransition } from "react";
 import Modal from "./Modals/Modal";
 import EditProducts from "@/app/ui/EditProducts";
@@ -42,23 +41,17 @@ export default function Products({ products, categories }: { products: Product[]
     modalName: "addProduct" | "confirmDelete" | "editProduct" | "useFilter",
     product?: Product | null
   ) {
-    setActiveModal(modalName);
     if (product) {
-      setSelectedProductId(product.id);
-      setSelectedProductName(product.name);
-      setSelectedProductPrice(product.price);
-      setSelectedProductStock(product.stock ?? 0);
+      setSelectedProductId(product.id ?? null);
+      setSelectedProductName(product.name ?? null);
+      setSelectedProductPrice(product.price ?? null);
+      setSelectedProductStock(product.stock ?? null);
       setSelectedProductDescription(product.description ?? null);
       setSelectedProductImageUrl(product.image_url ?? null);
       setSelectedProductImagePath(product.image_path ?? null);
       setSelectedProductCategoryId(product.category?.id ?? null);
-    } else {
-      setSelectedProductId(null);
-      setSelectedProductDescription(null);
-      setSelectedProductImageUrl(null);
-      setSelectedProductImagePath(null);
-      setSelectedProductCategoryId(null);
     }
+    setActiveModal(modalName);
   }
 
   const onSuccess = () => {

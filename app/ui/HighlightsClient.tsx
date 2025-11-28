@@ -12,25 +12,12 @@ import { deleteHighlightAction } from "@/app/dashboard/destacados/actions";
 
 export default function AllHighlights({ highlights }: { highlights: Highlight[] }) {
   const [activeModal, setActiveModal] = useState<null | "addHighlight" | "editHighlight" | "confirmDelete">(null);
-  const [selectedHighlightId, setSelectedHighlightId] = useState<number | null>(null);
-  const [selectedHighlightDescription, setSelectedHighlightDescription] = useState<string | null>(null);
-  const [selectedHighlightImageUrl, setSelectedHighlightImageUrl] = useState<string | null>(null);
-  const [selectedHighlightImagePath, setSelectedHighlightImagePath] = useState<string | null>(null);
+  const [selectedHighlight, setSelectedHighlight] = useState<Highlight | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   function openModal(modalName: "addHighlight" | "editHighlight" | "confirmDelete", highlight?: Highlight | null) {
-    if (highlight) {
-      setSelectedHighlightId(highlight.id);
-      setSelectedHighlightDescription(highlight.description);
-      setSelectedHighlightImageUrl(highlight.image_url ?? null);
-      setSelectedHighlightImagePath(highlight.image_path ?? null);
-    } else {
-      setSelectedHighlightId(null);
-      setSelectedHighlightDescription(null);
-      setSelectedHighlightImageUrl(null);
-      setSelectedHighlightImagePath(null);
-    }
+    setSelectedHighlight(highlight ?? null);
     setActiveModal(modalName);
   }
 
@@ -122,6 +109,7 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
       />
 
       {/* Modal de edición de destacado */}
+
       <Modal
         isOpen={activeModal === "editHighlight"}
         icon={<Pencil color="#137fec" />}
@@ -129,13 +117,7 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
         onCloseAction={() => setActiveModal(null)}
         title={"Editar Destacado"}
         fixedBody={
-          <EditHighlights
-            highlightId={selectedHighlightId!}
-            highlightDescription={selectedHighlightDescription!}
-            highlightImageUrl={selectedHighlightImageUrl}
-            highlightImagePath={selectedHighlightImagePath}
-            onSuccess={() => setActiveModal(null)}
-          />
+          selectedHighlight && <EditHighlights highlight={selectedHighlight} onSuccess={() => setActiveModal(null)} />
         }
       />
 
@@ -162,7 +144,7 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
         buttonBName={isPending ? "Eliminando..." : "Eliminar"}
         buttonBOptionalClassName="bg-[var(--color-delete)] text-white"
         onButtonBClickAction={() => {
-          if (selectedHighlightId != null) onDelete(selectedHighlightId);
+          if (selectedHighlight?.id != null) onDelete(selectedHighlight.id);
         }}
       />
     </div>

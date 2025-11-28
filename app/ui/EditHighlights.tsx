@@ -5,25 +5,20 @@ import { useRouter } from "next/navigation";
 import ImageUpload from "@/app/ui/ImageUpload";
 import { updateHighlightAction } from "@/app/dashboard/destacados/actions";
 import Image from "next/image";
+import type { Highlight } from "@/app/lib/validators/types";
 
 export default function EditHighlights({
-  highlightId,
-  highlightDescription,
-  highlightImageUrl,
-  highlightImagePath,
+  highlight,
   onCancel,
   onSuccess,
 }: {
-  highlightId: number;
-  highlightDescription: string;
-  highlightImageUrl: string | null;
-  highlightImagePath: string | null;
+  highlight: Highlight;
   onCancel?: () => void;
   onSuccess?: () => void;
 }) {
-  const [description, setDescription] = useState(highlightDescription ?? "");
-  const [imagePath, setImagePath] = useState<string | null>(highlightImagePath ?? null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(highlightImageUrl ?? null);
+  const [description, setDescription] = useState(highlight.description ?? "");
+  const [imagePath, setImagePath] = useState<string | null>(highlight.image_path ?? null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(highlight.image_url ?? null);
   const [uploading, setUploading] = useState(false);
   const [uploaderKey, setUploaderKey] = useState(0);
   const [pending, startTransition] = useTransition();
@@ -31,16 +26,10 @@ export default function EditHighlights({
   const router = useRouter();
 
   useEffect(() => {
-    setDescription(highlightDescription ?? "");
-  }, [highlightDescription]);
-
-  useEffect(() => {
-    setImagePath(highlightImagePath ?? null);
-  }, [highlightImagePath]);
-
-  useEffect(() => {
-    setPreviewUrl(highlightImageUrl ?? null);
-  }, [highlightImageUrl]);
+    setDescription(highlight.description ?? "");
+    setImagePath(highlight.image_path ?? null);
+    setPreviewUrl(highlight.image_url ?? null);
+  }, [highlight]);
 
   const updatePreviewFromPath = async (path: string | null) => {
     if (!path) {
@@ -84,17 +73,17 @@ export default function EditHighlights({
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     // const desc = description.trim();
-    const finalDescription = description.trim() || highlightDescription;
+    const finalDescription = description.trim() || highlight.description;
     if (uploading) return alert("Espera a que termine la subida de la imagen");
     // imagePath ya es opcional; si no se cambió, no se manda
 
     startTransition(async () => {
       try {
         const payload: { description?: string; image_path?: string | null } = {};
-        if (finalDescription !== highlightDescription) {
+        if (finalDescription !== highlight.description) {
           payload.description = finalDescription;
         }
-        if (imagePath !== highlightImagePath) {
+        if (imagePath !== highlight.image_path) {
           payload.image_path = imagePath;
         }
         if (!payload.description && payload.image_path === undefined) {
@@ -102,7 +91,7 @@ export default function EditHighlights({
           return;
         }
 
-        const res = await updateHighlightAction(highlightId, payload);
+        const res = await updateHighlightAction(highlight.id, payload);
         if (res?.ok) {
           alert("Destacado editado");
           setDescription(finalDescription);
@@ -130,7 +119,7 @@ export default function EditHighlights({
                 {previewUrl ? (
                   <Image
                     src={previewUrl}
-                    alt={highlightId.toString()}
+                    alt={highlight.id.toString()}
                     width={400}
                     height={400}
                     className="relative h-24 w-24 flex-shrink-0 rounded-xl border object-cover"
@@ -166,7 +155,7 @@ export default function EditHighlights({
           <label className="text-sm pb-2 font-semibold">Descripción Actual</label>
           <div className="flex w-full items-center rounded-lg border border-gray-300 dark:border-gray-600 bg-[var(--color-cancel)] dark:bg-gray-700/50 p-3 mb-4">
             <p className="text-sm font-normal leading-normal text-gray-500 dark:text-gray-400">
-              {highlightDescription}
+              {highlight.description}
             </p>
           </div>
           <label className="text-sm pb-2 font-semibold">Nueva Descripción</label>
