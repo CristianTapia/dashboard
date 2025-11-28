@@ -32,6 +32,6 @@ export async function updateHighlightAction(id: number, payload: { description?:
   }
   const updated = await updateHighlight(id, cleanedPayload);
   revalidateTag("Highlights");
-  revalidatePath("/dashboard/destacados");
+  // revalidatePath("/dashboard/destacados");
   return { ok: true, updated };
 }

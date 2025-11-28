@@ -49,6 +49,6 @@ export async function updateProductAction(
   }
   const updated = await updateProduct(id, cleanedPayload);
   revalidateTag("Products");
-  revalidatePath("/dashboard/destacados/todos");
+  // revalidatePath("/dashboard/productos/todos");
   return { ok: true, updated };
 }
