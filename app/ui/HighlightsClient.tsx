@@ -109,7 +109,6 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
       />
 
       {/* Modal de edición de destacado */}
-
       <Modal
         isOpen={activeModal === "editHighlight"}
         icon={<Pencil color="#137fec" />}

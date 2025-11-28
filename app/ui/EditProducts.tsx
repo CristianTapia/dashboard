@@ -5,40 +5,26 @@ import { useRouter } from "next/navigation";
 import ImageUpload from "@/app/ui/ImageUpload";
 import { updateProductAction } from "@/app/dashboard/productos/actions";
 import Image from "next/image";
-import type { Category } from "@/app/lib/validators/types";
+import type { Category, Product } from "@/app/lib/validators/types";
 
 export default function EditProducts({
-  productId,
-  productName,
-  productPrice,
-  productStock,
-  productDescription,
-  productImageUrl,
-  productImagePath,
-  productCategoryId,
+  product,
   categories,
   onCancel,
   onSuccess,
 }: {
-  productId: number;
-  productName: string;
-  productPrice: number;
-  productStock: number;
-  productDescription: string;
-  productImageUrl: string | null;
-  productImagePath: string | null;
-  productCategoryId: number | null;
+  product: Product;
   categories: Category[];
   onCancel?: () => void;
   onSuccess?: () => void;
 }) {
-  const [name, setName] = useState(productName);
-  const [price, setPrice] = useState(productPrice.toString());
-  const [stock, setStock] = useState(productStock.toString());
-  const [description, setDescription] = useState(productDescription ?? "");
-  const [imagePath, setImagePath] = useState<string | null>(productImagePath ?? null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(productImageUrl ?? null);
-  const [categoryId, setCategoryId] = useState<string>(productCategoryId?.toString() ?? "");
+  const [name, setName] = useState(product.name);
+  const [price, setPrice] = useState(product.price.toString());
+  const [stock, setStock] = useState((product.stock ?? 0).toString());
+  const [description, setDescription] = useState(product.description ?? "");
+  const [imagePath, setImagePath] = useState<string | null>(product.image_path ?? null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(product.image_url ?? null);
+  const [categoryId, setCategoryId] = useState<string>(product.category?.id ? String(product.category.id) : "");
   const [uploading, setUploading] = useState(false);
   const [uploaderKey, setUploaderKey] = useState(0);
   const [pending, startTransition] = useTransition();
@@ -46,23 +32,14 @@ export default function EditProducts({
   const router = useRouter();
 
   useEffect(() => {
-    setName(productName);
-    setPrice(productPrice.toString());
-    setStock(productStock.toString());
-    setDescription(productDescription ?? "");
-  }, [productName, productPrice, productStock, productDescription]);
-
-  useEffect(() => {
-    setImagePath(productImagePath ?? null);
-  }, [productImagePath]);
-
-  useEffect(() => {
-    setPreviewUrl(productImageUrl ?? null);
-  }, [productImageUrl]);
-
-  useEffect(() => {
-    setCategoryId(productCategoryId?.toString() ?? "");
-  }, [productCategoryId]);
+    setName(product.name);
+    setPrice(product.price.toString());
+    setStock((product.stock ?? 0).toString());
+    setDescription(product.description ?? "");
+    setImagePath(product.image_path ?? null);
+    setPreviewUrl(product.image_url ?? null);
+    setCategoryId(product.category?.id ? String(product.category.id) : "");
+  }, [product]);
 
   const updatePreviewFromPath = async (path: string | null) => {
     if (!path) {
@@ -105,10 +82,12 @@ export default function EditProducts({
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const nextName = name.trim() || productName;
-    const nextPrice = Number(price) || productPrice;
-    const nextStock = Number(stock) || productStock;
-    const finalDescription = description.trim() || productDescription;
+    const nextName = name.trim() || product.name;
+    const parsedPrice = Number(price);
+    const nextPrice = Number.isFinite(parsedPrice) ? parsedPrice : product.price;
+    const parsedStock = Number(stock);
+    const nextStock = Number.isFinite(parsedStock) ? parsedStock : product.stock ?? 0;
+    const finalDescription = description.trim() || product.description || "";
     if (!categoryId) {
       alert("Selecciona una categoría");
       return;
@@ -130,22 +109,24 @@ export default function EditProducts({
           image_path?: string | null;
           category_id?: number;
         } = {};
-        if (nextName !== productName) {
+        if (nextName !== product.name) {
           payload.name = nextName;
         }
-        if (nextPrice !== productPrice) {
+        if (nextPrice !== product.price) {
           payload.price = nextPrice;
         }
-        if (nextStock !== productStock) {
+        if (nextStock !== product.stock) {
           payload.stock = nextStock;
         }
-        if (finalDescription !== productDescription) {
+        const originalDescription = product.description ?? "";
+        if (finalDescription !== originalDescription) {
           payload.description = finalDescription;
         }
-        if (imagePath !== productImagePath) {
+        if (imagePath !== product.image_path) {
           payload.image_path = imagePath;
         }
-        if (nextCategoryId !== productCategoryId) {
+        const currentCategoryId = product.category?.id ?? null;
+        if (nextCategoryId !== currentCategoryId) {
           payload.category_id = nextCategoryId;
         }
         if (Object.keys(payload).length === 0) {
@@ -153,7 +134,7 @@ export default function EditProducts({
           return;
         }
 
-        const res = await updateProductAction(productId, payload);
+        const res = await updateProductAction(product.id, payload);
         if (res?.ok) {
           alert("Producto editado");
           setName(nextName);
@@ -185,7 +166,7 @@ export default function EditProducts({
                 {previewUrl ? (
                   <Image
                     src={previewUrl}
-                    alt={productId.toString()}
+                    alt={product.id.toString()}
                     width={400}
                     height={400}
                     className="relative h-24 w-24 flex-shrink-0 rounded-xl border object-cover"
@@ -237,7 +218,7 @@ export default function EditProducts({
 
           <label className="text-sm pb-2 font-semibold">Nuevo Nombre</label>
           <input
-            // name={productName}
+            // name={product.name}
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="form-input text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 mb-4"
@@ -270,7 +251,7 @@ export default function EditProducts({
           />
           <label className="text-sm pb-2 font-semibold">Nueva Descripción</label>
           <textarea
-            name={productDescription}
+            name="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="form-textarea text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 h-24"

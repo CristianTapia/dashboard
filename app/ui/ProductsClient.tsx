@@ -16,14 +16,7 @@ export default function Products({ products, categories }: { products: Product[]
   const [activeModal, setActiveModal] = useState<null | "addProduct" | "confirmDelete" | "editProduct" | "useFilter">(
     null
   );
-  const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
-  const [selectedProductName, setSelectedProductName] = useState<string | null>(null);
-  const [selectedProductPrice, setSelectedProductPrice] = useState<number | null>(null);
-  const [selectedProductStock, setSelectedProductStock] = useState<number | null>(null);
-  const [selectedProductDescription, setSelectedProductDescription] = useState<string | null>(null);
-  const [selectedProductImageUrl, setSelectedProductImageUrl] = useState<string | null>(null);
-  const [selectedProductImagePath, setSelectedProductImagePath] = useState<string | null>(null);
-  const [selectedProductCategoryId, setSelectedProductCategoryId] = useState<number | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -41,16 +34,7 @@ export default function Products({ products, categories }: { products: Product[]
     modalName: "addProduct" | "confirmDelete" | "editProduct" | "useFilter",
     product?: Product | null
   ) {
-    if (product) {
-      setSelectedProductId(product.id ?? null);
-      setSelectedProductName(product.name ?? null);
-      setSelectedProductPrice(product.price ?? null);
-      setSelectedProductStock(product.stock ?? null);
-      setSelectedProductDescription(product.description ?? null);
-      setSelectedProductImageUrl(product.image_url ?? null);
-      setSelectedProductImagePath(product.image_path ?? null);
-      setSelectedProductCategoryId(product.category?.id ?? null);
-    }
+    setSelectedProduct(product ?? null);
     setActiveModal(modalName);
   }
 
@@ -160,18 +144,9 @@ export default function Products({ products, categories }: { products: Product[]
         onCloseAction={() => setActiveModal(null)}
         title={"Editar Producto"}
         fixedBody={
-          <EditProducts
-            productId={selectedProductId!}
-            productName={selectedProductName!}
-            productPrice={selectedProductPrice!}
-            productStock={selectedProductStock!}
-            productDescription={selectedProductDescription!}
-            productImageUrl={selectedProductImageUrl}
-            productImagePath={selectedProductImagePath}
-            productCategoryId={selectedProductCategoryId}
-            categories={categories}
-            onSuccess={() => setActiveModal(null)}
-          />
+          selectedProduct && (
+            <EditProducts product={selectedProduct} categories={categories} onSuccess={() => setActiveModal(null)} />
+          )
         }
       />
 
@@ -198,7 +173,7 @@ export default function Products({ products, categories }: { products: Product[]
         buttonBName={isPending ? "Eliminando..." : "Eliminar"}
         buttonBOptionalClassName="bg-[var(--color-delete)] text-white"
         onButtonBClickAction={() => {
-          if (selectedProductId != null) onDelete(selectedProductId);
+          if (selectedProduct?.id != null) onDelete(selectedProduct.id);
         }}
       />
     </div>
