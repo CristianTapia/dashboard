@@ -6,7 +6,15 @@ import { Upload } from "lucide-react";
 import { createProductAction } from "@/app/dashboard/productos/actions";
 import { Category } from "@/app/lib/validators/types";
 
-export default function AddProducts({ categories }: { categories: Category[] }) {
+export default function AddProducts({
+  onCancel,
+  onSuccess,
+  categories,
+}: {
+  onCancel?: () => void;
+  onSuccess?: () => void;
+  categories: Category[];
+}) {
   // Form states
   const [name, setName] = useState("");
   const [price, setPrice] = useState<number | "">("");
@@ -54,6 +62,7 @@ export default function AddProducts({ categories }: { categories: Category[] }) 
           setDescription("");
           setImagePath(null);
           setUploaderKey((k) => k + 1);
+          onSuccess?.();
         }
       } catch (err: any) {
         alert(err?.message || "Error agregando el producto");
@@ -200,15 +209,21 @@ export default function AddProducts({ categories }: { categories: Category[] }) 
         />
 
         {/* Botón */}
-        <div className="flex justify-end">
+        <div className="flex gap-4 px-4 text-sm font-bold justify-center">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-cancel)] text-black hover:bg-[var(--color-cancel-hover)]"
+          >
+            Cancelar
+          </button>
           <button
             type="submit"
             disabled={saving || uploading}
-            className="p-3 bg-[var(--color-button-send)] text-white rounded-xl ml-2 cursor-pointer
-                       disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
+            className="flex px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-button-send)] text-white
+                       disabled:opacity-60 items-center justify-center transition font-bold hover:bg-[var(--color-button-send-hover)]"
           >
-            <Upload />
-            {saving ? "Creando..." : uploading ? "Subiendo imagen..." : "Agregar"}
+            {saving ? "Creando..." : uploading ? "Subiendo imagen..." : "Añadir"}
           </button>
         </div>
       </form>

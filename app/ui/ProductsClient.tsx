@@ -3,10 +3,11 @@
 import { useState, useTransition } from "react";
 import Modal from "./Modals/Modal";
 import EditProducts from "@/app/ui/EditProducts";
+import AddProducts from "@/app/ui/AddProducts";
 import Image from "next/image";
 import { Product, Category } from "../lib/validators/types";
 import { useRouter } from "next/navigation";
-import { CirclePlus, Trash, Pencil, Search, TriangleAlert } from "lucide-react";
+import { CirclePlus, Trash, Pencil, Search, TriangleAlert, Upload } from "lucide-react";
 import { deleteProductAction } from "@/app/dashboard/productos/actions";
 
 export default function Products({ products, categories }: { products: Product[]; categories: Category[] }) {
@@ -135,6 +136,25 @@ export default function Products({ products, categories }: { products: Product[]
           </div>
         ))}
       </div>
+
+      {/* Modal para añadir producto */}
+      <Modal
+        isOpen={activeModal === "addProduct"}
+        icon={<Upload color="#137fec" />}
+        iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
+        onCloseAction={() => setActiveModal(null)}
+        title="Añadir Producto"
+        fixedBody={
+          <AddProducts
+            categories={categories}
+            onCancel={() => setActiveModal(null)}
+            onSuccess={() => {
+              setActiveModal(null);
+              router.refresh();
+            }}
+          />
+        }
+      />
 
       {/* Modal de edición de producto */}
       <Modal
