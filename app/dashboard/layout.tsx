@@ -29,14 +29,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               href="/dashboard/destacados"
             />
 
-            <CollapsibleNavButton
+            <DashboardNavButton
               icon={<UtensilsCrossed size={iconSize} />}
-              label="Productos"
-              baseHref="/dashboard/productos"
-              items={[
-                { href: "/dashboard/productos/nuevo", label: "Añadir nuevo producto" },
-                { href: "/dashboard/productos/todos", label: "Ver todos los productos" },
-              ]}
+              name="Productos"
+              href="/dashboard/productos"
             />
 
             <DashboardNavButton icon={<Shapes size={iconSize} />} name="Categorías" href="/dashboard/categorias" />
