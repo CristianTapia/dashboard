@@ -72,14 +72,7 @@ export default function AddProducts({
   }
 
   return (
-    <div className="mx-auto max-w-3xl pt-4 flex flex-col">
-      <div className="flex flex-col items-start gap-2">
-        <h1 className="text-3xl font-bold">Añadir Productos</h1>
-        <p className="text-md text-[var(--color-txt-secondary)]">
-          Agrega nuevos productos. Se visualizarán inmediatamente en el menú.
-        </p>
-      </div>
-
+    <div className="mx-auto max-w-3xl flex flex-col text-sm">
       <form onSubmit={onSubmit} className="flex flex-col gap-6 mt-6">
         {/* Nombre */}
         <div className="flex flex-col">
@@ -100,7 +93,7 @@ export default function AddProducts({
         {/* Precio + Stock */}
         <div className="flex flex-row flex-wrap gap-6">
           <div className="flex flex-col flex-1 basis-0 min-w-[300px]">
-            <label className="text-sm pb-2 font-semibold">Precio *</label>
+            <label className="pb-2 font-semibold">Precio *</label>
             <input
               type="number"
               name="price"
