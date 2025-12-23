@@ -21,7 +21,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
         <nav>
           <ul className="gap-2 flex flex-col p-4">
-            <DashboardNavButton icon={<ChartNoAxesColumn size={iconSize} />} name="Resumen" href="/dashboard" />
+            <DashboardNavButton icon={<ChartNoAxesColumn size={iconSize} />} name="Resumen" href="/dashboard/resumen" />
 
             <DashboardNavButton
               icon={<BadgeDollarSign size={iconSize} />}
