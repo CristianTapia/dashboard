@@ -1,32 +1,58 @@
-// (SERVER)
 import "server-only";
-import { createSupabaseAdmin } from "@/app/lib/supabase"; // tu factory
+import { createServer } from "@/app/lib/supabase/server";
+import { getCurrentTenantId } from "@/app/lib/data/tentant";
 import { CreateCategoryInput, UpdateCategoryInput } from "../validators";
 
 export async function listCategories() {
-  const db = createSupabaseAdmin();
-  const { data, error } = await db.from("categories").select("id,name").order("name", { ascending: false });
+  const supabase = await createServer();
+  const tenantId = await getCurrentTenantId();
+
+  const { data, error } = await supabase
+    .from("categories")
+    .select("id,name")
+    .eq("tenant_id", tenantId)
+    .order("name", { ascending: false });
+
   if (error) throw new Error(error.message);
   return data ?? [];
 }
 
 export async function createCategory(input: CreateCategoryInput) {
-  const db = createSupabaseAdmin();
-  const { data, error } = await db.from("categories").insert(input).select().single();
+  const supabase = await createServer();
+  const tenantId = await getCurrentTenantId();
+
+  const { data, error } = await supabase
+    .from("categories")
+    .insert({ ...input, tenant_id: tenantId })
+    .select()
+    .single();
+
   if (error) throw new Error(error.message);
   return data;
 }
 
 export async function updateCategory(id: number, input: UpdateCategoryInput) {
-  const db = createSupabaseAdmin();
-  const { data, error } = await db.from("categories").update(input).eq("id", id).select().single();
+  const supabase = await createServer();
+  const tenantId = await getCurrentTenantId();
+
+  const { data, error } = await supabase
+    .from("categories")
+    .update(input)
+    .eq("id", id)
+    .eq("tenant_id", tenantId)
+    .select()
+    .single();
+
   if (error) throw new Error(error.message);
   return data;
 }
 
 export async function deleteCategory(id: number) {
-  const db = createSupabaseAdmin();
-  const { error } = await db.from("categories").delete().eq("id", id);
+  const supabase = await createServer();
+  const tenantId = await getCurrentTenantId();
+
+  const { error } = await supabase.from("categories").delete().eq("id", id).eq("tenant_id", tenantId);
+
   if (error) throw new Error(error.message);
   return { ok: true };
 }
