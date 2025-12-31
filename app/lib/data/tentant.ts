@@ -1,44 +1,59 @@
 import "server-only";
-import { cookies } from "next/headers";
 import { createServer } from "@/app/lib/supabase/server";
+import { getCurrentTenantId } from "@/app/lib/tenant";
+import { CreateCategoryInput, UpdateCategoryInput } from "../validators";
 
-/**
- * Obtiene el tenant activo desde cookie `tenantId` y valida que el usuario
- * pertenece a él. Si no hay cookie, toma el primer tenant del usuario.
- */
-export async function getCurrentTenantId() {
-  const cookieStore = await cookies();
-  const tenantIdFromCookie = cookieStore.get("tenantId")?.value;
-
+export async function listCategories() {
   const supabase = await createServer();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-  if (userError || !user) throw new Error("Sesión no válida");
+  const tenantId = await getCurrentTenantId();
 
-  if (tenantIdFromCookie) {
-    const { data: membership, error } = await supabase
-      .from("tenant_members")
-      .select("tenant_id")
-      .eq("user_id", user.id)
-      .eq("tenant_id", tenantIdFromCookie)
-      .maybeSingle();
+  const { data, error } = await supabase
+    .from("categories")
+    .select("id,name")
+    .eq("tenant_id", tenantId)
+    .order("name", { ascending: false });
 
-    if (error) throw new Error(error.message);
-    if (!membership) throw new Error("No tienes acceso a este tenant");
-    return tenantIdFromCookie;
-  }
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
 
-  // Fallback: primer tenant del usuario
-  const { data: membership, error } = await supabase
-    .from("tenant_members")
-    .select("tenant_id")
-    .eq("user_id", user.id)
-    .limit(1)
+export async function createCategory(input: CreateCategoryInput) {
+  const supabase = await createServer();
+  const tenantId = await getCurrentTenantId();
+
+  const { data, error } = await supabase
+    .from("categories")
+    .insert({ ...input, tenant_id: tenantId })
+    .select()
     .single();
 
   if (error) throw new Error(error.message);
-  if (!membership) throw new Error("El usuario no tiene tenants asignados");
-  return membership.tenant_id;
+  return data;
 }
+
+export async function updateCategory(id: number, input: UpdateCategoryInput) {
+  const supabase = await createServer();
+  const tenantId = await getCurrentTenantId();
+
+  const { data, error } = await supabase
+    .from("categories")
+    .update(input)
+    .eq("id", id)
+    .eq("tenant_id", tenantId)
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function deleteCategory(id: number) {
+  const supabase = await createServer();
+  const tenantId = await getCurrentTenantId();
+
+  const { error } = await supabase.from("categories").delete().eq("id", id).eq("tenant_id", tenantId);
+
+  if (error) throw new Error(error.message);
+  return { ok: true };
+}
+export { getCurrentTenantId };
