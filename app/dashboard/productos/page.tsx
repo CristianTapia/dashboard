@@ -3,7 +3,8 @@ import ProductsClient from "@/app/ui/ProductsClient";
 import { listProductsWithSigned } from "@/app/lib/data/products";
 import { listCategories } from "@/app/lib/data/categories";
 
-export const revalidate = 60;
+// Necesitamos cookies/sesión por tenant => deshabilita caché estática
+export const dynamic = "force-dynamic";
 
 export default async function AllProductsPage() {
   const [products, categories] = await Promise.all([

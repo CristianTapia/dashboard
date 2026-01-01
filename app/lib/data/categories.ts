@@ -1,6 +1,6 @@
 import "server-only";
 import { createServer } from "@/app/lib/supabase/server";
-import { getCurrentTenantId } from "@/app/lib/data/tentant";
+import { getCurrentTenantId } from "@/app/lib/tenant";
 import { CreateCategoryInput, UpdateCategoryInput } from "../validators";
 
 export async function listCategories() {
