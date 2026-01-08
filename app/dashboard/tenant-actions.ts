@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { cookies } from "next/headers";
 import { createServer } from "@/app/lib/supabase/server";
@@ -15,7 +15,7 @@ export async function setActiveTenantAction(tenantId: string) {
     data: { user },
     error: userError,
   } = await supabase.auth.getUser();
-  if (userError || !user) throw new Error("Sesión no válida");
+  if (userError || !user) throw new Error("Sesion no valida");
 
   const { data: membership, error } = await supabase
     .from("tenant_members")

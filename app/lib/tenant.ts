@@ -1,4 +1,4 @@
-import "server-only";
+﻿import "server-only";
 import { cookies } from "next/headers";
 import { createServer } from "@/app/lib/supabase/server";
 
@@ -15,7 +15,7 @@ export async function getCurrentTenantId() {
     data: { user },
     error: userError,
   } = await supabase.auth.getUser();
-  if (userError || !user) throw new Error("Sesión no válida");
+  if (userError || !user) throw new Error("Sesion no valida");
 
   if (tenantIdFromCookie) {
     const { data: membership, error } = await supabase
@@ -26,8 +26,7 @@ export async function getCurrentTenantId() {
       .maybeSingle();
 
     if (error) throw new Error(error.message);
-    if (!membership) throw new Error("No tienes acceso a este tenant");
-    return tenantIdFromCookie;
+    if (membership) return tenantIdFromCookie;
   }
 
   // Fallback: primer tenant del usuario
