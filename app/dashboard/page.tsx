@@ -28,6 +28,7 @@ export default function LoginPage() {
   }
 
   return (
+    // Login and Registration Form
     <div style={{ padding: 20 }}>
       <input placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)} />
       <br />
