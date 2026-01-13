@@ -42,33 +42,36 @@ export default function Modal({
       {isOpen && (
         // Cierra el modal al hacer clic fuera
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 transition-opacity"
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 transition-opacity"
           onClick={onCloseAction}
         >
           {/* Evita que el click dentro del modal lo cierre */}
-          <div className="bg-white p-6 rounded-lg w-auto mx-auto max-w-3xl" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="bg-white p-6 rounded-lg w-full mx-4 my-6 max-w-3xl max-h-[90vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal header */}
-            <div className="flex justify-end mb-2">
+            <div className="flex justify-end mb-2 shrink-0">
               <button className=" text-gray-900 cursor-pointer" onClick={onCloseAction}>
                 <X size={24} />
               </button>
             </div>
 
-            <div className="flex justify-center">
+            <div className="flex justify-center shrink-0">
               <div className={`${iconBgOptionalClassName} rounded-full p-3`}>{icon}</div>
             </div>
-            <div className="flex p-4 justify-center items-center gap-4 border-b border-[var(--color-border-box)]">
+            <div className="flex p-4 justify-center items-center gap-4 border-b border-[var(--color-border-box)] shrink-0">
               <h1 className="text-md font-bold">{title}</h1>
             </div>
             {/* Modal body scrolleable*/}
-            {body ? <div className="p-4 max-h-[70vh] overflow-y-auto">{body}</div> : null}
+            {body ? <div className="p-4 flex-1 min-h-0 overflow-y-auto">{body}</div> : null}
 
             {/* Model Body fijo */}
-            {fixedBody ? <div className="px-4">{fixedBody}</div> : null}
+            {fixedBody ? <div className="px-4 shrink-0">{fixedBody}</div> : null}
 
             {/* Modal footer buttons*/}
             {buttonAName || buttonBName ? (
-              <div className="flex gap-4 px-4 text-sm font-bold justify-center">
+              <div className="flex gap-4 px-4 text-sm font-bold justify-center shrink-0">
                 {buttonAName ? (
                   <button
                     onClick={onButtonAClickAction}

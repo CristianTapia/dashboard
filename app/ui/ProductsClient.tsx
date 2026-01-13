@@ -144,7 +144,7 @@ export default function Products({ products, categories }: { products: Product[]
         iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
         onCloseAction={() => setActiveModal(null)}
         title="Añadir Producto"
-        fixedBody={
+        body={
           <AddProducts
             categories={categories}
             onCancel={() => setActiveModal(null)}
@@ -163,7 +163,7 @@ export default function Products({ products, categories }: { products: Product[]
         iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
         onCloseAction={() => setActiveModal(null)}
         title={"Editar Producto"}
-        fixedBody={
+        body={
           selectedProduct && (
             <EditProducts product={selectedProduct} categories={categories} onSuccess={() => setActiveModal(null)} />
           )
@@ -177,7 +177,7 @@ export default function Products({ products, categories }: { products: Product[]
         icon={<TriangleAlert color="#DC2626" />}
         iconBgOptionalClassName="bg-[#fee2e2]"
         title={"Eliminar producto"}
-        fixedBody={
+        body={
           <div className="text-[var(--color-txt-secondary)] py-6 text-center text-sm flex flex-col gap-4 align-middle items-center">
             <p>
               ¿Estás seguro/a de que quieres eliminar este producto? <br />
@@ -199,3 +199,4 @@ export default function Products({ products, categories }: { products: Product[]
     </div>
   );
 }
+
