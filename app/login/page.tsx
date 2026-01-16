@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseClient } from "@/app/lib/supabase/client";
-import { Box } from "lucide-react";
+import { Box, Eye } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -35,57 +35,51 @@ export default function LoginPage() {
       <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
         <div className="layout-container flex h-full grow flex-col">
           {/* Header */}
-          <header className="flex items-center justify-between whitespace-nowrap border-b border-[var(--color-line-limit)] dark:border-slate-800 px-6 md:px-10 py-3 bg-white dark:bg-slate-900">
+          <header className="flex items-center justify-between whitespace-nowrap border-b border-[var(--color-line-limit)] dark:border-slate-800 px-6 md:px-10 py-3 bg-[var(--color-background)] dark:bg-slate-900">
             <div className="flex items-center gap-2 text-slate-900 dark:text-white">
               <Box size={30} color="#137fec" />
               <h2 className="dark:text-white text-lg font-bold">Panel de Administración</h2>
             </div>
             <div className="flex flex-1 justify-end gap-4">
               <button className="flex cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-[var(--color-button-send)] text-white text-sm font-bold hover:bg-[var(--color-button-send-hover)] transition-colors">
-                <span className="">Ayuda</span>
+                <span>Ayuda</span>
               </button>
             </div>
           </header>
-          {/* <!-- Main Content Area --> */}
-          <main className="flex-1 flex items-center justify-center p-4">
-            <div className="w-full max-w-[480px] bg-white dark:bg-slate-900 p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-              {/* <!-- Headline Section --> */}
+          {/* Main Content Area */}
+          <main className="flex-1 flex items-center justify-center p-4 bg-[var(--color-background)]">
+            <div className="w-full max-w-[480px] bg-[var(--color-foreground)] dark:bg-slate-900 p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+              {/* Headline */}
               <div className="text-center mb-8">
-                <h1 className="text-slate-900 dark:text-white tracking-tight text-[32px] font-bold leading-tight pb-2">
-                  Iniciar Sesión
-                </h1>
-                <p className="text-slate-500 dark:text-slate-400 text-base font-normal leading-normal">
-                  Ingresa tus credenciales para gestionar el contenido destacado
+                <h1 className="dark:text-white text-3xl font-bold pb-2">Iniciar Sesión</h1>
+                <p className="text-[var(--color-txt-secondary)] dark:text-slate-400">
+                  Ingresa tus credenciales para gestionar el contenido del menú
                 </p>
               </div>
-              {/* <!-- Login Form --> */}
-              <form className="space-y-6">
-                {/* <!-- Email Field --> */}
+              {/* Form */}
+              <form className="space-y-4">
+                {/* Email */}
                 <div className="flex flex-col gap-2">
-                  <label className="text-slate-900 dark:text-slate-200 text-base font-medium leading-normal">
-                    Correo Electrónico
-                  </label>
+                  <label className="dark:text-slate-200 font-semibold text-sm">Correo Electrónico</label>
                   <input
-                    className="form-input flex w-full min-w-0 flex-1 rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:border-primary h-14 placeholder:text-slate-400 p-[15px] text-base font-normal"
+                    className="form-input text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 mb-4"
                     placeholder="ejemplo@correo.com"
-                    // required=""
+                    required
                     type="email"
                   />
                 </div>
                 {/* <!-- Password Field --> */}
                 <div className="flex flex-col gap-2">
-                  <label className="text-slate-900 dark:text-slate-200 text-base font-medium leading-normal">
-                    Contraseña
-                  </label>
+                  <label className="dark:text-slate-200 font-semibold text-sm">Contraseña</label>
                   <div className="flex w-full items-stretch rounded-lg">
                     <input
-                      className="form-input flex w-full min-w-0 flex-1 rounded-lg rounded-r-none text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:border-primary h-14 placeholder:text-slate-400 p-[15px] border-r-0 pr-2 text-base font-normal"
+                      className="form-input text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 mb-4"
                       placeholder="••••••••"
-                      // required=""
+                      required
                       type="password"
                     />
-                    <div className="text-slate-400 flex border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 items-center justify-center pr-[15px] rounded-r-lg border-l-0 cursor-pointer hover:text-primary">
-                      <span className="material-symbols-outlined">visibility</span>
+                    <div className="cursor-pointer text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] p-3 mb-4 ">
+                      <Eye />
                     </div>
                   </div>
                 </div>
