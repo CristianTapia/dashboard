@@ -68,49 +68,53 @@ export default function LoginPage() {
                     type="email"
                   />
                 </div>
-                {/* <!-- Password Field --> */}
+                {/* Password */}
                 <div className="flex flex-col gap-2">
                   <label className="dark:text-slate-200 font-semibold text-sm">Contraseña</label>
+
                   <div className="flex w-full rounded-lg">
                     <input
-                      className="flex-1 form-input text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 mb-4"
+                      className="flex-1 form-input text-sm bg-[var(--color-foreground)] rounded-l-lg border border-r-0 border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 mb-4"
                       placeholder="••••••••"
                       required
                       type="password"
                     />
-                    <div className="cursor-pointer text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] p-3 mb-4 ">
-                      <Eye />
+                    <div className="cursor-pointer text-sm bg-[var(--color-foreground)] rounded-r-lg border border-l-0 border-[var(--color-border-box)] p-3 mb-4 ">
+                      <Eye color="#62748E" />
                     </div>
                   </div>
                 </div>
-                {/* <!-- Options Row --> */}
+                {/* Options */}
                 <div className="flex items-center justify-between py-2">
                   <label className="flex items-center gap-2 cursor-pointer group">
                     <input
-                      className="rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary bg-white dark:bg-slate-800 transition-all"
+                      className="cursor-pointer rounded border-[var(--color-border-box)] dark:border-slate-700 text-primary focus:ring-primarydark:bg-slate-800 transition-all"
                       type="checkbox"
                     />
-                    <span className="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
+                    <span className="text-sm text-[var(--color-txt-secondary)] dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
                       Recordarme
                     </span>
                   </label>
-                  <a className="text-sm font-medium text-primary hover:underline" href="#">
+                  <a
+                    className="text-sm text-[var(--color-button-send)] font-semibold text-primary hover:underline"
+                    href="#"
+                  >
                     ¿Olvidaste tu contraseña?
                   </a>
                 </div>
-                {/* <!-- Action Button --> */}
+                {/* Botón */}
                 <button
-                  className="w-full flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-5 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 shadow-md shadow-primary/20 active:scale-[0.98] transition-all"
+                  className="w-full bg-[var(--color-button-send)] flex cursor-pointer items-center justify-center rounded-lg h-14 text-white font-bold hover:bg-primary/90 shadow-md shadow-primary/20 active:scale-[0.98] transition-all"
                   type="submit"
                 >
                   <span className="truncate">Acceder al Dashboard</span>
                 </button>
               </form>
-              {/* <!-- Footer Text --> */}
+              {/* Footer */}
               <div className="mt-8 text-center pt-6 border-t border-slate-100 dark:border-slate-800">
                 <p className="text-sm text-slate-500 dark:text-slate-400">
                   ¿Necesitas una cuenta?{" "}
-                  <a className="text-primary font-semibold hover:underline" href="#">
+                  <a className="text-[var(--color-button-send)] font-semibold hover:underline" href="#">
                     Contacta a soporte
                   </a>
                 </p>
