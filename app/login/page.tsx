@@ -35,7 +35,7 @@ export default function LoginPage() {
       <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
         <div className="layout-container flex h-full grow flex-col">
           {/* Header */}
-          <header className="flex items-center justify-between whitespace-nowrap border-b border-[var(--color-line-limit)] dark:border-slate-800 px-6 md:px-10 py-3 bg-[var(--color-background)] dark:bg-slate-900">
+          <header className="flex items-center justify-between whitespace-nowrap border-b border-[var(--color-line-limit)] dark:border-slate-800 px-6 md:px-10 py-3 bg-[var(--color-foreground)] dark:bg-slate-900">
             <div className="flex items-center gap-2 text-slate-900 dark:text-white">
               <Box size={30} color="#137fec" />
               <h2 className="dark:text-white text-lg font-bold">Panel de Administración</h2>
@@ -48,7 +48,7 @@ export default function LoginPage() {
           </header>
           {/* Main Content Area */}
           <main className="flex-1 flex items-center justify-center p-4 bg-[var(--color-background)]">
-            <div className="w-full max-w-[480px] bg-[var(--color-foreground)] dark:bg-slate-900 p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+            <div className="w-full max-w-[480px] bg-[var(--color-foreground)] dark:bg-slate-900 p-8 rounded-xl shadow-sm border border-[var(--color-border-box)] dark:border-slate-800">
               {/* Headline */}
               <div className="text-center mb-8">
                 <h1 className="dark:text-white text-3xl font-bold pb-2">Iniciar Sesión</h1>
@@ -71,9 +71,9 @@ export default function LoginPage() {
                 {/* <!-- Password Field --> */}
                 <div className="flex flex-col gap-2">
                   <label className="dark:text-slate-200 font-semibold text-sm">Contraseña</label>
-                  <div className="flex w-full items-stretch rounded-lg">
+                  <div className="flex w-full rounded-lg">
                     <input
-                      className="form-input text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 mb-4"
+                      className="flex-1 form-input text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 mb-4"
                       placeholder="••••••••"
                       required
                       type="password"
