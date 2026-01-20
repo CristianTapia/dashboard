@@ -31,7 +31,7 @@ export default function LoginPage() {
   }
 
   return (
-    <body className="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display transition-colors duration-300">
+    <div className="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display transition-colors duration-300">
       <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
         <div className="layout-container flex h-full grow flex-col">
           {/* Header */}
@@ -151,6 +151,6 @@ export default function LoginPage() {
           <button onClick={handleRegister}>Register</button>
         </div>
       </div>
-    </body>
+    </div>
   );
 }
