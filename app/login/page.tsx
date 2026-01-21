@@ -57,7 +57,13 @@ export default function LoginPage() {
                 </p>
               </div>
               {/* Form */}
-              <form className="space-y-4">
+              <form
+                className="space-y-4"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  handleLogin();
+                }}
+              >
                 {/* Email */}
                 <div className="flex flex-col gap-2">
                   <label className="dark:text-slate-200 font-semibold text-sm">Correo Electrónico</label>
@@ -66,6 +72,8 @@ export default function LoginPage() {
                     placeholder="ejemplo@correo.com"
                     required
                     type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
                   />
                 </div>
                 {/* Password */}
@@ -78,6 +86,8 @@ export default function LoginPage() {
                       placeholder="••••••••"
                       required
                       type="password"
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
                     />
                     <div className="cursor-pointer text-sm bg-[var(--color-foreground)] rounded-r-lg border border-l-0 border-[var(--color-border-box)] p-3 mb-4 ">
                       <Eye color="#62748E" />
@@ -123,32 +133,6 @@ export default function LoginPage() {
           </main>
           {/* <!-- Bottom Background Decoration (Abstract) --> */}
           <div className="fixed bottom-0 left-0 w-full h-1 bg-gradient-to-r from-primary/10 via-primary to-primary/10"></div>
-        </div>
-      </div>
-      <div style={{ maxWidth: 360, margin: "80px auto", padding: 24 }}>
-        <h1 style={{ marginBottom: 16 }}>Iniciar sesion</h1>
-        <label style={{ display: "block", marginBottom: 8 }}>
-          Email
-          <input
-            style={{ display: "block", width: "100%", marginTop: 4, padding: 8 }}
-            placeholder="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </label>
-        <label style={{ display: "block", marginBottom: 16 }}>
-          Password
-          <input
-            style={{ display: "block", width: "100%", marginTop: 4, padding: 8 }}
-            placeholder="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </label>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={handleLogin}>Login</button>
-          <button onClick={handleRegister}>Register</button>
         </div>
       </div>
     </div>
