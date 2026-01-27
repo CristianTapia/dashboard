@@ -2,7 +2,7 @@
 
 import DashboardNavButton from "../ui/DashboardNavButton";
 import CollapsibleNavButton from "../ui/CollapsibleNavButton";
-import { ChartNoAxesColumn, BadgeDollarSign, UtensilsCrossed, Shapes, Settings } from "lucide-react";
+import { ChartNoAxesColumn, BadgeDollarSign, UtensilsCrossed, Shapes, Settings, Users } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   // Nav tab icon size
@@ -42,6 +42,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               name="Configuración"
               href="/dashboard/configuracion"
             />
+            <DashboardNavButton icon={<Users size={iconSize} />} name="Usuarios" href="/dashboard/usuarios" />
           </ul>
         </nav>
       </aside>
