@@ -23,3 +23,8 @@ export type Highlight = {
   image_path?: string | null;
   image_url?: string | null;
 };
+
+export type User = {
+  id: number;
+  name: string;
+};

@@ -1,13 +1,32 @@
 "use client";
 
-import { useState } from "react";
-import { CirclePlus, Search } from "lucide-react";
+import { useState, useTransition } from "react";
+import { CirclePlus, Search, Upload } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { User } from "@/app/lib/validators/types";
+import Modal from "@/app/ui/Modals/Modal";
+import AddCategories from "@/app/ui/AddCategories";
 
 export default function UsuariosPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("member");
 
+  // ESTADOS PRINCIPALES
+  const [search, setSearch] = useState({ term: "" });
+
+  const [activeModal, setActiveModal] = useState<null | "addUser" | "confirmDelete" | "editUser" | "useFilter">(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  // MODALES
+  function openModal(modalName: "addUser" | "confirmDelete" | "editUser" | "useFilter", user?: User | null) {
+    setSelectedUser(user ?? null);
+    setActiveModal(modalName);
+  }
+
+  // RENDERIZADO
   return (
     <div className="max-w-auto p-4 flex flex-col">
       <div className="flex flex-col items-start gap-2">
@@ -20,7 +39,7 @@ export default function UsuariosPage() {
         {/* Botón añadir */}
         <button
           type="button"
-          // onClick={() => openModal("addProduct")}
+          onClick={() => openModal("addUser")}
           className="p-2 pl-5 pr-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
         >
           <CirclePlus /> Añadir nuevo usuario
@@ -36,8 +55,8 @@ export default function UsuariosPage() {
           name="search"
           className="w-full bg-[var(--color-foreground)] rounded-r-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
           placeholder="Buscar usuarios por nombre"
-          // value={search.term}
-          // onChange={(e) => setSearch((prev) => ({ ...prev, term: e.target.value }))}
+          value={search.term}
+          onChange={(e) => setSearch((prev) => ({ ...prev, term: e.target.value }))}
         />
       </div>
 
@@ -112,6 +131,25 @@ export default function UsuariosPage() {
         <h2 className="text-lg font-semibold mb-2">Usuarios del tenant</h2>
         <p className="text-sm text-[var(--color-txt-secondary)]">Aun no hay listado conectado.</p>
       </section>
+
+      {/* Modal para añadir categoría */}
+      <Modal
+        isOpen={activeModal === "addUser"}
+        icon={<Upload color="#137fec" />}
+        iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
+        onCloseAction={() => setActiveModal(null)}
+        title="Añadir Usuario"
+        fixedBody={
+          "sf"
+          // <AddCategories
+          //   onCancel={() => setActiveModal(null)}
+          //   onSuccess={() => {
+          //     setActiveModal(null);
+          //     router.refresh();
+          //   }}
+          // />
+        }
+      />
     </div>
   );
 }

@@ -15,7 +15,7 @@ export default function Products({ products, categories }: { products: Product[]
   const [search, setSearch] = useState({ term: "" });
 
   const [activeModal, setActiveModal] = useState<null | "addProduct" | "confirmDelete" | "editProduct" | "useFilter">(
-    null
+    null,
   );
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -33,15 +33,15 @@ export default function Products({ products, categories }: { products: Product[]
   // MODALES
   function openModal(
     modalName: "addProduct" | "confirmDelete" | "editProduct" | "useFilter",
-    product?: Product | null
+    product?: Product | null,
   ) {
     setSelectedProduct(product ?? null);
     setActiveModal(modalName);
   }
 
   const onSuccess = () => {
-    console.log("Categoría agregada con éxito. Aquí podrías refrescar los datos.");
-    // router.refresh(); // si usas App Router con fetch server-side
+    console.log("Producto agregado con éxito. Aquí podrías refrescar los datos.");
+    router.refresh(); // si usas App Router con fetch server-side
   };
 
   // RENDERIZADO
@@ -199,4 +199,3 @@ export default function Products({ products, categories }: { products: Product[]
     </div>
   );
 }
-
