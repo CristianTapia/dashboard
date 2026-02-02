@@ -6,6 +6,9 @@ import { createCategoryAction } from "@/app/dashboard/categorias/actions";
 export default function AddCategories({ onCancel, onSuccess }: { onCancel?: () => void; onSuccess?: () => void }) {
   // Form states
   const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [role, setRole] = useState("member");
 
   // State management
   const [pending, startTransition] = useTransition();
@@ -49,6 +52,32 @@ export default function AddCategories({ onCancel, onSuccess }: { onCancel?: () =
                        focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm text-sm"
             required
           />
+        </div>
+        <div className="flex flex-col">
+          <label className="text-sm pb-2 font-semibold">Contraseña *</label>
+          <input
+            className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
+                       focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm text-sm"
+            placeholder="••••••••"
+            required
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col">
+          <label className="text-sm pb-2 font-semibold">Rol *</label>
+          <select
+            className="form-select text-sm cursor-pointer bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
+                focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)]
+                p-3"
+            value={role}
+            onChange={(event) => setRole(event.target.value)}
+          >
+            <option value="member">Usuario</option>
+            <option value="admin">Admin</option>
+          </select>
         </div>
 
         {/* Botón */}
