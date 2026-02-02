@@ -5,7 +5,7 @@ import { CirclePlus, Search, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { User } from "@/app/lib/validators/types";
 import Modal from "@/app/ui/Modals/Modal";
-import AddCategories from "@/app/ui/AddCategories";
+import AddUsers from "@/app/ui/AddUsers";
 
 export default function UsuariosPage() {
   const [email, setEmail] = useState("");
@@ -132,7 +132,7 @@ export default function UsuariosPage() {
         <p className="text-sm text-[var(--color-txt-secondary)]">Aun no hay listado conectado.</p>
       </section>
 
-      {/* Modal para añadir categoría */}
+      {/* Modal para añadir usuarios */}
       <Modal
         isOpen={activeModal === "addUser"}
         icon={<Upload color="#137fec" />}
@@ -140,14 +140,13 @@ export default function UsuariosPage() {
         onCloseAction={() => setActiveModal(null)}
         title="Añadir Usuario"
         fixedBody={
-          "sf"
-          // <AddCategories
-          //   onCancel={() => setActiveModal(null)}
-          //   onSuccess={() => {
-          //     setActiveModal(null);
-          //     router.refresh();
-          //   }}
-          // />
+          <AddUsers
+            onCancel={() => setActiveModal(null)}
+            onSuccess={() => {
+              setActiveModal(null);
+              router.refresh();
+            }}
+          />
         }
       />
     </div>
