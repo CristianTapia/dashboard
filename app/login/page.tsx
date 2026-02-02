@@ -3,12 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseClient } from "@/app/lib/supabase/client";
-import { Box, Eye } from "lucide-react";
+import { Box, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleLogin() {
     const { error } = await supabaseClient.auth.signInWithPassword({
@@ -85,13 +86,18 @@ export default function LoginPage() {
                       className="flex-1 form-input text-sm bg-[var(--color-foreground)] rounded-l-lg border border-r-0 border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 mb-4"
                       placeholder="••••••••"
                       required
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
                     />
-                    <div className="cursor-pointer text-sm bg-[var(--color-foreground)] rounded-r-lg border border-l-0 border-[var(--color-border-box)] p-3 mb-4 ">
-                      <Eye color="#62748E" />
-                    </div>
+                    <button
+                      aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                      className="cursor-pointer text-sm bg-[var(--color-foreground)] rounded-r-lg border border-l-0 border-[var(--color-border-box)] p-3 mb-4"
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                    >
+                      {showPassword ? <EyeOff color="#62748E" /> : <Eye color="#62748E" />}
+                    </button>
                   </div>
                 </div>
                 {/* Options */}
