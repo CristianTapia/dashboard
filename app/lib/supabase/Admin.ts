@@ -1,9 +1,11 @@
-// (SOLO SERVER — NUNCA EN EL CLIENTE)
-import "server-only"; // Asegura que este archivo solo se use en el servidor
+import "server-only";
 import { createClient } from "@supabase/supabase-js";
 
-export function createSupabaseAdmin() {
+export function createAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!; // <- no pública
-  return createClient(url, key);
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+  return createClient(url, serviceRoleKey, {
+    auth: { persistSession: false },
+  });
 }

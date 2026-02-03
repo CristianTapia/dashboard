@@ -1,12 +1,12 @@
 import "server-only";
-import { createSupabaseAdmin } from "@/app/lib/supabase";
+import { createAdmin } from "@/app/lib/supabase";
 import { CreateHighlightInput, UpdateHighlightInput } from "@/app/lib/validators";
 import { signPaths } from "@/app/lib/data/images"; // 👈 helper de firma en lote
 
-const db = () => createSupabaseAdmin();
+const db = () => createAdmin();
 
 export async function listHighlights({ limit = 20, offset = 0 }: { limit?: number; offset?: number } = {}) {
-  const db = createSupabaseAdmin();
+  const db = createAdmin();
   const { data, error } = await db
     .from("highlights")
     .select("id,description,image_path,created_at")
@@ -36,7 +36,7 @@ export async function listHighlightsWithSigned({
   // Mapea el resultado agregando `image_url` firmada y preservando path
   return items.map((p: any) => ({
     ...p,
-    image_url: p.image_path ? urlMap.get(p.image_path) ?? null : null,
+    image_url: p.image_path ? (urlMap.get(p.image_path) ?? null) : null,
   }));
 }
 
@@ -47,7 +47,7 @@ export async function createHighlight(input: CreateHighlightInput) {
 }
 
 export async function updateHighlight(id: number, input: UpdateHighlightInput) {
-  const db = createSupabaseAdmin();
+  const db = createAdmin();
   const { data, error } = await db.from("highlights").update(input).eq("id", id).select().single();
   if (error) throw new Error(error.message);
   return data;
@@ -56,7 +56,7 @@ export async function updateHighlight(id: number, input: UpdateHighlightInput) {
 const IMAGE_BUCKET = process.env.SB_BUCKET_NAME ?? "images";
 
 export async function deleteHighlight(id: number) {
-  const db = createSupabaseAdmin();
+  const db = createAdmin();
   const { data, error } = await db
     .from("highlights")
     .delete()

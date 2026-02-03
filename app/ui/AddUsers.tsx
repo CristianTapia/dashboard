@@ -1,31 +1,37 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { createCategoryAction } from "@/app/dashboard/categorias/actions";
+import { useState, useTransition, type FormEvent } from "react";
+import { createUserAction } from "@/app/dashboard/usuarios/actions";
 
-export default function AddCategories({ onCancel, onSuccess }: { onCancel?: () => void; onSuccess?: () => void }) {
+export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => void; onSuccess?: () => void }) {
   // Form states
-  const [name, setName] = useState("");
+  const [tenantName, setTenantName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState("member");
+  const [role, setRole] = useState("owner");
 
   // State management
   const [pending, startTransition] = useTransition();
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (!name.trim()) return alert("El nombre es obligatorio");
+    if (!tenantName.trim()) return alert("El nombre del local es obligatorio");
 
     startTransition(async () => {
       try {
-        const res = await createCategoryAction({
-          name: name.trim(),
+        const res = await createUserAction({
+          tenantName: tenantName.trim(),
+          email: email.trim(),
+          password,
+          role,
         });
         if (res?.ok) {
-          alert("Usuario creado ✅");
-          setName("");
+          alert("Usuario creado con éxito");
+          setTenantName("");
+          setEmail("");
+          setPassword("");
+          setRole("owner");
           onSuccess?.();
         }
       } catch (err: any) {
@@ -38,14 +44,14 @@ export default function AddCategories({ onCancel, onSuccess }: { onCancel?: () =
   return (
     <div className="mx-auto max-w-3xl flex flex-col">
       <form onSubmit={onSubmit} className="flex flex-col gap-6 mt-6">
-        {/* Nombre */}
+        {/* Nombre del local */}
         <div className="flex flex-col">
-          <label className="text-sm pb-2 font-semibold">Nombre *</label>
+          <label className="text-sm pb-2 font-semibold">Nombre del local *</label>
           <input
             type="text"
-            name="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            name="tenantName"
+            value={tenantName}
+            onChange={(e) => setTenantName(e.target.value)}
             placeholder="Ej: Restaurant A"
             disabled={pending}
             className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
@@ -53,6 +59,22 @@ export default function AddCategories({ onCancel, onSuccess }: { onCancel?: () =
             required
           />
         </div>
+
+        <div className="flex flex-col">
+          <label className="text-sm pb-2 font-semibold">Correo Electrónico *</label>
+          <input
+            type="email"
+            name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="admin@restaurant.com"
+            disabled={pending}
+            className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
+                       focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm text-sm"
+            required
+          />
+        </div>
+
         <div className="flex flex-col">
           <label className="text-sm pb-2 font-semibold">Contraseña *</label>
           <input
@@ -75,12 +97,13 @@ export default function AddCategories({ onCancel, onSuccess }: { onCancel?: () =
             value={role}
             onChange={(event) => setRole(event.target.value)}
           >
-            <option value="member">Usuario</option>
+            <option value="owner">Owner</option>
             <option value="admin">Admin</option>
+            <option value="member">Usuario</option>
           </select>
         </div>
 
-        {/* Botón */}
+        {/* BotÃ³n */}
         <div className="flex gap-4 px-4 text-sm font-bold justify-center">
           <button
             type="button"

@@ -1,11 +1,11 @@
 // app/lib/data/products.ts
 import "server-only";
-import { createSupabaseAdmin } from "@/app/lib/supabase";
+import { createAdmin } from "@/app/lib/supabase";
 import { CreateProductInput, UpdateProductInput } from "@/app/lib/validators";
 import { signPaths } from "@/app/lib/data/images"; // 👈 helper de firma en lote
 
 export async function listProducts({ limit = 20, offset = 0 }: { limit?: number; offset?: number } = {}) {
-  const db = createSupabaseAdmin();
+  const db = createAdmin();
   const { data, error } = await db
     .from("products")
     .select("id,name,price,stock,description,image_path,created_at,category:categories(id,name)")
@@ -39,14 +39,14 @@ export async function listProductsWithSigned({
 }
 
 export async function createProduct(input: CreateProductInput) {
-  const db = createSupabaseAdmin();
+  const db = createAdmin();
   const { data, error } = await db.from("products").insert(input).select().single();
   if (error) throw new Error(error.message);
   return data;
 }
 
 export async function updateProduct(id: number, input: UpdateProductInput) {
-  const db = createSupabaseAdmin();
+  const db = createAdmin();
   const { data, error } = await db.from("products").update(input).eq("id", id).select().single();
   if (error) throw new Error(error.message);
   return data;
@@ -55,7 +55,7 @@ export async function updateProduct(id: number, input: UpdateProductInput) {
 const IMAGE_BUCKET = process.env.SB_BUCKET_NAME ?? "images";
 
 export async function deleteProduct(id: number) {
-  const db = createSupabaseAdmin();
+  const db = createAdmin();
   const { data, error } = await db
     .from("products")
     .delete()

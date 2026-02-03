@@ -1,6 +1,6 @@
 // app/api/categories/route.ts
 import { NextResponse } from "next/server";
-import { createSupabaseAdmin } from "@/app/lib/supabase";
+import { createAdmin } from "@/app/lib/supabase";
 import { CreateCategorySchema } from "@/app/lib/validators/categories";
 
 const corsHeaders = {
@@ -15,7 +15,7 @@ export async function OPTIONS() {
 
 // Maneja GET y POST de categorías (public GET)
 export async function GET() {
-  const db = createSupabaseAdmin();
+  const db = createAdmin();
   const { data, error } = await db.from("categories").select("id, name").order("name", { ascending: true });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders });
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { name } = CreateCategorySchema.parse(body);
-    const db = createSupabaseAdmin();
+    const db = createAdmin();
     const { data, error } = await db
       .from("categories")
       .upsert({ name }, { onConflict: "name" })
@@ -40,4 +40,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status, headers: corsHeaders });
   }
 }
-

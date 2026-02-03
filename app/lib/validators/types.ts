@@ -25,6 +25,6 @@ export type Highlight = {
 };
 
 export type User = {
-  id: number;
+  id: string;
   name: string;
 };
