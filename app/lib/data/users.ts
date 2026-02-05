@@ -5,13 +5,34 @@ import { CreateUserInput, UpdateUserInput } from "@/app/lib/validators/users";
 export async function listUsers() {
   const supabase = createAdmin();
 
-  const { data, error } = await supabase
-    .from("tenants")
-    .select("id,name")
-    .order("name", { ascending: false });
+  const { data: memberships, error: membershipError } = await supabase
+    .from("tenant_members")
+    .select("user_id, role, tenant_id, tenants:tenant_id ( id, name )")
+    .order("created_at", { ascending: false });
 
-  if (error) throw new Error(error.message);
-  return data ?? [];
+  if (membershipError) throw new Error(membershipError.message);
+
+  const userIds = Array.from(new Set((memberships ?? []).map((m) => m.user_id))).filter(Boolean);
+  let usersById = new Map<string, { id: string; email: string | null }>();
+
+  if (userIds.length > 0) {
+    const { data: usersData, error: usersError } = await supabase.auth.admin.listUsers({
+      page: 1,
+      perPage: 1000,
+    });
+
+    if (usersError) throw new Error(usersError.message);
+    const filtered = (usersData?.users ?? []).filter((u) => userIds.includes(u.id));
+    usersById = new Map(filtered.map((u) => [u.id, { id: u.id, email: u.email ?? null }]));
+  }
+
+  return (memberships ?? []).map((m) => ({
+    userId: m.user_id,
+    email: usersById.get(m.user_id)?.email ?? null,
+    role: m.role,
+    tenantId: m.tenant_id,
+    tenantName: m.tenants?.name ?? "Sin nombre",
+  }));
 }
 
 export async function createUser(input: CreateUserInput) {

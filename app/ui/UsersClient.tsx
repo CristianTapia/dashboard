@@ -1,20 +1,27 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { CirclePlus, Search, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { User } from "@/app/lib/validators/types";
 import Modal from "@/app/ui/Modals/Modal";
 import AddUsers from "@/app/ui/AddUsers";
+import { listUsersAction } from "@/app/dashboard/usuarios/actions";
+
+type UserTenantRow = {
+  userId: string;
+  email: string | null;
+  role: string | null;
+  tenantId: string | null;
+  tenantName: string;
+};
 
 export default function UsuariosPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("member");
-
   // ESTADOS PRINCIPALES
   const [search, setSearch] = useState({ term: "" });
 
+  const [rows, setRows] = useState<UserTenantRow[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [activeModal, setActiveModal] = useState<null | "addUser" | "confirmDelete" | "editUser" | "useFilter">(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -25,6 +32,27 @@ export default function UsuariosPage() {
     setSelectedUser(user ?? null);
     setActiveModal(modalName);
   }
+
+  useEffect(() => {
+    startTransition(async () => {
+      try {
+        const res = await listUsersAction();
+        if (res?.ok) setRows(res.users ?? []);
+      } catch (err: any) {
+        setLoadError(err?.message || "Error cargando usuarios");
+      }
+    });
+  }, []);
+
+  const filteredRows = rows.filter((r) => {
+    const term = search.term.trim().toLowerCase();
+    if (!term) return true;
+    return (
+      r.email?.toLowerCase().includes(term) ||
+      r.tenantName.toLowerCase().includes(term) ||
+      r.role?.toLowerCase().includes(term)
+    );
+  });
 
   // RENDERIZADO
   return (
@@ -60,76 +88,34 @@ export default function UsuariosPage() {
         />
       </div>
 
-      <section className="bg-[var(--color-foreground)] border border-[var(--color-line-limit)] rounded-xl p-6 max-w-[720px]">
-        <h2 className="text-lg font-semibold mb-4">Nuevo usuario</h2>
-        <form
-          className="grid gap-4"
-          onSubmit={(event) => {
-            event.preventDefault();
-            alert("UI solamente: aun no crea usuarios.");
-          }}
-        >
-          <label className="grid gap-2">
-            <span className="text-sm font-medium">Correo</span>
-            <input
-              className="form-input text-sm rounded-lg border border-[var(--color-border-box)] p-3 bg-transparent"
-              placeholder="usuario@empresa.com"
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
-            />
-          </label>
-
-          <label className="grid gap-2">
-            <span className="text-sm font-medium">Contrasena</span>
-            <input
-              className="form-input text-sm rounded-lg border border-[var(--color-border-box)] p-3 bg-transparent"
-              placeholder="Minimo 8 caracteres"
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              required
-            />
-          </label>
-
-          <label className="grid gap-2">
-            <span className="text-sm font-medium">Rol</span>
-            <select
-              className="form-select text-sm rounded-lg border border-[var(--color-border-box)] p-3 bg-transparent"
-              value={role}
-              onChange={(event) => setRole(event.target.value)}
-            >
-              <option value="member">Member</option>
-              <option value="admin">Admin</option>
-            </select>
-          </label>
-
-          <div className="flex gap-3 pt-2">
-            <button
-              className="bg-[var(--color-button-send)] text-white rounded-lg h-10 px-4 font-semibold"
-              type="submit"
-            >
-              Crear usuario
-            </button>
-            <button
-              className="border border-[var(--color-line-limit)] rounded-lg h-10 px-4"
-              type="reset"
-              onClick={() => {
-                setEmail("");
-                setPassword("");
-                setRole("member");
-              }}
-            >
-              Limpiar
-            </button>
-          </div>
-        </form>
-      </section>
-
       <section className="bg-[var(--color-foreground)] border border-[var(--color-line-limit)] rounded-xl p-6">
         <h2 className="text-lg font-semibold mb-2">Usuarios del tenant</h2>
-        <p className="text-sm text-[var(--color-txt-secondary)]">Aun no hay listado conectado.</p>
+        {loadError ? (
+          <p className="text-sm text-red-500">{loadError}</p>
+        ) : filteredRows.length === 0 ? (
+          <p className="text-sm text-[var(--color-txt-secondary)]">Aun no hay usuarios.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left border-b border-[var(--color-line-limit)]">
+                  <th className="py-2">Email</th>
+                  <th className="py-2">Tenant</th>
+                  <th className="py-2">Rol</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredRows.map((row) => (
+                  <tr key={`${row.userId}-${row.tenantId}`} className="border-b border-[var(--color-line-limit)]">
+                    <td className="py-2">{row.email ?? "Sin email"}</td>
+                    <td className="py-2">{row.tenantName}</td>
+                    <td className="py-2">{row.role ?? "Sin rol"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       {/* Modal para añadir usuarios */}
