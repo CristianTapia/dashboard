@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { CirclePlus, Search, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { User } from "@/app/lib/validators/types";
 import Modal from "@/app/ui/Modals/Modal";
 import AddUsers from "@/app/ui/AddUsers";
-import { listUsersAction } from "@/app/dashboard/usuarios/actions";
 
 type UserTenantRow = {
   userId: string;
@@ -16,15 +15,13 @@ type UserTenantRow = {
   tenantName: string;
 };
 
-export default function UsuariosPage() {
+export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenantRow[] }) {
   // ESTADOS PRINCIPALES
   const [search, setSearch] = useState({ term: "" });
 
-  const [rows, setRows] = useState<UserTenantRow[]>([]);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [rows, setRows] = useState<UserTenantRow[]>(initialUsers);
   const [activeModal, setActiveModal] = useState<null | "addUser" | "confirmDelete" | "editUser" | "useFilter">(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   // MODALES
@@ -34,15 +31,8 @@ export default function UsuariosPage() {
   }
 
   useEffect(() => {
-    startTransition(async () => {
-      try {
-        const res = await listUsersAction();
-        if (res?.ok) setRows(res.users ?? []);
-      } catch (err: any) {
-        setLoadError(err?.message || "Error cargando usuarios");
-      }
-    });
-  }, []);
+    setRows(initialUsers);
+  }, [initialUsers]);
 
   const filteredRows = rows.filter((r) => {
     const term = search.term.trim().toLowerCase();
@@ -90,9 +80,7 @@ export default function UsuariosPage() {
 
       <section className="bg-[var(--color-foreground)] border border-[var(--color-line-limit)] rounded-xl p-6">
         <h2 className="text-lg font-semibold mb-2">Usuarios del tenant</h2>
-        {loadError ? (
-          <p className="text-sm text-red-500">{loadError}</p>
-        ) : filteredRows.length === 0 ? (
+        {filteredRows.length === 0 ? (
           <p className="text-sm text-[var(--color-txt-secondary)]">Aun no hay usuarios.</p>
         ) : (
           <div className="overflow-x-auto">

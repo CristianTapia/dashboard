@@ -1,7 +1,7 @@
 import UsersClient from "@/app/ui/UsersClient";
+import { listUsers } from "@/app/lib/data/users";
 
 export default async function UsersPage() {
-  // const categories = await listCategories(); // server-only helper
-
-  return <UsersClient />;
+  const users = await listUsers();
+  return <UsersClient initialUsers={users} />;
 }
