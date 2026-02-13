@@ -77,7 +77,7 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
           onChange={(e) => setSearch((prev) => ({ ...prev, term: e.target.value }))}
         />
       </div>
-
+    {/* Show list */}
       <section className="bg-[var(--color-foreground)] border border-[var(--color-line-limit)] rounded-xl p-6">
         <h2 className="text-lg font-semibold mb-2">Usuarios del tenant</h2>
         {filteredRows.length === 0 ? (
