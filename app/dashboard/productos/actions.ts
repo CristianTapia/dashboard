@@ -1,7 +1,17 @@
 "use server";
 
 import { revalidatePath, revalidateTag } from "next/cache";
+import { createServer } from "@/app/lib/supabase/server";
 import { createProduct, listProducts, updateProduct, deleteProduct } from "@/app/lib/data/products";
+
+async function requireUser() {
+  const supabase = await createServer();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  if (error || !user) throw new Error("Sesion no valida");
+}
 
 export async function createProductAction(payload: {
   name: string;
@@ -11,6 +21,7 @@ export async function createProductAction(payload: {
   description: string;
   image_path: string | null;
 }) {
+  await requireUser();
   const created = await createProduct(payload);
   // refresca el listado
   revalidatePath("/dashboard/productos/todos");
@@ -18,13 +29,15 @@ export async function createProductAction(payload: {
 }
 
 export async function listProductsAction() {
+  await requireUser();
   const Products = await listProducts();
   revalidateTag("Products");
   return { ok: true, Products };
 }
 
 export async function deleteProductAction(id: number) {
-  const Products = await deleteProduct(id);
+  await requireUser();
+  await deleteProduct(id);
   // refresca el listado
   revalidateTag("Products");
   return { ok: true };
@@ -41,6 +54,7 @@ export async function updateProductAction(
     image_path?: string | null;
   }
 ) {
+  await requireUser();
   const cleanedPayload: typeof payload = { ...payload };
   if (payload.image_path === undefined) {
     delete cleanedPayload.image_path;

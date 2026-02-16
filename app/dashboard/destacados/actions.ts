@@ -1,9 +1,20 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
+import { createServer } from "@/app/lib/supabase/server";
 import { createHighlight, listHighlights, updateHighlight, deleteHighlight } from "@/app/lib/data/highlights";
 
+async function requireUser() {
+  const supabase = await createServer();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  if (error || !user) throw new Error("Sesion no valida");
+}
+
 export async function createHighlightAction(payload: { description: string; image_path: string }) {
+  await requireUser();
   const created = await createHighlight(payload);
   // refresca el listado
   revalidateTag("/dashboard/destacados");
@@ -11,19 +22,22 @@ export async function createHighlightAction(payload: { description: string; imag
 }
 
 export async function listHighlightsAction() {
+  await requireUser();
   const Highlights = await listHighlights();
   revalidateTag("Highlights");
   return { ok: true, Highlights };
 }
 
 export async function deleteHighlightAction(id: number) {
-  const Highlights = await deleteHighlight(id);
+  await requireUser();
+  await deleteHighlight(id);
   // refresca el listado
   revalidateTag("Highlights");
   return { ok: true };
 }
 
 export async function updateHighlightAction(id: number, payload: { description?: string; image_path?: string | null }) {
+  await requireUser();
   const cleanedPayload: typeof payload = { ...payload };
   if (payload.image_path === undefined) {
     delete cleanedPayload.image_path;

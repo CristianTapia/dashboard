@@ -1,10 +1,19 @@
-"use client";
-
+import { redirect } from "next/navigation";
+import { createServer } from "@/app/lib/supabase/server";
 import DashboardNavButton from "../ui/DashboardNavButton";
-import CollapsibleNavButton from "../ui/CollapsibleNavButton";
 import { ChartNoAxesColumn, BadgeDollarSign, UtensilsCrossed, Shapes, Settings, Users } from "lucide-react";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createServer();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    redirect("/login");
+  }
+
   // Nav tab icon size
   const iconSize = 20;
 
