@@ -12,7 +12,7 @@ export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: corsHeaders });
 }
 
-// [GET] READ PRODUCTS (public API)
+// [GET] READ PRODUCTS (tenant scoped)
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const limit = Math.max(1, Math.min(100, Number(searchParams.get("limit") ?? 20)));
@@ -21,7 +21,9 @@ export async function GET(req: Request) {
     const items = await listProductsWithSigned({ limit, offset, expires: 3600 });
     return NextResponse.json(items, { status: 200, headers: corsHeaders });
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message ?? "Server error" }, { status: 500, headers: corsHeaders });
+    const message = e?.message ?? "Server error";
+    const status = message === "Sesion no valida" ? 401 : 500;
+    return NextResponse.json({ error: message }, { status, headers: corsHeaders });
   }
 }
 
@@ -33,9 +35,8 @@ export async function POST(req: Request) {
     const data = await createProduct(parsed);
     return NextResponse.json(data, { status: 201, headers: corsHeaders });
   } catch (err: any) {
-    const status = err?.name === "ZodError" ? 400 : 500;
+    const status = err?.name === "ZodError" ? 400 : err?.message === "Sesion no valida" ? 401 : 500;
     const message = err?.message || (status === 400 ? "Payload inválido" : "Server error");
     return NextResponse.json({ error: message }, { status, headers: corsHeaders });
   }
 }
-
