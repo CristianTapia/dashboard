@@ -8,7 +8,7 @@ export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => voi
   const [tenantName, setTenantName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("owner");
+  const [role, setRole] = useState<"admin" | "member">("member");
 
   // State management
   const [pending, startTransition] = useTransition();
@@ -31,7 +31,7 @@ export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => voi
           setTenantName("");
           setEmail("");
           setPassword("");
-          setRole("owner");
+          setRole("member");
           onSuccess?.();
         }
       } catch (err: any) {
@@ -95,9 +95,8 @@ export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => voi
                 focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)]
                 p-3"
             value={role}
-            onChange={(event) => setRole(event.target.value)}
+            onChange={(event) => setRole(event.target.value as "admin" | "member")}
           >
-            <option value="owner">Owner</option>
             <option value="admin">Admin</option>
             <option value="member">Usuario</option>
           </select>

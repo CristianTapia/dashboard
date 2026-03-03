@@ -1,8 +1,9 @@
 import "server-only";
 import { createServer } from "@/app/lib/supabase/server";
+import { createAdmin } from "@/app/lib/supabase";
 import { CreateProductInput, UpdateProductInput } from "@/app/lib/validators";
 import { signPaths } from "@/app/lib/data/images";
-import { getCurrentTenantId } from "@/app/lib/tenant";
+import { getCurrentTenantId, isCurrentUserAdmin } from "@/app/lib/tenant";
 
 async function assertCategoryBelongsToTenant(categoryId: number, tenantId: string) {
   const supabase = await createServer();
@@ -18,15 +19,21 @@ async function assertCategoryBelongsToTenant(categoryId: number, tenantId: strin
 }
 
 export async function listProducts({ limit = 20, offset = 0 }: { limit?: number; offset?: number } = {}) {
-  const supabase = await createServer();
-  const tenantId = await getCurrentTenantId();
+  const isAdmin = await isCurrentUserAdmin();
+  const tenantId = isAdmin ? null : await getCurrentTenantId();
+  const db = isAdmin ? createAdmin() : await createServer();
 
-  const { data, error } = await supabase
+  let query = db
     .from("products")
     .select("id,name,price,stock,description,image_path,created_at,category:categories(id,name)")
-    .eq("tenant_id", tenantId)
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
+
+  if (tenantId) {
+    query = query.eq("tenant_id", tenantId);
+  }
+
+  const { data, error } = await query;
 
   if (error) throw new Error(error.message);
   return data ?? [];

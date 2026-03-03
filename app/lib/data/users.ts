@@ -60,7 +60,7 @@ export async function createUser(input: CreateUserInput) {
   const { error: memberError } = await supabase.from("tenant_members").insert({
     tenant_id: tenant.id,
     user_id: authData.user.id,
-    role: input.role ?? "owner",
+    role: input.role ?? "member",
   });
 
   if (memberError) {

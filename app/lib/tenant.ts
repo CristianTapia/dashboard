@@ -41,3 +41,27 @@ export async function getCurrentTenantId() {
   if (!membership) throw new Error("El usuario no tiene tenants asignados");
   return membership.tenant_id;
 }
+
+/**
+ * Retorna true si el usuario tiene permisos globales.
+ * Nota: "owner" se mantiene por compatibilidad temporal hasta migrar a solo admin/member.
+ */
+export async function isCurrentUserAdmin() {
+  const supabase = await createServer();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+  if (userError || !user) throw new Error("Sesion no valida");
+
+  const { data, error } = await supabase
+    .from("tenant_members")
+    .select("tenant_id")
+    .eq("user_id", user.id)
+    .in("role", ["admin", "owner"])
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  return !!data;
+}
