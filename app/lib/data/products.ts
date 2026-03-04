@@ -25,7 +25,7 @@ export async function listProducts({ limit = 20, offset = 0 }: { limit?: number;
 
   let query = db
     .from("products")
-    .select("id,name,price,stock,description,image_path,created_at,category:categories(id,name)")
+    .select("id,name,price,stock,description,image_path,created_at,tenant_id,tenant:tenants(id,name),category:categories(id,name)")
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 

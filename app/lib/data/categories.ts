@@ -11,7 +11,7 @@ export async function listCategories() {
 
   let query = db
     .from("categories")
-    .select("id,name")
+    .select("id,name,tenant_id,tenant:tenants(id,name)")
     .order("name", { ascending: false });
 
   if (tenantId) {

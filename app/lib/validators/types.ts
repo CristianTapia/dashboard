@@ -4,6 +4,11 @@ export type Product = {
   price: number;
   stock?: number;
   description?: string;
+  tenant_id?: string | null;
+  tenant?: {
+    id: string;
+    name: string;
+  } | null;
   category: {
     id: number;
     name: string;
@@ -15,11 +20,21 @@ export type Product = {
 export type Category = {
   id: number;
   name: string;
+  tenant_id?: string | null;
+  tenant?: {
+    id: string;
+    name: string;
+  } | null;
 };
 
 export type Highlight = {
   id: number;
   description: string;
+  tenant_id?: string | null;
+  tenant?: {
+    id: string;
+    name: string;
+  } | null;
   image_path?: string | null;
   image_url?: string | null;
 };

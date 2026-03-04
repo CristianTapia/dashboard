@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { TriangleAlert, Pencil, Trash, CirclePlus, Upload } from "lucide-react";
 import { Highlight } from "../lib/validators/types";
 import Image from "next/image";
@@ -13,6 +13,7 @@ import { deleteHighlightAction } from "@/app/dashboard/destacados/actions";
 export default function AllHighlights({ highlights }: { highlights: Highlight[] }) {
   const [activeModal, setActiveModal] = useState<null | "addHighlight" | "editHighlight" | "confirmDelete">(null);
   const [selectedHighlight, setSelectedHighlight] = useState<Highlight | null>(null);
+  const [tenantFilter, setTenantFilter] = useState("all");
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -28,6 +29,28 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
       // router.refresh();
     });
   };
+
+  const tenantOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const highlight of highlights) {
+      const tenantId = highlight.tenant_id ?? highlight.tenant?.id;
+      const tenantName = highlight.tenant?.name;
+      if (tenantId && tenantName) {
+        map.set(tenantId, tenantName);
+      }
+    }
+    return Array.from(map.entries())
+      .map(([id, name]) => ({ id, name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [highlights]);
+
+  const filteredHighlights = useMemo(() => {
+    return highlights.filter((highlight) => {
+      if (tenantFilter === "all") return true;
+      const tenantId = highlight.tenant_id ?? highlight.tenant?.id ?? null;
+      return tenantId === tenantFilter;
+    });
+  }, [highlights, tenantFilter]);
 
   return (
     <div className="max-w-auto p-4 flex flex-col">
@@ -47,8 +70,23 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
           <CirclePlus /> Añadir nuevo destacado
         </button>
       </div>
+      <div className="mt-4">
+        <select
+          className="w-56 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 text-sm"
+          value={tenantFilter}
+          onChange={(e) => setTenantFilter(e.target.value)}
+          disabled={tenantOptions.length === 0}
+        >
+          <option value="all">{tenantOptions.length === 0 ? "Global (sin tenant)" : "Todos los tenants"}</option>
+          {tenantOptions.map((tenant) => (
+            <option key={tenant.id} value={tenant.id}>
+              {tenant.name}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 mt-6">
-        {highlights.map((highlight) => (
+        {filteredHighlights.map((highlight) => (
           <div
             key={highlight.id}
             className="dark:bg-surface-dark rounded-xl shadow-card overflow-hidden flex flex-col bg-[var(--color-foreground)]"
@@ -68,6 +106,9 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
               )}
             </div>
             <div className="p-4 flex flex-col flex-grow">
+              {highlight.tenant?.name && (
+                <p className="text-xs text-[var(--color-txt-secondary)] mb-1">Tenant: {highlight.tenant.name}</p>
+              )}
               <p className="mt-1 text-sm text-text-light/70 dark:text-text-dark/70 flex-grow">
                 {highlight.description}
               </p>

@@ -4,7 +4,7 @@ import Dropdown from "@/app/ui/Dropdown";
 import Modal from "@/app/ui/Modals/Modal";
 import AddCategories from "@/app/ui/AddCategories";
 import EditCategories from "@/app/ui/EditCategories";
-import { useState, useRef, useEffect, useTransition } from "react";
+import { useState, useRef, useEffect, useTransition, useMemo } from "react";
 import { Category } from "@/app/lib/validators/types";
 import { CirclePlus, Search, EllipsisVertical, Pen, Trash, Pencil, TriangleAlert, Edit, Upload } from "lucide-react";
 import { deleteCategoryAction } from "@/app/dashboard/categorias/actions";
@@ -13,6 +13,8 @@ import { useRouter } from "next/navigation";
 export default function CategoriesPage({ categories }: { categories: Category[] }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [tenantFilter, setTenantFilter] = useState("all");
 
   // Modals
   const [activeModal, setActiveModal] = useState<null | "addCategory" | "confirmDelete" | "editCategory">(null);
@@ -71,6 +73,30 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
     });
   };
 
+  const tenantOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const category of categories) {
+      const tenantId = category.tenant_id ?? category.tenant?.id;
+      const tenantName = category.tenant?.name;
+      if (tenantId && tenantName) {
+        map.set(tenantId, tenantName);
+      }
+    }
+    return Array.from(map.entries())
+      .map(([id, name]) => ({ id, name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [categories]);
+
+  const filteredCategories = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    return categories.filter((category) => {
+      const tenantId = category.tenant_id ?? category.tenant?.id ?? null;
+      const byTenant = tenantFilter === "all" || tenantId === tenantFilter;
+      const bySearch = !term || category.name.toLowerCase().includes(term);
+      return byTenant && bySearch;
+    });
+  }, [categories, searchTerm, tenantFilter]);
+
   return (
     <div className="max-w-auto p-4 flex flex-col">
       {/* Título */}
@@ -94,7 +120,19 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
         </button>
       </div>
       {/* Búsqueda */}
-      <div className="flex w-full flex-1 items-stretch rounded-lg h-full mt-6 mb-6">
+      <div className="flex w-full flex-1 items-stretch rounded-lg h-full mt-6 mb-6 gap-3">
+        <select
+          className="w-56 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 text-sm"
+          value={tenantFilter}
+          onChange={(e) => setTenantFilter(e.target.value)}
+        >
+          <option value="all">Todos los tenants</option>
+          {tenantOptions.map((tenant) => (
+            <option key={tenant.id} value={tenant.id}>
+              {tenant.name}
+            </option>
+          ))}
+        </select>
         <div className="text-slate-500 dark:text-slate-400 flex bg-[var(--color-foreground)] dark:bg-background-dark items-center justify-center p-2 rounded-l-lg border border-[var(--color-border-box)] border-r-0">
           <Search />
         </div>
@@ -103,20 +141,25 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
           name="search"
           className="w-full bg-[var(--color-foreground)] rounded-r-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
           placeholder="Buscar categorías por nombre"
-          value=""
-          onChange={() => {}}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
       {/* </div> */}
       {/* Categorías */}
       <div className="flex flex-wrap gap-8 justify-center">
-        {categories.map((category) => (
+        {filteredCategories.map((category) => (
           <div
             key={category.id}
             className="w-52 bg-[var(--color-foreground)] dark:bg-slate-800/50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="flex justify-between items-center">
-              <p className="dark:text-white text-lg font-bold">{category.name}</p>
+              <div className="pr-2">
+                <p className="dark:text-white text-lg font-bold">{category.name}</p>
+                {category.tenant?.name && (
+                  <p className="text-xs text-[var(--color-txt-secondary)] mt-1">Tenant: {category.tenant.name}</p>
+                )}
+              </div>
               <div className="relative" ref={openDropdownId === category.id ? dropdownRef : null}>
                 <button
                   className="cursor-pointer flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-700"
