@@ -12,10 +12,14 @@ export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: corsHeaders });
 }
 
-export async function GET(req: Request, { params }: { params: { tenant: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ tenant: string }> }) {
   try {
+    const { tenant: tenantParam } = await params;
+    const { searchParams } = new URL(req.url);
+    const limit = Math.max(1, Math.min(200, Number(searchParams.get("limit") ?? 200)));
+    const offset = Math.max(0, Number(searchParams.get("offset") ?? 0));
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-    const limited = limitByKey(`public-menu:${ip}:${params.tenant}`, 120, 60_000);
+    const limited = limitByKey(`public-menu:${ip}:${tenantParam}`, 120, 60_000);
     if (!limited.ok) {
       return NextResponse.json(
         { error: "Demasiadas solicitudes, intenta nuevamente en unos segundos" },
@@ -23,14 +27,14 @@ export async function GET(req: Request, { params }: { params: { tenant: string }
       );
     }
 
-    const tenantKey = decodeURIComponent(params.tenant);
+    const tenantKey = decodeURIComponent(tenantParam);
     const tenant = await resolveTenantByPublicKey(tenantKey);
 
     if (!tenant) {
       return NextResponse.json({ error: "Tenant no encontrado" }, { status: 404, headers: corsHeaders });
     }
 
-    const items = await listPublicProductsByTenant(tenant.id, { limit: 200 });
+    const items = await listPublicProductsByTenant(tenant.id, { limit, offset });
 
     return NextResponse.json(
       {
@@ -41,6 +45,7 @@ export async function GET(req: Request, { params }: { params: { tenant: string }
     );
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Server error";
+    console.error("GET /api/public/menu/[tenant] error", { message, url: req.url });
     return NextResponse.json({ error: message }, { status: 500, headers: corsHeaders });
   }
 }

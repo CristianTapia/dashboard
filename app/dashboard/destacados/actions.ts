@@ -4,9 +4,9 @@ import { revalidateTag } from "next/cache";
 import { createHighlight, listHighlights, updateHighlight, deleteHighlight } from "@/app/lib/data/highlights";
 import { requireUser } from "@/app/lib/auth";
 
-export async function createHighlightAction(payload: { description: string; image_path: string }) {
+export async function createHighlightAction(payload: { description: string; image_path: string; tenant_id?: string }) {
   await requireUser();
-  const created = await createHighlight(payload);
+  const created = await createHighlight({ description: payload.description, image_path: payload.image_path }, payload.tenant_id);
   // refresca el listado
   revalidateTag("/dashboard/destacados");
   return { ok: true, created };

@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { CreateHighlightSchema } from "@/app/lib/validators/highlights";
 import { createHighlight, listHighlightsWithSigned } from "@/app/lib/data/highlights";
-import { requireUser } from "@/app/lib/auth";
+import { getCurrentUserOptional, requireUser } from "@/app/lib/auth";
+import { listPublicHighlightsByTenant, resolveTenantByPublicKey } from "@/app/lib/data/public-menu";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,15 +20,25 @@ export async function OPTIONS() {
 
 export async function GET(req: Request) {
   try {
-    await requireUser();
     const { searchParams } = new URL(req.url);
     const limit = Math.max(1, Math.min(100, Number(searchParams.get("limit") ?? 20)));
     const offset = Math.max(0, Number(searchParams.get("offset") ?? 0));
-    const items = await listHighlightsWithSigned({ limit, offset, expires: 3600 });
+    const tenantKey = searchParams.get("tenant");
+    const user = await getCurrentUserOptional();
+
+    const items = user
+      ? await listHighlightsWithSigned({ limit, offset, expires: 3600 })
+      : await (async () => {
+          if (!tenantKey) throw new Error("Sesion no valida");
+          const tenant = await resolveTenantByPublicKey(tenantKey);
+          if (!tenant) throw new Error("Tenant no encontrado");
+          return listPublicHighlightsByTenant(tenant.id, { limit, offset });
+        })();
+
     return NextResponse.json(items, { status: 200, headers: corsHeaders });
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Server error";
-    const status = message === "Sesion no valida" ? 401 : 500;
+    const status = message === "Sesion no valida" ? 401 : message === "Tenant no encontrado" ? 404 : 500;
     return NextResponse.json({ error: message }, { status, headers: corsHeaders });
   }
 }

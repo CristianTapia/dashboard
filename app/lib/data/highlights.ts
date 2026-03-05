@@ -3,7 +3,7 @@ import { createAdmin } from "@/app/lib/supabase";
 import { createServer } from "@/app/lib/supabase/server";
 import { CreateHighlightInput, UpdateHighlightInput } from "@/app/lib/validators";
 import { signPaths } from "@/app/lib/data/images";
-import { getCurrentTenantId, isCurrentUserAdmin } from "@/app/lib/tenant";
+import { getCurrentTenantId, isCurrentUserAdmin, resolveWritableTenantId } from "@/app/lib/tenant";
 
 export async function listHighlights({ limit = 20, offset = 0 }: { limit?: number; offset?: number } = {}) {
   const isAdmin = await isCurrentUserAdmin();
@@ -40,11 +40,13 @@ export async function listHighlightsWithSigned({
   }));
 }
 
-export async function createHighlight(input: CreateHighlightInput) {
+export async function createHighlight(input: CreateHighlightInput, requestedTenantId?: string) {
   const supabase = await createServer();
-  const tenantId = await getCurrentTenantId();
+  const tenantId = await resolveWritableTenantId(requestedTenantId);
+  const adminWrite = await isCurrentUserAdmin();
+  const db = adminWrite ? createAdmin() : supabase;
 
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("highlights")
     .insert({ ...input, tenant_id: tenantId })
     .select()

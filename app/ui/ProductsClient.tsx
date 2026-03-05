@@ -5,12 +5,24 @@ import Modal from "./Modals/Modal";
 import EditProducts from "@/app/ui/EditProducts";
 import AddProducts from "@/app/ui/AddProducts";
 import Image from "next/image";
-import { Product, Category } from "../lib/validators/types";
+import { Product, Category, TenantOption } from "../lib/validators/types";
 import { useRouter } from "next/navigation";
 import { CirclePlus, Trash, Pencil, Search, TriangleAlert, Upload } from "lucide-react";
 import { deleteProductAction } from "@/app/dashboard/productos/actions";
 
-export default function Products({ products, categories }: { products: Product[]; categories: Category[] }) {
+export default function Products({
+  products,
+  categories,
+  tenants,
+  isAdmin,
+  activeTenantId,
+}: {
+  products: Product[];
+  categories: Category[];
+  tenants: TenantOption[];
+  isAdmin: boolean;
+  activeTenantId: string;
+}) {
   // ESTADOS PRINCIPALES
   const [search, setSearch] = useState({ term: "" });
   const [tenantFilter, setTenantFilter] = useState("all");
@@ -187,6 +199,9 @@ export default function Products({ products, categories }: { products: Product[]
         body={
           <AddProducts
             categories={categories}
+            tenants={tenants}
+            isAdmin={isAdmin}
+            activeTenantId={activeTenantId}
             onCancel={() => setActiveModal(null)}
             onSuccess={() => {
               setActiveModal(null);

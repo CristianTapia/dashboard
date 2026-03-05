@@ -1,7 +1,7 @@
 import "server-only";
 import { createServer } from "@/app/lib/supabase/server";
 import { createAdmin } from "@/app/lib/supabase";
-import { getCurrentTenantId, isCurrentUserAdmin } from "@/app/lib/tenant";
+import { getCurrentTenantId, isCurrentUserAdmin, resolveWritableTenantId } from "@/app/lib/tenant";
 import { CreateCategoryInput, UpdateCategoryInput } from "../validators";
 
 export async function listCategories() {
@@ -24,11 +24,13 @@ export async function listCategories() {
   return data ?? [];
 }
 
-export async function createCategory(input: CreateCategoryInput) {
+export async function createCategory(input: CreateCategoryInput, requestedTenantId?: string) {
   const supabase = await createServer();
-  const tenantId = await getCurrentTenantId();
+  const tenantId = await resolveWritableTenantId(requestedTenantId);
+  const adminWrite = await isCurrentUserAdmin();
+  const db = adminWrite ? createAdmin() : supabase;
 
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("categories")
     .insert({ ...input, tenant_id: tenantId })
     .select()

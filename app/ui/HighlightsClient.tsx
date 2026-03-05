@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { TriangleAlert, Pencil, Trash, CirclePlus, Upload } from "lucide-react";
-import { Highlight } from "../lib/validators/types";
+import { Highlight, TenantOption } from "../lib/validators/types";
 import Image from "next/image";
 import Modal from "@/app/ui/Modals/Modal";
 import EditHighlights from "./EditHighlights";
@@ -10,7 +10,17 @@ import AddHighlights from "./AddHighlights";
 import { useRouter } from "next/navigation";
 import { deleteHighlightAction } from "@/app/dashboard/destacados/actions";
 
-export default function AllHighlights({ highlights }: { highlights: Highlight[] }) {
+export default function AllHighlights({
+  highlights,
+  tenants,
+  isAdmin,
+  activeTenantId,
+}: {
+  highlights: Highlight[];
+  tenants: TenantOption[];
+  isAdmin: boolean;
+  activeTenantId: string;
+}) {
   const [activeModal, setActiveModal] = useState<null | "addHighlight" | "editHighlight" | "confirmDelete">(null);
   const [selectedHighlight, setSelectedHighlight] = useState<Highlight | null>(null);
   const [tenantFilter, setTenantFilter] = useState("all");
@@ -140,6 +150,9 @@ export default function AllHighlights({ highlights }: { highlights: Highlight[] 
         title="Añadir Destacado"
         fixedBody={
           <AddHighlights
+            tenants={tenants}
+            isAdmin={isAdmin}
+            activeTenantId={activeTenantId}
             onCancel={() => setActiveModal(null)}
             onSuccess={() => {
               setActiveModal(null);

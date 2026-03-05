@@ -1,6 +1,7 @@
-﻿import "server-only";
+import "server-only";
 import { cookies } from "next/headers";
 import { createServer } from "@/app/lib/supabase/server";
+import { createAdmin } from "@/app/lib/supabase";
 
 /**
  * Obtiene el tenant activo desde la cookie `tenantId` y valida que el usuario
@@ -29,7 +30,6 @@ export async function getCurrentTenantId() {
     if (membership) return tenantIdFromCookie;
   }
 
-  // Fallback: primer tenant del usuario
   const { data: membership, error } = await supabase
     .from("tenant_members")
     .select("tenant_id")
@@ -64,4 +64,28 @@ export async function isCurrentUserAdmin() {
 
   if (error) throw new Error(error.message);
   return !!data;
+}
+
+/**
+ * Resuelve el tenant objetivo para operaciones de escritura.
+ * - admin puede elegir cualquier tenant valido.
+ * - member siempre usa su tenant activo.
+ */
+export async function resolveWritableTenantId(requestedTenantId?: string) {
+  const currentTenantId = await getCurrentTenantId();
+  if (!requestedTenantId) return currentTenantId;
+
+  const isAdmin = await isCurrentUserAdmin();
+  if (!isAdmin) {
+    if (requestedTenantId !== currentTenantId) {
+      throw new Error("No tienes permisos para crear en ese tenant");
+    }
+    return currentTenantId;
+  }
+
+  const admin = createAdmin();
+  const { data, error } = await admin.from("tenants").select("id").eq("id", requestedTenantId).maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Tenant invalido");
+  return requestedTenantId;
 }

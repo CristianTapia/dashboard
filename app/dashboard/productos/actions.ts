@@ -11,9 +11,10 @@ export async function createProductAction(payload: {
   category_id: number;
   description: string;
   image_path: string | null;
+  tenant_id?: string;
 }) {
   await requireUser();
-  const created = await createProduct(payload);
+  const created = await createProduct(payload, payload.tenant_id);
   // refresca el listado
   revalidatePath("/dashboard/productos/todos");
   return { ok: true, created };

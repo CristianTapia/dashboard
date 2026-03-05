@@ -43,3 +43,8 @@ export type User = {
   id: string;
   name: string;
 };
+
+export type TenantOption = {
+  id: string;
+  name: string;
+};

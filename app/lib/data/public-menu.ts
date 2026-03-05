@@ -30,7 +30,10 @@ export async function resolveTenantByPublicKey(tenantKey: string) {
   return byId ?? null;
 }
 
-export async function listPublicProductsByTenant(tenantId: string, { limit = 100 }: { limit?: number } = {}) {
+export async function listPublicProductsByTenant(
+  tenantId: string,
+  { limit = 100, offset = 0 }: { limit?: number; offset?: number } = {}
+) {
   const admin = createAdmin();
 
   const { data, error } = await admin
@@ -38,7 +41,7 @@ export async function listPublicProductsByTenant(tenantId: string, { limit = 100
     .select("id,name,price,stock,description,image_path,created_at,category:categories(id,name)")
     .eq("tenant_id", tenantId)
     .order("created_at", { ascending: false })
-    .limit(limit);
+    .range(offset, offset + limit - 1);
 
   if (error) throw new Error(error.message);
 
@@ -49,5 +52,37 @@ export async function listPublicProductsByTenant(tenantId: string, { limit = 100
   return products.map((p) => ({
     ...p,
     image_url: p.image_path ? urlMap.get(p.image_path) ?? null : null,
+  }));
+}
+
+export async function listPublicCategoriesByTenant(tenantId: string) {
+  const admin = createAdmin();
+  const { data, error } = await admin
+    .from("categories")
+    .select("id,name")
+    .eq("tenant_id", tenantId)
+    .order("name", { ascending: true });
+
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function listPublicHighlightsByTenant(tenantId: string, { limit = 100, offset = 0 }: { limit?: number; offset?: number } = {}) {
+  const admin = createAdmin();
+  const { data, error } = await admin
+    .from("highlights")
+    .select("id,description,image_path,created_at")
+    .eq("tenant_id", tenantId)
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (error) throw new Error(error.message);
+  const highlights = data ?? [];
+  const paths = highlights.map((h) => h.image_path).filter((x): x is string => !!x);
+  const urlMap = await signPaths(paths, 3600);
+
+  return highlights.map((h) => ({
+    ...h,
+    image_url: h.image_path ? urlMap.get(h.image_path) ?? null : null,
   }));
 }

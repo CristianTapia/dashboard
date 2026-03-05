@@ -4,9 +4,9 @@ import { revalidateTag } from "next/cache";
 import { createCategory, listCategories, deleteCategory, updateCategory } from "@/app/lib/data/categories";
 import { requireUser } from "@/app/lib/auth";
 
-export async function createCategoryAction(payload: { name: string }) {
+export async function createCategoryAction(payload: { name: string; tenant_id?: string }) {
   await requireUser();
-  const created = await createCategory(payload);
+  const created = await createCategory({ name: payload.name }, payload.tenant_id);
   // refresca el listado
   revalidateTag("categories");
   return { ok: true, created };

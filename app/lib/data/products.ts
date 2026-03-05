@@ -3,11 +3,11 @@ import { createServer } from "@/app/lib/supabase/server";
 import { createAdmin } from "@/app/lib/supabase";
 import { CreateProductInput, UpdateProductInput } from "@/app/lib/validators";
 import { signPaths } from "@/app/lib/data/images";
-import { getCurrentTenantId, isCurrentUserAdmin } from "@/app/lib/tenant";
+import { getCurrentTenantId, isCurrentUserAdmin, resolveWritableTenantId } from "@/app/lib/tenant";
 
-async function assertCategoryBelongsToTenant(categoryId: number, tenantId: string) {
-  const supabase = await createServer();
-  const { data, error } = await supabase
+async function assertCategoryBelongsToTenant(categoryId: number, tenantId: string, useAdmin = false) {
+  const db = useAdmin ? createAdmin() : await createServer();
+  const { data, error } = await db
     .from("categories")
     .select("id")
     .eq("id", categoryId)
@@ -55,13 +55,15 @@ export async function listProductsWithSigned({
   }));
 }
 
-export async function createProduct(input: CreateProductInput) {
+export async function createProduct(input: CreateProductInput, requestedTenantId?: string) {
   const supabase = await createServer();
-  const tenantId = await getCurrentTenantId();
+  const tenantId = await resolveWritableTenantId(requestedTenantId);
+  const adminWrite = await isCurrentUserAdmin();
+  const db = adminWrite ? createAdmin() : supabase;
 
-  await assertCategoryBelongsToTenant(input.category_id, tenantId);
+  await assertCategoryBelongsToTenant(input.category_id, tenantId, adminWrite);
 
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("products")
     .insert({ ...input, tenant_id: tenantId })
     .select()

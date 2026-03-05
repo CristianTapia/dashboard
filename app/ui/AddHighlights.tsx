@@ -2,43 +2,62 @@
 
 import { useState, useTransition } from "react";
 import ImageUpload from "@/app/ui/ImageUpload";
-import { Upload } from "lucide-react";
 import { createHighlightAction } from "@/app/dashboard/destacados/actions";
+import { TenantOption } from "@/app/lib/validators/types";
 
-export default function AddHighlights({ onSuccess, onCancel }: { onSuccess?: () => void; onCancel?: () => void }) {
+export default function AddHighlights({
+  onSuccess,
+  onCancel,
+  tenants,
+  isAdmin,
+  activeTenantId,
+}: {
+  onSuccess?: () => void;
+  onCancel?: () => void;
+  tenants: TenantOption[];
+  isAdmin: boolean;
+  activeTenantId: string;
+}) {
   const [description, setDescription] = useState("");
+  const [tenantId, setTenantId] = useState(activeTenantId);
   const [imagePath, setImagePath] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploaderKey, setUploaderKey] = useState(0);
   const [pending, startTransition] = useTransition();
-
   const saving = pending;
 
-  const handleImageChange = (info: any) => {
-    const val = typeof info === "string" ? info : info?.path ?? info?.url ?? null;
+  const handleImageChange = (info: unknown) => {
+    const obj = info as { path?: string; url?: string } | string | null;
+    const val = typeof obj === "string" ? obj : obj?.path ?? obj?.url ?? null;
     setImagePath(val);
   };
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const desc = description.trim();
-    if (!desc) return alert("La descripción es obligatoria");
+    if (!desc) return alert("La descripcion es obligatoria");
+    if (isAdmin && !tenantId) return alert("Selecciona un tenant");
     if (!imagePath) return alert("La imagen es obligatoria");
     if (uploading) return alert("Espera a que termine la subida de la imagen");
 
     startTransition(async () => {
       try {
-        const res = await createHighlightAction({ description: desc, image_path: imagePath });
+        const res = await createHighlightAction({
+          description: desc,
+          image_path: imagePath,
+          tenant_id: isAdmin ? tenantId : undefined,
+        });
         if (res?.ok) {
-          alert("Destacado creado.");
+          alert("Destacado creado");
           setDescription("");
+          setTenantId(activeTenantId);
           setImagePath(null);
           setUploaderKey((k) => k + 1);
           onSuccess?.();
         }
-      } catch (err: any) {
-        alert(err?.message || "Error agregando el destacado");
-        console.error(err);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Error agregando el destacado";
+        alert(message);
       }
     });
   }
@@ -46,10 +65,32 @@ export default function AddHighlights({ onSuccess, onCancel }: { onSuccess?: () 
   return (
     <div className="mx-auto max-w-3xl flex flex-col">
       <form onSubmit={onSubmit} className="flex flex-col gap-6 mt-6">
+        {isAdmin && (
+          <div className="flex flex-col">
+            <label className="text-sm pb-2 font-semibold">Tenant *</label>
+            <select
+              value={tenantId}
+              onChange={(e) => setTenantId(e.target.value)}
+              disabled={saving || uploading}
+              className="cursor-pointer w-full bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
+                         focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
+              required
+            >
+              <option value="" disabled>
+                Selecciona un tenant
+              </option>
+              {tenants.map((tenant) => (
+                <option key={tenant.id} value={tenant.id}>
+                  {tenant.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <div className="flex flex-col">
-          <label className="text-sm pb-2 font-semibold">Descripción *</label>
+          <label className="text-sm pb-2 font-semibold">Descripcion *</label>
           <textarea
-            name="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="text-sm form-textarea bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 h-24"
@@ -58,7 +99,6 @@ export default function AddHighlights({ onSuccess, onCancel }: { onSuccess?: () 
           />
         </div>
 
-        {/* Sube a images/highlights/... */}
         <ImageUpload
           key={uploaderKey}
           folder="highlights"
@@ -66,7 +106,6 @@ export default function AddHighlights({ onSuccess, onCancel }: { onSuccess?: () 
           onUploadingChange={setUploading}
         />
 
-        {/* Botón para enviar el formulario */}
         <div className="flex gap-4 px-4 text-sm font-bold justify-center">
           <button
             type="button"
@@ -81,7 +120,7 @@ export default function AddHighlights({ onSuccess, onCancel }: { onSuccess?: () 
             className="flex px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-button-send)] text-white
                        disabled:opacity-60 items-center justify-center transition font-bold hover:bg-[var(--color-button-send-hover)]"
           >
-            {saving ? "Creando..." : uploading ? "Subiendo imagen..." : "Añadir"}
+            {saving ? "Creando..." : uploading ? "Subiendo imagen..." : "Anadir"}
           </button>
         </div>
       </form>

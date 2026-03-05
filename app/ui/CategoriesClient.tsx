@@ -5,12 +5,22 @@ import Modal from "@/app/ui/Modals/Modal";
 import AddCategories from "@/app/ui/AddCategories";
 import EditCategories from "@/app/ui/EditCategories";
 import { useState, useRef, useEffect, useTransition, useMemo } from "react";
-import { Category } from "@/app/lib/validators/types";
+import { Category, TenantOption } from "@/app/lib/validators/types";
 import { CirclePlus, Search, EllipsisVertical, Pen, Trash, Pencil, TriangleAlert, Edit, Upload } from "lucide-react";
 import { deleteCategoryAction } from "@/app/dashboard/categorias/actions";
 import { useRouter } from "next/navigation";
 
-export default function CategoriesPage({ categories }: { categories: Category[] }) {
+export default function CategoriesPage({
+  categories,
+  tenants,
+  isAdmin,
+  activeTenantId,
+}: {
+  categories: Category[];
+  tenants: TenantOption[];
+  isAdmin: boolean;
+  activeTenantId: string;
+}) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState("");
@@ -215,6 +225,9 @@ export default function CategoriesPage({ categories }: { categories: Category[] 
           title="Añadir Categoría"
           fixedBody={
             <AddCategories
+              tenants={tenants}
+              isAdmin={isAdmin}
+              activeTenantId={activeTenantId}
               onCancel={() => setActiveModal(null)}
               onSuccess={() => {
                 setActiveModal(null);
