@@ -1,17 +1,8 @@
 "use server";
 
 import { revalidateTag } from "next/cache";
-import { createServer } from "@/app/lib/supabase/server";
 import { createHighlight, listHighlights, updateHighlight, deleteHighlight } from "@/app/lib/data/highlights";
-
-async function requireUser() {
-  const supabase = await createServer();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-  if (error || !user) throw new Error("Sesion no valida");
-}
+import { requireUser } from "@/app/lib/auth";
 
 export async function createHighlightAction(payload: { description: string; image_path: string }) {
   await requireUser();

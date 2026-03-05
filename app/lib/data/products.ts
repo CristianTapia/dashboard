@@ -72,38 +72,61 @@ export async function createProduct(input: CreateProductInput) {
 }
 
 export async function updateProduct(id: number, input: UpdateProductInput) {
-  const supabase = await createServer();
-  const tenantId = await getCurrentTenantId();
+  const isAdmin = await isCurrentUserAdmin();
+  const tenantId = isAdmin ? null : await getCurrentTenantId();
+  const db = isAdmin ? createAdmin() : await createServer();
 
   if (typeof input.category_id === "number") {
-    await assertCategoryBelongsToTenant(input.category_id, tenantId);
+    if (!isAdmin && tenantId) {
+      await assertCategoryBelongsToTenant(input.category_id, tenantId);
+    } else {
+      const { data: product, error: productError } = await db
+        .from("products")
+        .select("tenant_id")
+        .eq("id", id)
+        .maybeSingle<{ tenant_id: string | null }>();
+
+      if (productError) throw new Error(productError.message);
+      if (!product?.tenant_id) throw new Error("Producto no encontrado");
+
+      const admin = createAdmin();
+      const { data: category, error: categoryError } = await admin
+        .from("categories")
+        .select("id")
+        .eq("id", input.category_id)
+        .eq("tenant_id", product.tenant_id)
+        .maybeSingle();
+
+      if (categoryError) throw new Error(categoryError.message);
+      if (!category) throw new Error("Categoria invalida para este tenant");
+    }
   }
 
-  const { data, error } = await supabase
-    .from("products")
-    .update(input)
-    .eq("id", id)
-    .eq("tenant_id", tenantId)
-    .select()
-    .single();
+  let query = db.from("products").update(input).eq("id", id);
+  if (tenantId) {
+    query = query.eq("tenant_id", tenantId);
+  }
+
+  const { data, error } = await query.select().maybeSingle();
 
   if (error) throw new Error(error.message);
+  if (!data) throw new Error("Producto no encontrado o sin permisos");
   return data;
 }
 
 const IMAGE_BUCKET = process.env.SB_BUCKET_NAME ?? "images";
 
 export async function deleteProduct(id: number) {
-  const supabase = await createServer();
-  const tenantId = await getCurrentTenantId();
+  const isAdmin = await isCurrentUserAdmin();
+  const tenantId = isAdmin ? null : await getCurrentTenantId();
+  const db = isAdmin ? createAdmin() : await createServer();
 
-  const { data, error } = await supabase
-    .from("products")
-    .delete()
-    .eq("id", id)
-    .eq("tenant_id", tenantId)
-    .select("id, image_path")
-    .maybeSingle<{ id: number; image_path: string | null }>();
+  let query = db.from("products").delete().eq("id", id);
+  if (tenantId) {
+    query = query.eq("tenant_id", tenantId);
+  }
+
+  const { data, error } = await query.select("id, image_path").maybeSingle<{ id: number; image_path: string | null }>();
 
   if (error) throw new Error(error.message);
 
@@ -112,7 +135,8 @@ export async function deleteProduct(id: number) {
   }
 
   if (data.image_path) {
-    const { error: storageError } = await supabase.storage.from(IMAGE_BUCKET).remove([data.image_path]);
+    const admin = createAdmin();
+    const { error: storageError } = await admin.storage.from(IMAGE_BUCKET).remove([data.image_path]);
     if (storageError) {
       console.error("deleteProduct storage error:", storageError);
       throw new Error("Producto eliminado pero no se pudo eliminar la imagen asociada");

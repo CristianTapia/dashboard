@@ -1,17 +1,8 @@
 "use server";
 
 import { revalidatePath, revalidateTag } from "next/cache";
-import { createServer } from "@/app/lib/supabase/server";
 import { createProduct, listProducts, updateProduct, deleteProduct } from "@/app/lib/data/products";
-
-async function requireUser() {
-  const supabase = await createServer();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-  if (error || !user) throw new Error("Sesion no valida");
-}
+import { requireUser } from "@/app/lib/auth";
 
 export async function createProductAction(payload: {
   name: string;

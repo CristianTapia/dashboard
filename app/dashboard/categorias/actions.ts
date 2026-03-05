@@ -1,17 +1,8 @@
 "use server";
 
 import { revalidateTag } from "next/cache";
-import { createServer } from "@/app/lib/supabase/server";
 import { createCategory, listCategories, deleteCategory, updateCategory } from "@/app/lib/data/categories";
-
-async function requireUser() {
-  const supabase = await createServer();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-  if (error || !user) throw new Error("Sesion no valida");
-}
+import { requireUser } from "@/app/lib/auth";
 
 export async function createCategoryAction(payload: { name: string }) {
   await requireUser();

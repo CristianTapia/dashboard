@@ -1,71 +1,70 @@
-// app/api/upload/route.ts
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { requireUser } from "@/app/lib/auth";
+import { limitByKey } from "@/app/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // server only
-);
-
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 const BUCKET = process.env.SB_BUCKET_NAME ?? "images";
-
-// ✅ carpetas permitidas dentro del bucket (puedes agregar más)
 const ALLOWED_FOLDERS = new Set(["products", "highlights", "banners"]);
+const ALLOWED_EXT = new Set(["jpg", "jpeg", "png", "webp", "gif"]);
 
-// normaliza y valida carpeta; si no es válida, cae en "products"
 function sanitizeFolder(raw?: string | null) {
   const base = (raw ?? "products").toString().trim();
-  // quita slashes extremos y caracteres no permitidos
   const clean = base.replace(/^\/+|\/+$/g, "").replace(/[^a-z0-9/_-]/gi, "");
-  // la raíz es lo que validamos contra la whitelist
   const root = (clean.split("/")[0] || "products").toLowerCase();
   if (!ALLOWED_FOLDERS.has(root)) return "products";
-  // si pasó la raíz, retornamos la ruta limpia (puede incluir subcarpetas bajo la raíz permitida)
   return clean || "products";
+}
+
+function getClientKey(req: Request, userId: string) {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  return `${ip}:${userId}`;
 }
 
 export async function POST(req: Request) {
   try {
+    const user = await requireUser();
+    const key = getClientKey(req, user.id);
+    const limited = limitByKey(`upload:${key}`, 20, 60_000);
+    if (!limited.ok) {
+      return NextResponse.json(
+        { error: "Demasiadas solicitudes, intenta nuevamente en unos segundos" },
+        { status: 429, headers: { "Retry-After": String(Math.ceil((limited.resetAt - Date.now()) / 1000)) } }
+      );
+    }
+
     const formData = await req.formData();
-
     const file = formData.get("file") as File | null;
+
     if (!file) return NextResponse.json({ error: "Archivo requerido" }, { status: 400 });
-    if (!file.type?.startsWith("image/")) {
-      return NextResponse.json({ error: "Solo imágenes" }, { status: 400 });
-    }
-    if (file.size > 2 * 1024 * 1024) {
-      return NextResponse.json({ error: "Máx 2MB" }, { status: 400 });
-    }
+    if (!file.type?.startsWith("image/")) return NextResponse.json({ error: "Solo imagenes" }, { status: 400 });
+    if (file.size > 2 * 1024 * 1024) return NextResponse.json({ error: "Maximo 2MB" }, { status: 400 });
 
-    const folder = sanitizeFolder(formData.get("folder") as string | null); // p.ej. "products", "highlights/ofertas"
-    const ext = (file.name.split(".").pop() || "png").toLowerCase();
-    const key = `${folder}/${crypto.randomUUID()}.${ext}`;
+    const ext = (file.name.split(".").pop() || "").toLowerCase();
+    if (!ALLOWED_EXT.has(ext)) return NextResponse.json({ error: "Extension no permitida" }, { status: 400 });
 
+    const folder = sanitizeFolder(formData.get("folder") as string | null);
+    const storagePath = `${folder}/${crypto.randomUUID()}.${ext}`;
     const arrayBuffer = await file.arrayBuffer();
-    const { error: upErr } = await supabase.storage.from(BUCKET).upload(key, Buffer.from(arrayBuffer), {
+
+    const { error: upErr } = await supabase.storage.from(BUCKET).upload(storagePath, Buffer.from(arrayBuffer), {
       contentType: file.type,
-      cacheControl: "31536000", // 1 año
+      cacheControl: "31536000",
       upsert: false,
     });
     if (upErr) return NextResponse.json({ error: upErr.message }, { status: 500 });
 
-    // URL pública permanente (bucket debe ser público)
-    const pub = supabase.storage.from(BUCKET).getPublicUrl(key);
-    const image_url = pub.data.publicUrl;
-
+    const pub = supabase.storage.from(BUCKET).getPublicUrl(storagePath);
     return NextResponse.json(
-      { image_url, path: key, bucket: BUCKET },
-      {
-        status: 201,
-        headers: {
-          "Cache-Control": "no-store",
-        },
-      }
+      { image_url: pub.data.publicUrl, path: storagePath, bucket: BUCKET },
+      { status: 201, headers: { "Cache-Control": "no-store" } }
     );
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message ?? "Server error" }, { status: 500 });
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Server error";
+    const status = message === "Sesion no valida" ? 401 : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }

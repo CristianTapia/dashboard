@@ -1,6 +1,8 @@
 import { listCategories } from "@/app/lib/data";
 import CategoriesClient from "@/app/ui/CategoriesClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function CategoriesPage() {
   const categories = await listCategories(); // server-only helper
 

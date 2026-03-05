@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { listPublicProductsByTenant, resolveTenantByPublicKey } from "@/app/lib/data/public-menu";
+import { limitByKey } from "@/app/lib/rate-limit";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": process.env.CORS_ORIGIN ?? "*",
@@ -11,8 +12,17 @@ export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: corsHeaders });
 }
 
-export async function GET(_req: Request, { params }: { params: { tenant: string } }) {
+export async function GET(req: Request, { params }: { params: { tenant: string } }) {
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const limited = limitByKey(`public-menu:${ip}:${params.tenant}`, 120, 60_000);
+    if (!limited.ok) {
+      return NextResponse.json(
+        { error: "Demasiadas solicitudes, intenta nuevamente en unos segundos" },
+        { status: 429, headers: { ...corsHeaders, "Retry-After": String(Math.ceil((limited.resetAt - Date.now()) / 1000)) } }
+      );
+    }
+
     const tenantKey = decodeURIComponent(params.tenant);
     const tenant = await resolveTenantByPublicKey(tenantKey);
 

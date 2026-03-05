@@ -1,21 +1,12 @@
 "use server";
 
 import { revalidateTag } from "next/cache";
-import { createServer } from "@/app/lib/supabase/server";
 import { createUser, listUsers, deleteUser, updateUser } from "@/app/lib/data/users";
 import { CreateUserSchema } from "@/app/lib/validators/users";
-
-async function requireUser() {
-  const supabase = await createServer();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-  if (error || !user) throw new Error("Sesion no valida");
-}
+import { requireAdmin } from "@/app/lib/auth";
 
 export async function createUserAction(payload: unknown) {
-  await requireUser();
+  await requireAdmin();
 
   const parsed = CreateUserSchema.safeParse(payload);
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Datos invalidos");
@@ -27,14 +18,14 @@ export async function createUserAction(payload: unknown) {
 }
 
 export async function listUsersAction() {
-  await requireUser();
+  await requireAdmin();
   const users = await listUsers();
   revalidateTag("users");
   return { ok: true, users };
 }
 
 export async function deleteUserAction(id: string) {
-  await requireUser();
+  await requireAdmin();
   await deleteUser(id);
   // refresca el listado
   revalidateTag("users");
@@ -42,7 +33,7 @@ export async function deleteUserAction(id: string) {
 }
 
 export async function updateUserAction(id: string, payload: { tenantName?: string }) {
-  await requireUser();
+  await requireAdmin();
   const updated = await updateUser(id, payload);
   revalidateTag("users");
   return { ok: true, updated };

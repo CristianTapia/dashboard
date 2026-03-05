@@ -1,7 +1,8 @@
-// app/api/categories/route.ts
 import { NextResponse } from "next/server";
-import { createAdmin } from "@/app/lib/supabase";
+import { ZodError } from "zod";
 import { CreateCategorySchema } from "@/app/lib/validators/categories";
+import { createCategory, listCategories } from "@/app/lib/data/categories";
+import { requireUser } from "@/app/lib/auth";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": process.env.CORS_ORIGIN ?? "*",
@@ -13,30 +14,32 @@ export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: corsHeaders });
 }
 
-// Maneja GET y POST de categorías (public GET)
 export async function GET() {
-  const db = createAdmin();
-  const { data, error } = await db.from("categories").select("id, name").order("name", { ascending: true });
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders });
-  return NextResponse.json(data, { status: 200, headers: corsHeaders });
+  try {
+    await requireUser();
+    const categories = await listCategories();
+    const data = categories.map((c) => ({ id: c.id, name: c.name }));
+    return NextResponse.json(data, { status: 200, headers: corsHeaders });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Server error";
+    const status = message === "Sesion no valida" ? 401 : 500;
+    return NextResponse.json({ error: message }, { status, headers: corsHeaders });
+  }
 }
 
 export async function POST(request: Request) {
   try {
+    await requireUser();
     const body = await request.json();
     const { name } = CreateCategorySchema.parse(body);
-    const db = createAdmin();
-    const { data, error } = await db
-      .from("categories")
-      .upsert({ name }, { onConflict: "name" })
-      .select("id, name")
-      .single();
-    if (error) return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders });
-    return NextResponse.json(data, { status: 200, headers: corsHeaders });
-  } catch (err: any) {
-    const status = err?.name === "ZodError" ? 400 : 500;
-    const message = err?.message || (status === 400 ? "Payload inválido" : "Server error");
+    const data = await createCategory({ name });
+    return NextResponse.json({ id: data.id, name: data.name }, { status: 200, headers: corsHeaders });
+  } catch (err: unknown) {
+    if (err instanceof ZodError) {
+      return NextResponse.json({ error: err.issues[0]?.message ?? "Payload invalido" }, { status: 400, headers: corsHeaders });
+    }
+    const message = err instanceof Error ? err.message : "Server error";
+    const status = message === "Sesion no valida" ? 401 : 500;
     return NextResponse.json({ error: message }, { status, headers: corsHeaders });
   }
 }
