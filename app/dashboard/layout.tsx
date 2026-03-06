@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createServer } from "@/app/lib/supabase/server";
 import DashboardNavButton from "../ui/DashboardNavButton";
+import LogoutButton from "../ui/LogoutButton";
 import { ChartNoAxesColumn, BadgeDollarSign, UtensilsCrossed, Shapes, Settings, Users } from "lucide-react";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -54,6 +55,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <DashboardNavButton icon={<Users size={iconSize} />} name="Usuarios" href="/dashboard/usuarios" />
           </ul>
         </nav>
+        <div className="p-4 pt-0">
+          <LogoutButton />
+        </div>
       </aside>
 
       {/* Main content */}
