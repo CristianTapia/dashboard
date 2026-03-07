@@ -50,7 +50,13 @@ export async function listPublicProductsByTenant(
   const urlMap = await signPaths(paths, 3600);
 
   return products.map((p) => ({
-    ...p,
+    id: p.id,
+    name: p.name,
+    price: p.price,
+    stock: p.stock,
+    description: p.description,
+    created_at: p.created_at,
+    category: p.category,
     image_url: p.image_path ? urlMap.get(p.image_path) ?? null : null,
   }));
 }
@@ -82,7 +88,9 @@ export async function listPublicHighlightsByTenant(tenantId: string, { limit = 1
   const urlMap = await signPaths(paths, 3600);
 
   return highlights.map((h) => ({
-    ...h,
+    id: h.id,
+    description: h.description,
+    created_at: h.created_at,
     image_url: h.image_path ? urlMap.get(h.image_path) ?? null : null,
   }));
 }

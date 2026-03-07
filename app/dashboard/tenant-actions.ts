@@ -31,6 +31,7 @@ export async function setActiveTenantAction(tenantId: string) {
     path: "/",
     httpOnly: true,
     sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
   });
 
   return { ok: true };

@@ -6,7 +6,7 @@ import { getCurrentUserOptional, requireUser } from "@/app/lib/auth";
 import { listPublicCategoriesByTenant, resolveTenantByPublicKey } from "@/app/lib/data/public-menu";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": process.env.CORS_ORIGIN ?? "*",
+  ...(process.env.CORS_ORIGIN ? { "Access-Control-Allow-Origin": process.env.CORS_ORIGIN } : {}),
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };

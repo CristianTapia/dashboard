@@ -3,7 +3,7 @@ import { listPublicProductsByTenant, resolveTenantByPublicKey } from "@/app/lib/
 import { limitByKey } from "@/app/lib/rate-limit";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": process.env.CORS_ORIGIN ?? "*",
+  ...(process.env.CORS_ORIGIN ? { "Access-Control-Allow-Origin": process.env.CORS_ORIGIN } : {}),
   "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };

@@ -56,6 +56,8 @@
 // app/api/signed/route.ts
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { requireUser } from "@/app/lib/auth";
+import { limitByKey } from "@/app/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -70,7 +72,7 @@ function isAllowedPath(p: string) {
 }
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": process.env.CORS_ORIGIN ?? "*", // o tu dominio exacto
+  ...(process.env.CORS_ORIGIN ? { "Access-Control-Allow-Origin": process.env.CORS_ORIGIN } : {}),
   "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
@@ -81,6 +83,16 @@ export async function OPTIONS() {
 
 export async function GET(req: Request) {
   try {
+    const user = await requireUser();
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const limited = limitByKey(`signed:${ip}:${user.id}`, 120, 60_000);
+    if (!limited.ok) {
+      return NextResponse.json(
+        { error: "Demasiadas solicitudes, intenta nuevamente en unos segundos" },
+        { status: 429, headers: { ...corsHeaders, "Retry-After": String(Math.ceil((limited.resetAt - Date.now()) / 1000)) } }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     const path = searchParams.get("path");
     const expiresParam = Number(searchParams.get("expires") ?? 3600);
@@ -104,7 +116,9 @@ export async function GET(req: Request) {
       { status: 200, headers: { ...corsHeaders, "Cache-Control": "no-store" } }
     );
     return res;
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message || "Server error" }, { status: 500, headers: corsHeaders });
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Server error";
+    const status = message === "Sesion no valida" ? 401 : 500;
+    return NextResponse.json({ error: message }, { status, headers: corsHeaders });
   }
 }
