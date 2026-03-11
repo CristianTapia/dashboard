@@ -10,12 +10,10 @@ import type { Category, Product } from "@/app/lib/validators/types";
 export default function EditProducts({
   product,
   categories,
-  onCancel,
   onSuccess,
 }: {
   product: Product;
   categories: Category[];
-  onCancel?: () => void;
   onSuccess?: () => void;
 }) {
   const [name, setName] = useState(product.name);
@@ -61,7 +59,7 @@ export default function EditProducts({
     }
   };
 
-  const handleImageChange = (info: any) => {
+  const handleImageChange = (info: { path?: string | null; url?: string | null } | string | null) => {
     const val = typeof info === "string" ? info : info?.path ?? info?.url ?? null;
     setImagePath(val);
     updatePreviewFromPath(val);
@@ -148,8 +146,9 @@ export default function EditProducts({
           router.refresh();
           onSuccess?.();
         }
-      } catch (err: any) {
-        alert(err?.message || "Error agregando el producto");
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Error agregando el producto";
+        alert(message);
         console.error(err);
       }
     });

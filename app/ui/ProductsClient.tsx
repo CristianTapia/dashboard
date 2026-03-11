@@ -52,11 +52,6 @@ export default function Products({
     setActiveModal(modalName);
   }
 
-  const onSuccess = () => {
-    console.log("Producto agregado con éxito. Aquí podrías refrescar los datos.");
-    router.refresh(); // si usas App Router con fetch server-side
-  };
-
   const tenantOptions = useMemo(() => {
     const map = new Map<string, string>();
     for (const product of products) {

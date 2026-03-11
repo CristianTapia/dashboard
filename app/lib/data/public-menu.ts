@@ -8,6 +8,18 @@ type TenantRow = {
   domain: string | null;
 };
 
+type CategoryShape = { id: number; name: string };
+type ProductRow = {
+  id: number;
+  name: string;
+  price: number;
+  stock: number | null;
+  description: string | null;
+  image_path: string | null;
+  created_at: string;
+  category: CategoryShape | CategoryShape[] | null;
+};
+
 export async function resolveTenantByPublicKey(tenantKey: string) {
   const admin = createAdmin();
 
@@ -45,20 +57,23 @@ export async function listPublicProductsByTenant(
 
   if (error) throw new Error(error.message);
 
-  const products = data ?? [];
+  const products = (data ?? []) as ProductRow[];
   const paths = products.map((p) => p.image_path).filter((x): x is string => !!x);
   const urlMap = await signPaths(paths, 3600);
 
-  return products.map((p) => ({
-    id: p.id,
-    name: p.name,
-    price: p.price,
-    stock: p.stock,
-    description: p.description,
-    created_at: p.created_at,
-    category: p.category,
-    image_url: p.image_path ? urlMap.get(p.image_path) ?? null : null,
-  }));
+  return products.map((p) => {
+    const categoryValue = Array.isArray(p.category) ? p.category[0] ?? null : p.category;
+    return {
+      id: p.id,
+      name: p.name,
+      price: p.price,
+      stock: p.stock,
+      description: p.description,
+      created_at: p.created_at,
+      category: categoryValue ? { id: categoryValue.id, name: categoryValue.name } : null,
+      image_url: p.image_path ? urlMap.get(p.image_path) ?? null : null,
+    };
+  });
 }
 
 export async function listPublicCategoriesByTenant(tenantId: string) {

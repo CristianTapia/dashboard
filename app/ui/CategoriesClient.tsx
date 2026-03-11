@@ -6,7 +6,7 @@ import AddCategories from "@/app/ui/AddCategories";
 import EditCategories from "@/app/ui/EditCategories";
 import { useState, useRef, useEffect, useTransition, useMemo } from "react";
 import { Category, TenantOption } from "@/app/lib/validators/types";
-import { CirclePlus, Search, EllipsisVertical, Pen, Trash, Pencil, TriangleAlert, Edit, Upload } from "lucide-react";
+import { CirclePlus, Search, EllipsisVertical, Pen, Trash, Pencil, TriangleAlert, Upload } from "lucide-react";
 import { deleteCategoryAction } from "@/app/dashboard/categorias/actions";
 import { useRouter } from "next/navigation";
 
@@ -61,7 +61,7 @@ export default function CategoriesPage({
     };
   }, [openDropdownId]);
 
-  function openModal(modalName: "addCategory" | "confirmDelete" | "editCategory", id?: number) {
+  function openModal(modalName: "addCategory" | "confirmDelete" | "editCategory") {
     setActiveModal(modalName);
   }
 

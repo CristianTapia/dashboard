@@ -2,6 +2,14 @@ import "server-only";
 import { createAdmin } from "@/app/lib/supabase/admin";
 import { CreateUserInput, UpdateUserInput } from "@/app/lib/validators/users";
 
+type TenantShape = { id: string; name: string };
+type MembershipRow = {
+  user_id: string;
+  role: string | null;
+  tenant_id: string | null;
+  tenants: TenantShape | TenantShape[] | null;
+};
+
 export async function listUsers() {
   const supabase = createAdmin();
 
@@ -12,7 +20,9 @@ export async function listUsers() {
 
   if (membershipError) throw new Error(membershipError.message);
 
-  const userIds = Array.from(new Set((memberships ?? []).map((m) => m.user_id))).filter(Boolean);
+  const normalizedMemberships = ((memberships ?? []) as unknown) as MembershipRow[];
+
+  const userIds = Array.from(new Set(normalizedMemberships.map((m) => m.user_id))).filter(Boolean);
   let usersById = new Map<string, { id: string; email: string | null }>();
 
   if (userIds.length > 0) {
@@ -26,13 +36,16 @@ export async function listUsers() {
     usersById = new Map(filtered.map((u) => [u.id, { id: u.id, email: u.email ?? null }]));
   }
 
-  return (memberships ?? []).map((m) => ({
-    userId: m.user_id,
-    email: usersById.get(m.user_id)?.email ?? null,
-    role: m.role,
-    tenantId: m.tenant_id,
-    tenantName: m.tenants?.name ?? "Sin nombre",
-  }));
+  return normalizedMemberships.map((m) => {
+    const tenantValue = Array.isArray(m.tenants) ? m.tenants[0] ?? null : m.tenants;
+    return {
+      userId: m.user_id,
+      email: usersById.get(m.user_id)?.email ?? null,
+      role: m.role,
+      tenantId: m.tenant_id,
+      tenantName: tenantValue?.name ?? "Sin nombre",
+    };
+  });
 }
 
 export async function createUser(input: CreateUserInput) {

@@ -16,8 +16,8 @@ export default async function AllProductsPage() {
 
   return (
     <ProductsClient
-      products={products as any}
-      categories={categories as any}
+      products={products}
+      categories={categories}
       tenants={tenantCtx.tenants}
       isAdmin={tenantCtx.isAdmin}
       activeTenantId={tenantCtx.activeTenantId}

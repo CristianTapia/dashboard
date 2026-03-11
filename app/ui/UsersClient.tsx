@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { CirclePlus, Search, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { User } from "@/app/lib/validators/types";
 import Modal from "@/app/ui/Modals/Modal";
 import AddUsers from "@/app/ui/AddUsers";
 
@@ -21,12 +20,10 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
 
   const [rows, setRows] = useState<UserTenantRow[]>(initialUsers);
   const [activeModal, setActiveModal] = useState<null | "addUser" | "confirmDelete" | "editUser" | "useFilter">(null);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const router = useRouter();
 
   // MODALES
-  function openModal(modalName: "addUser" | "confirmDelete" | "editUser" | "useFilter", user?: User | null) {
-    setSelectedUser(user ?? null);
+  function openModal(modalName: "addUser" | "confirmDelete" | "editUser" | "useFilter") {
     setActiveModal(modalName);
   }
 

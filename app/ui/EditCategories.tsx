@@ -33,8 +33,9 @@ export default function EditCategories({
           setName("");
           onSuccess?.();
         }
-      } catch (err: any) {
-        alert(err?.message || "Error editando la categoría");
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Error editando la categoría";
+        alert(message);
         console.error(err);
       }
     });

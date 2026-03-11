@@ -4,6 +4,21 @@ import { createAdmin } from "@/app/lib/supabase";
 import { CreateProductInput, UpdateProductInput } from "@/app/lib/validators";
 import { signPaths } from "@/app/lib/data/images";
 import { getCurrentTenantId, isCurrentUserAdmin, resolveWritableTenantId } from "@/app/lib/tenant";
+import type { Product } from "@/app/lib/validators/types";
+
+type TenantShape = { id: string; name: string };
+type CategoryShape = { id: number; name: string };
+type ProductRow = {
+  id: number;
+  name: string;
+  price: number;
+  stock: number | null;
+  description: string | null;
+  image_path: string | null;
+  tenant_id: string | null;
+  tenant: TenantShape | TenantShape[] | null;
+  category: CategoryShape | CategoryShape[] | null;
+};
 
 async function assertCategoryBelongsToTenant(categoryId: number, tenantId: string, useAdmin = false) {
   const db = useAdmin ? createAdmin() : await createServer();
@@ -36,7 +51,23 @@ export async function listProducts({ limit = 20, offset = 0 }: { limit?: number;
   const { data, error } = await query;
 
   if (error) throw new Error(error.message);
-  return data ?? [];
+  const rows = (data ?? []) as ProductRow[];
+
+  return rows.map((row): Product => {
+    const tenantValue = Array.isArray(row.tenant) ? row.tenant[0] ?? null : row.tenant ?? null;
+    const categoryValue = Array.isArray(row.category) ? row.category[0] ?? null : row.category ?? null;
+    return {
+      id: row.id,
+      name: row.name,
+      price: row.price,
+      stock: row.stock ?? 0,
+      description: row.description ?? "",
+      image_path: row.image_path,
+      tenant_id: row.tenant_id,
+      tenant: tenantValue ? { id: tenantValue.id, name: tenantValue.name } : null,
+      category: categoryValue ? { id: categoryValue.id, name: categoryValue.name } : { id: 0, name: "Sin categoría" },
+    };
+  });
 }
 
 export async function listProductsWithSigned({

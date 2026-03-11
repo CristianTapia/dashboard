@@ -1,6 +1,6 @@
 "use client";
 
-import { RefObject, useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
 import { ImageUp, Trash2, RefreshCw, Loader2 } from "lucide-react";
 
@@ -29,7 +29,6 @@ export default function ImageInput({
   const iconSize = 16;
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imagePath, setImagePath] = useState<string | null>(initialPath);
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
 
@@ -72,13 +71,12 @@ export default function ImageInput({
       const json = await res.json();
       if (!res.ok) throw new Error(json?.error || "Error subiendo imagen");
 
-      setImagePath(json.path);
       onUploaded?.(json.path);
       await fetchSigned(json.path);
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error(e);
-      alert(e.message || "Error subiendo imagen");
-      setImagePath(null);
+      const message = e instanceof Error ? e.message : "Error subiendo imagen";
+      alert(message);
       onUploaded?.(null);
       setImagePreview(null);
     } finally {
@@ -125,16 +123,13 @@ export default function ImageInput({
 
   useEffect(() => {
     if (!initialPath) {
-      setImagePath(null);
       setImagePreview(null);
       return;
     }
-    setImagePath(initialPath);
     fetchSigned(initialPath).catch(() => setImagePreview(null));
   }, [initialPath]);
 
   const clearImage = () => {
-    setImagePath(null);
     setImagePreview(null);
     onUploaded?.(null);
     if (fileInputRef.current) fileInputRef.current.value = "";

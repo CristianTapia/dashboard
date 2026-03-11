@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Upload } from "lucide-react";
+import { X } from "lucide-react";
 
 const baseClassNameButton = "flex px-4 p-3 gap-2 rounded-xl cursor-pointer";
 

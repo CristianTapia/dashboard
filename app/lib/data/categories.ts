@@ -3,6 +3,15 @@ import { createServer } from "@/app/lib/supabase/server";
 import { createAdmin } from "@/app/lib/supabase";
 import { getCurrentTenantId, isCurrentUserAdmin, resolveWritableTenantId } from "@/app/lib/tenant";
 import { CreateCategoryInput, UpdateCategoryInput } from "../validators";
+import type { Category } from "../validators/types";
+
+type TenantShape = { id: string; name: string };
+type CategoryRow = {
+  id: number;
+  name: string;
+  tenant_id: string | null;
+  tenant: TenantShape | TenantShape[] | null;
+};
 
 export async function listCategories() {
   const isAdmin = await isCurrentUserAdmin();
@@ -21,7 +30,18 @@ export async function listCategories() {
   const { data, error } = await query;
 
   if (error) throw new Error(error.message);
-  return data ?? [];
+
+  const rows = (data ?? []) as CategoryRow[];
+
+  return rows.map((row): Category => {
+    const tenantValue = Array.isArray(row.tenant) ? row.tenant[0] ?? null : row.tenant ?? null;
+    return {
+      id: row.id,
+      name: row.name,
+      tenant_id: row.tenant_id,
+      tenant: tenantValue ? { id: tenantValue.id, name: tenantValue.name } : null,
+    };
+  });
 }
 
 export async function createCategory(input: CreateCategoryInput, requestedTenantId?: string) {

@@ -6,10 +6,21 @@ import { TenantOption } from "@/app/lib/validators/types";
 
 type TenantMembershipRow = {
   tenant_id: string;
-  tenants: {
-    id: string;
-    name: string;
-  } | null;
+  tenants:
+    | {
+        id: string;
+        name: string;
+      }
+    | {
+        id: string;
+        name: string;
+      }[]
+    | null;
+};
+
+type TenantShape = {
+  id: string;
+  name: string;
 };
 
 export async function listSelectableTenants() {
@@ -41,10 +52,10 @@ export async function listSelectableTenants() {
 
   if (error) throw new Error(error.message);
 
-  const memberships = (data ?? []) as TenantMembershipRow[];
+  const memberships = ((data ?? []) as unknown) as TenantMembershipRow[];
   const tenants: TenantOption[] = memberships
-    .map((row) => row.tenants)
-    .filter((t): t is { id: string; name: string } => !!t?.id && !!t?.name)
+    .map((row) => (Array.isArray(row.tenants) ? row.tenants[0] ?? null : row.tenants))
+    .filter((t): t is TenantShape => !!t?.id && !!t?.name)
     .map((t) => ({ id: t.id, name: t.name }));
 
   return { isAdmin, activeTenantId, tenants };

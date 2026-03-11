@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { ImageUp } from "lucide-react";
 
 type Props = {
   onUploaded?: (path: string | null) => void;
@@ -49,9 +48,10 @@ export default function ImageInput({ onUploaded, onUploadingChange, initialPath 
       setImagePath(json.path);
       onUploaded?.(json.path);
       await fetchSigned(json.path);
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error(e);
-      alert(e.message || "Error subiendo imagen");
+      const message = e instanceof Error ? e.message : "Error subiendo imagen";
+      alert(message);
       setImagePath(null);
       onUploaded?.(null);
       setImagePreview(null);

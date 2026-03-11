@@ -9,11 +9,9 @@ import type { Highlight } from "@/app/lib/validators/types";
 
 export default function EditHighlights({
   highlight,
-  onCancel,
   onSuccess,
 }: {
   highlight: Highlight;
-  onCancel?: () => void;
   onSuccess?: () => void;
 }) {
   const [description, setDescription] = useState(highlight.description ?? "");
@@ -51,7 +49,7 @@ export default function EditHighlights({
     }
   };
 
-  const handleImageChange = (info: any) => {
+  const handleImageChange = (info: { path?: string | null; url?: string | null } | string | null) => {
     const val = typeof info === "string" ? info : info?.path ?? info?.url ?? null;
     setImagePath(val);
     updatePreviewFromPath(val);
@@ -101,8 +99,9 @@ export default function EditHighlights({
           router.refresh();
           onSuccess?.();
         }
-      } catch (err: any) {
-        alert(err?.message || "Error agregando el destacado");
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Error agregando el destacado";
+        alert(message);
         console.error(err);
       }
     });

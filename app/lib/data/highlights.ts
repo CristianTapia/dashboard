@@ -4,6 +4,16 @@ import { createServer } from "@/app/lib/supabase/server";
 import { CreateHighlightInput, UpdateHighlightInput } from "@/app/lib/validators";
 import { signPaths } from "@/app/lib/data/images";
 import { getCurrentTenantId, isCurrentUserAdmin, resolveWritableTenantId } from "@/app/lib/tenant";
+import type { Highlight } from "@/app/lib/validators/types";
+
+type TenantShape = { id: string; name: string };
+type HighlightRow = {
+  id: number;
+  description: string;
+  image_path: string | null;
+  tenant_id: string | null;
+  tenant: TenantShape | TenantShape[] | null;
+};
 
 export async function listHighlights({ limit = 20, offset = 0 }: { limit?: number; offset?: number } = {}) {
   const isAdmin = await isCurrentUserAdmin();
@@ -22,7 +32,19 @@ export async function listHighlights({ limit = 20, offset = 0 }: { limit?: numbe
 
   const { data, error } = await query;
   if (error) throw new Error(error.message);
-  return data ?? [];
+
+  const rows = (data ?? []) as HighlightRow[];
+
+  return rows.map((row): Highlight => {
+    const tenantValue = Array.isArray(row.tenant) ? row.tenant[0] ?? null : row.tenant ?? null;
+    return {
+      id: row.id,
+      description: row.description,
+      image_path: row.image_path,
+      tenant_id: row.tenant_id,
+      tenant: tenantValue ? { id: tenantValue.id, name: tenantValue.name } : null,
+    };
+  });
 }
 
 export async function listHighlightsWithSigned({

@@ -34,8 +34,9 @@ export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => voi
           setRole("member");
           onSuccess?.();
         }
-      } catch (err: any) {
-        alert(err?.message || "Error agregando al usuario");
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Error agregando al usuario";
+        alert(message);
         console.error(err);
       }
     });

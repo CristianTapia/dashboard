@@ -21,16 +21,6 @@ export default function LoginPage() {
     else router.push("/dashboard");
   }
 
-  async function handleRegister() {
-    const { error } = await supabaseClient.auth.signUp({
-      email,
-      password,
-    });
-
-    if (error) alert(error.message);
-    else alert("Registro OK (revisa email si esta activo)");
-  }
-
   return (
     <div className="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display transition-colors duration-300">
       <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
