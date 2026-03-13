@@ -27,7 +27,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ tenant: 
       );
     }
 
-    const tenantKey = decodeURIComponent(tenantParam);
+    let tenantKey: string;
+    try {
+      tenantKey = decodeURIComponent(tenantParam);
+    } catch {
+      return NextResponse.json({ error: "Tenant inválido" }, { status: 400, headers: corsHeaders });
+    }
     const tenant = await resolveTenantByPublicKey(tenantKey);
 
     if (!tenant) {

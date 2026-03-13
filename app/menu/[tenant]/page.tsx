@@ -5,7 +5,12 @@ export const dynamic = "force-dynamic";
 
 export default async function PublicMenuPage({ params }: { params: Promise<{ tenant: string }> }) {
   const { tenant } = await params;
-  const tenantKey = decodeURIComponent(tenant);
+  let tenantKey: string;
+  try {
+    tenantKey = decodeURIComponent(tenant);
+  } catch {
+    notFound();
+  }
   const tenantData = await resolveTenantByPublicKey(tenantKey);
 
   if (!tenantData) notFound();
