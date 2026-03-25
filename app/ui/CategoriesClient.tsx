@@ -67,7 +67,7 @@ export default function CategoriesPage({
 
   function openConfirm(
     modalName: "addCategory" | "confirmDelete" | "editCategory",
-    category: { id: number; name: string }
+    category: { id: number; name: string },
   ) {
     setSelectedCategoryId(category.id);
     setSelectedCategoryName(category.name);
@@ -285,6 +285,5 @@ export default function CategoriesPage({
         />
       </div>
     </div>
-    // </div>
   );
 }
