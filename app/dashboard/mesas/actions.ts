@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireUser } from "@/app/lib/auth";
-import { createRestaurantTable, updateRestaurantTableActive } from "@/app/lib/data/tables";
+import { createRestaurantTable, deleteRestaurantTable, updateRestaurantTableActive } from "@/app/lib/data/tables";
 
 export async function createRestaurantTableAction(payload: {
   name?: string;
@@ -30,4 +30,11 @@ export async function updateRestaurantTableActiveAction(id: string, active: bool
   const updated = await updateRestaurantTableActive(id, active);
   revalidatePath("/dashboard/mesas");
   return { ok: true, updated };
+}
+
+export async function deleteRestaurantTableAction(id: string) {
+  await requireUser();
+  await deleteRestaurantTable(id);
+  revalidatePath("/dashboard/mesas");
+  return { ok: true };
 }

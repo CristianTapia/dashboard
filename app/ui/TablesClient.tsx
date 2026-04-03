@@ -2,11 +2,11 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CirclePlus, Copy, ExternalLink, Search, Store, Table2, ToggleLeft, ToggleRight, Upload } from "lucide-react";
+import { CirclePlus, Copy, ExternalLink, Search, Store, Table2, ToggleLeft, ToggleRight, Trash, TriangleAlert, Upload } from "lucide-react";
 
 import AddTable from "@/app/ui/AddTable";
 import Modal from "@/app/ui/Modals/Modal";
-import { updateRestaurantTableActiveAction } from "@/app/dashboard/mesas/actions";
+import { deleteRestaurantTableAction, updateRestaurantTableActiveAction } from "@/app/dashboard/mesas/actions";
 import { RestaurantTable, TenantOption } from "@/app/lib/validators/types";
 
 export default function TablesClient({
@@ -21,7 +21,8 @@ export default function TablesClient({
   activeTenantId: string;
 }) {
   const router = useRouter();
-  const [activeModal, setActiveModal] = useState<null | "addTable">(null);
+  const [activeModal, setActiveModal] = useState<null | "addTable" | "confirmDelete">(null);
+  const [selectedTable, setSelectedTable] = useState<RestaurantTable | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [tenantFilter, setTenantFilter] = useState("all");
   const [isPending, startTransition] = useTransition();
@@ -78,6 +79,25 @@ export default function TablesClient({
     });
   }
 
+  function openDeleteModal(table: RestaurantTable) {
+    setSelectedTable(table);
+    setActiveModal("confirmDelete");
+  }
+
+  function onDelete(table: RestaurantTable) {
+    startTransition(async () => {
+      try {
+        await deleteRestaurantTableAction(table.id);
+        setActiveModal(null);
+        setSelectedTable(null);
+        router.refresh();
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Error eliminando la mesa";
+        alert(message);
+      }
+    });
+  }
+
   return (
     <div className="max-w-auto p-4 flex flex-col">
       <div className="flex flex-col items-start gap-2">
@@ -93,7 +113,7 @@ export default function TablesClient({
           onClick={() => setActiveModal("addTable")}
           className="p-2 pl-5 pr-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
         >
-          <CirclePlus /> Anadir mesa
+          <CirclePlus /> Añadir mesa
         </button>
       </div>
 
@@ -125,7 +145,10 @@ export default function TablesClient({
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {filteredTables.map((table) => (
-          <div key={table.id} className="rounded-xl bg-[var(--color-foreground)] border border-[var(--color-border-box)] p-5">
+          <div
+            key={table.id}
+            className="rounded-xl bg-[var(--color-foreground)] border border-[var(--color-border-box)] p-5"
+          >
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
@@ -221,6 +244,18 @@ export default function TablesClient({
                   </a>
                 </div>
               </div>
+
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  disabled={isPending}
+                  onClick={() => openDeleteModal(table)}
+                  className="inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg border border-red-200 text-[var(--color-delete)] hover:bg-red-50 disabled:opacity-60 cursor-pointer"
+                >
+                  <Trash size={14} />
+                  Eliminar mesa
+                </button>
+              </div>
             </div>
           </div>
         ))}
@@ -250,6 +285,36 @@ export default function TablesClient({
             }}
           />
         }
+      />
+
+      <Modal
+        isOpen={activeModal === "confirmDelete"}
+        onCloseAction={() => {
+          setActiveModal(null);
+          setSelectedTable(null);
+        }}
+        icon={<TriangleAlert color="#DC2626" />}
+        iconBgOptionalClassName="bg-[#fee2e2]"
+        title={`Eliminar mesa ${selectedTable?.label ?? ""}`}
+        fixedBody={
+          <div className="text-[var(--color-txt-secondary)] py-6 text-center text-sm flex flex-col gap-4 items-center">
+            <p>
+              Esta accion eliminara la mesa y dejara inutilizable su link publico actual.
+            </p>
+            <p>No se puede deshacer.</p>
+          </div>
+        }
+        buttonAName="Cancelar"
+        buttonAOptionalClassName="bg-[var(--color-cancel)] text-black"
+        onButtonAClickAction={() => {
+          setActiveModal(null);
+          setSelectedTable(null);
+        }}
+        buttonBName={isPending ? "Eliminando..." : "Eliminar"}
+        buttonBOptionalClassName="bg-[var(--color-delete)] text-white"
+        onButtonBClickAction={() => {
+          if (selectedTable) onDelete(selectedTable);
+        }}
       />
     </div>
   );

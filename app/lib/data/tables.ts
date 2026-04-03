@@ -38,23 +38,13 @@ function buildLabel(table: Pick<RestaurantTableRow, "name" | "number">) {
   return "Mesa";
 }
 
-function slugifyTokenPart(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 24);
-}
-
 function getMenuBaseUrl() {
   return (process.env.NEXT_PUBLIC_MENU_BASE_URL ?? "http://localhost:3000").replace(/\/+$/, "");
 }
 
-function buildPublicToken(input: { name?: string | null; number?: string | null }) {
-  const base = slugifyTokenPart(input.name || input.number || "mesa") || "mesa";
-  return `${base}-${randomBytes(4).toString("hex")}`;
+function buildPublicToken() {
+  const randomToken = randomBytes(9).toString("base64url");
+  return `t-${randomToken}`;
 }
 
 async function loadTenantsMap(db: ReturnType<typeof createAdmin> | Awaited<ReturnType<typeof createServer>>, tenantIds: string[]) {
@@ -141,7 +131,7 @@ export async function createRestaurantTable(
     name,
     number,
     active: input.active ?? true,
-    public_token: buildPublicToken({ name, number }),
+    public_token: buildPublicToken(),
   };
 
   const { data, error } = await db
@@ -185,4 +175,27 @@ export async function updateRestaurantTableActive(id: string, active: boolean) {
 
   const tenantsMap = await loadTenantsMap(db, [data.tenant_id]);
   return mapTable(data, tenantsMap.get(data.tenant_id) ?? null);
+}
+
+export async function deleteRestaurantTable(id: string) {
+  const adminUser = await isCurrentUserAdmin();
+  const currentTenantId = await getCurrentTenantId();
+  const db = adminUser ? createAdmin() : await createServer();
+
+  let query = db.from("restaurant_tables").delete().eq("id", id);
+
+  if (!adminUser) {
+    query = query.eq("tenant_id", currentTenantId);
+  }
+
+  const { error } = await query;
+
+  if (error) {
+    if (isMissingTablesRelation(error)) {
+      throw new Error("La tabla restaurant_tables aun no existe en la base de datos. Aplica la migracion pendiente.");
+    }
+    throw new Error(error.message);
+  }
+
+  return { ok: true };
 }
