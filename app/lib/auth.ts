@@ -1,27 +1,29 @@
 import "server-only";
-import { createServer } from "@/app/lib/supabase/server";
-import { isCurrentUserAdmin } from "@/app/lib/tenant";
+import { getCurrentUser, isCurrentUserAdmin } from "@/app/lib/tenant";
+import { redirect } from "next/navigation";
 
 export async function getCurrentUserOptional() {
-  const supabase = await createServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user ?? null;
+  try {
+    return await getCurrentUser();
+  } catch {
+    return null;
+  }
 }
 
 export async function requireUser() {
-  const supabase = await createServer();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-  if (error || !user) throw new Error("Sesion no valida");
-  return user;
+  return getCurrentUser();
+}
+
+export async function requireUserRedirect(nextPath = "/dashboard") {
+  try {
+    return await getCurrentUser();
+  } catch {
+    redirect(`/login?next=${encodeURIComponent(nextPath)}`);
+  }
 }
 
 export async function requireAdmin() {
-  await requireUser();
+  await getCurrentUser();
   const isAdmin = await isCurrentUserAdmin();
   if (!isAdmin) throw new Error("Permisos insuficientes");
   return { ok: true };

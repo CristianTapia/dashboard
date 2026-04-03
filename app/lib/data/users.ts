@@ -1,6 +1,7 @@
 import "server-only";
 import { createAdmin } from "@/app/lib/supabase/admin";
 import { CreateUserInput, UpdateUserInput } from "@/app/lib/validators/users";
+import { unstable_cache } from "next/cache";
 
 type TenantShape = { id: string; name: string };
 type MembershipRow = {
@@ -10,42 +11,50 @@ type MembershipRow = {
   tenants: TenantShape | TenantShape[] | null;
 };
 
-export async function listUsers() {
-  const supabase = createAdmin();
+const listUsersCached = unstable_cache(
+  async () => {
+    const supabase = createAdmin();
 
-  const { data: memberships, error: membershipError } = await supabase
-    .from("tenant_members")
-    .select("user_id, role, tenant_id, tenants:tenant_id ( id, name )")
-    .order("created_at", { ascending: false });
+    const { data: memberships, error: membershipError } = await supabase
+      .from("tenant_members")
+      .select("user_id, role, tenant_id, tenants:tenant_id ( id, name )")
+      .order("created_at", { ascending: false });
 
-  if (membershipError) throw new Error(membershipError.message);
+    if (membershipError) throw new Error(membershipError.message);
 
-  const normalizedMemberships = ((memberships ?? []) as unknown) as MembershipRow[];
+    const normalizedMemberships = ((memberships ?? []) as unknown) as MembershipRow[];
 
-  const userIds = Array.from(new Set(normalizedMemberships.map((m) => m.user_id))).filter(Boolean);
-  let usersById = new Map<string, { id: string; email: string | null }>();
+    const userIds = Array.from(new Set(normalizedMemberships.map((m) => m.user_id))).filter(Boolean);
+    let usersById = new Map<string, { id: string; email: string | null }>();
 
-  if (userIds.length > 0) {
-    const { data: usersData, error: usersError } = await supabase.auth.admin.listUsers({
-      page: 1,
-      perPage: 1000,
+    if (userIds.length > 0) {
+      const { data: usersData, error: usersError } = await supabase.auth.admin.listUsers({
+        page: 1,
+        perPage: 1000,
+      });
+
+      if (usersError) throw new Error(usersError.message);
+      const filtered = (usersData?.users ?? []).filter((u) => userIds.includes(u.id));
+      usersById = new Map(filtered.map((u) => [u.id, { id: u.id, email: u.email ?? null }]));
+    }
+
+    return normalizedMemberships.map((m) => {
+      const tenantValue = Array.isArray(m.tenants) ? m.tenants[0] ?? null : m.tenants;
+      return {
+        userId: m.user_id,
+        email: usersById.get(m.user_id)?.email ?? null,
+        role: m.role,
+        tenantId: m.tenant_id,
+        tenantName: tenantValue?.name ?? "Sin nombre",
+      };
     });
+  },
+  ["users:list"],
+  { tags: ["users"], revalidate: 300 },
+);
 
-    if (usersError) throw new Error(usersError.message);
-    const filtered = (usersData?.users ?? []).filter((u) => userIds.includes(u.id));
-    usersById = new Map(filtered.map((u) => [u.id, { id: u.id, email: u.email ?? null }]));
-  }
-
-  return normalizedMemberships.map((m) => {
-    const tenantValue = Array.isArray(m.tenants) ? m.tenants[0] ?? null : m.tenants;
-    return {
-      userId: m.user_id,
-      email: usersById.get(m.user_id)?.email ?? null,
-      role: m.role,
-      tenantId: m.tenant_id,
-      tenantName: tenantValue?.name ?? "Sin nombre",
-    };
-  });
+export async function listUsers() {
+  return listUsersCached();
 }
 
 export async function createUser(input: CreateUserInput) {

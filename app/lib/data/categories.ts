@@ -1,9 +1,9 @@
 import "server-only";
-import { createServer } from "@/app/lib/supabase/server";
 import { createAdmin } from "@/app/lib/supabase";
 import { getCurrentTenantId, isCurrentUserAdmin, resolveWritableTenantId } from "@/app/lib/tenant";
 import { CreateCategoryInput, UpdateCategoryInput } from "../validators";
 import type { Category } from "../validators/types";
+import { createServer } from "@/app/lib/supabase/server";
 
 type TenantShape = { id: string; name: string };
 type CategoryRow = {
@@ -16,7 +16,7 @@ type CategoryRow = {
 export async function listCategories() {
   const isAdmin = await isCurrentUserAdmin();
   const tenantId = isAdmin ? null : await getCurrentTenantId();
-  const db = isAdmin ? createAdmin() : await createServer();
+  const db = createAdmin();
 
   let query = db
     .from("categories")

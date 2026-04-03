@@ -14,6 +14,7 @@ export async function createUserAction(payload: unknown) {
   const created = await createUser(parsed.data);
   // refresca el listado
   revalidateTag("users");
+  revalidateTag("tenants");
   return { ok: true, created };
 }
 
@@ -29,6 +30,7 @@ export async function deleteUserAction(id: string) {
   await deleteUser(id);
   // refresca el listado
   revalidateTag("users");
+  revalidateTag("tenants");
   return { ok: true };
 }
 
@@ -36,5 +38,6 @@ export async function updateUserAction(id: string, payload: { tenantName?: strin
   await requireAdmin();
   const updated = await updateUser(id, payload);
   revalidateTag("users");
+  revalidateTag("tenants");
   return { ok: true, updated };
 }

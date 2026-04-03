@@ -1,62 +1,38 @@
 import "server-only";
-import { createServer } from "@/app/lib/supabase/server";
 import { createAdmin } from "@/app/lib/supabase";
-import { getCurrentTenantId, isCurrentUserAdmin } from "@/app/lib/tenant";
+import { getTenantAccessContext } from "@/app/lib/tenant";
 import { TenantOption } from "@/app/lib/validators/types";
+import { unstable_cache } from "next/cache";
 
-type TenantMembershipRow = {
-  tenant_id: string;
-  tenants:
-    | {
-        id: string;
-        name: string;
-      }
-    | {
-        id: string;
-        name: string;
-      }[]
-    | null;
-};
-
-type TenantShape = {
-  id: string;
-  name: string;
-};
-
-export async function listSelectableTenants() {
-  const supabase = await createServer();
-  const isAdmin = await isCurrentUserAdmin();
-  const activeTenantId = await getCurrentTenantId();
-
-  if (isAdmin) {
+const listAllTenantsCached = unstable_cache(
+  async () => {
     const admin = createAdmin();
     const { data, error } = await admin.from("tenants").select("id,name").order("name", { ascending: true });
     if (error) throw new Error(error.message);
+    return (data ?? []) as TenantOption[];
+  },
+  ["tenants:all"],
+  { tags: ["tenants"], revalidate: 300 },
+);
+
+export async function listSelectableTenants() {
+  const { isAdmin, activeTenantId, memberships } = await getTenantAccessContext();
+
+  if (isAdmin) {
     return {
       isAdmin,
       activeTenantId,
-      tenants: (data ?? []) as TenantOption[],
+      tenants: await listAllTenantsCached(),
     };
   }
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-  if (userError || !user) throw new Error("Sesion no valida");
-
-  const { data, error } = await supabase
-    .from("tenant_members")
-    .select("tenant_id, tenants:tenant_id(id,name)")
-    .eq("user_id", user.id);
-
-  if (error) throw new Error(error.message);
-
-  const memberships = ((data ?? []) as unknown) as TenantMembershipRow[];
-  const tenants: TenantOption[] = memberships
-    .map((row) => (Array.isArray(row.tenants) ? row.tenants[0] ?? null : row.tenants))
-    .filter((t): t is TenantShape => !!t?.id && !!t?.name)
-    .map((t) => ({ id: t.id, name: t.name }));
+  const tenants = Array.from(
+    new Map(
+      memberships
+        .filter((membership) => membership.tenant)
+        .map((membership) => [membership.tenant_id, { id: membership.tenant_id, name: membership.tenant!.name }]),
+    ).values(),
+  ).sort((a, b) => a.name.localeCompare(b.name));
 
   return { isAdmin, activeTenantId, tenants };
 }

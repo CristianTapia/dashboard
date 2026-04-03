@@ -15,8 +15,12 @@ type PublicTableRow = {
   name: string | null;
   number: string | null;
   active: boolean;
-  tenant: TenantRow | TenantRow[] | null;
 };
+
+function isMissingTablesRelation(error: { code?: string; message?: string } | null) {
+  if (!error) return false;
+  return error.code === "42P01" || error.message?.includes('relation "public.restaurant_tables" does not exist') === true;
+}
 
 function buildLabel(table: Pick<PublicTableRow, "name" | "number">) {
   if (table.name?.trim()) return table.name.trim();
@@ -29,16 +33,25 @@ export async function resolvePublicTableByToken(tableToken: string) {
 
   const { data, error } = await admin
     .from("restaurant_tables")
-    .select("id,tenant_id,public_token,name,number,active,tenant:tenants(id,name,domain)")
+    .select("id,tenant_id,public_token,name,number,active")
     .eq("public_token", tableToken)
     .eq("active", true)
     .maybeSingle<PublicTableRow>();
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (isMissingTablesRelation(error)) return null;
+    throw new Error(error.message);
+  }
   if (!data) return null;
 
-  const tenantValue = Array.isArray(data.tenant) ? data.tenant[0] ?? null : data.tenant;
-  if (!tenantValue) return null;
+  const { data: tenant, error: tenantError } = await admin
+    .from("tenants")
+    .select("id,name,domain")
+    .eq("id", data.tenant_id)
+    .maybeSingle<TenantRow>();
+
+  if (tenantError) throw new Error(tenantError.message);
+  if (!tenant) return null;
 
   return {
     table: {
@@ -48,9 +61,9 @@ export async function resolvePublicTableByToken(tableToken: string) {
       label: buildLabel(data),
     },
     tenant: {
-      id: tenantValue.id,
-      name: tenantValue.name,
-      domain: tenantValue.domain,
+      id: tenant.id,
+      name: tenant.name,
+      domain: tenant.domain,
     },
   };
 }
@@ -70,5 +83,10 @@ export async function createPublicTableEvent(input: {
     metadata: input.metadata ?? {},
   });
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (isMissingTablesRelation(error)) {
+      throw new Error("La tabla restaurant_tables aun no existe en la base de datos. Aplica la migracion pendiente.");
+    }
+    throw new Error(error.message);
+  }
 }

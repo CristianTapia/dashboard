@@ -18,7 +18,7 @@ type HighlightRow = {
 export async function listHighlights({ limit = 20, offset = 0 }: { limit?: number; offset?: number } = {}) {
   const isAdmin = await isCurrentUserAdmin();
   const tenantId = isAdmin ? null : await getCurrentTenantId();
-  const db = isAdmin ? createAdmin() : await createServer();
+  const db = createAdmin();
 
   let query = db
     .from("highlights")

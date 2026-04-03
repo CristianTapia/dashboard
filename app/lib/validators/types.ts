@@ -48,3 +48,21 @@ export type TenantOption = {
   id: string;
   name: string;
 };
+
+export type RestaurantTable = {
+  id: string;
+  tenant_id: string;
+  public_token: string;
+  name?: string | null;
+  number?: string | null;
+  active: boolean;
+  created_at: string;
+  label: string;
+  short_url: string;
+  tenant_url: string;
+  tenant?: {
+    id: string;
+    name: string;
+    domain?: string | null;
+  } | null;
+};

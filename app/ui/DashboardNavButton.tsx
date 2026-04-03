@@ -19,6 +19,7 @@ export default function DashboardNavButton({ href, name, icon, startsWith = fals
     <li>
       <Link
         href={href}
+        prefetch={false}
         className={`flex p-2 rounded-xl font-semibold text-md hover:bg-[var(--color-bg-selected)] items-center ${
           isActive
             ? "bg-[var(--color-bg-selected)] text-[var(--color-txt-selected)]"

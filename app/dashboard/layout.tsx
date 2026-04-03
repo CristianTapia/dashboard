@@ -1,19 +1,10 @@
-import { redirect } from "next/navigation";
-import { createServer } from "@/app/lib/supabase/server";
 import DashboardNavButton from "../ui/DashboardNavButton";
 import LogoutButton from "../ui/LogoutButton";
-import { ChartNoAxesColumn, BadgeDollarSign, UtensilsCrossed, Shapes, Settings, Users } from "lucide-react";
+import { ChartNoAxesColumn, BadgeDollarSign, UtensilsCrossed, Shapes, Settings, Users, Table2 } from "lucide-react";
+import { requireUserRedirect } from "@/app/lib/auth";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createServer();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    redirect("/login");
-  }
+  await requireUserRedirect("/dashboard");
 
   // Nav tab icon size
   const iconSize = 20;
@@ -46,6 +37,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
             />
 
             <DashboardNavButton icon={<Shapes size={iconSize} />} name="Categorías" href="/dashboard/categorias" />
+
+            <DashboardNavButton icon={<Table2 size={iconSize} />} name="Mesas" href="/dashboard/mesas" />
 
             <DashboardNavButton
               icon={<Settings size={iconSize} />}

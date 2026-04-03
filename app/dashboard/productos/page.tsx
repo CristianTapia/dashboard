@@ -7,9 +7,11 @@ import { listSelectableTenants } from "@/app/lib/data/tenants";
 // Necesitamos cookies/sesión por tenant => deshabilita caché estática
 export const dynamic = "force-dynamic";
 
+const INITIAL_PRODUCTS_LIMIT = 20;
+
 export default async function AllProductsPage() {
   const [products, categories, tenantCtx] = await Promise.all([
-    listProductsWithSigned({ limit: 50, expires: 3600 }), // firma en lote
+    listProductsWithSigned({ limit: INITIAL_PRODUCTS_LIMIT, expires: 3600 }),
     listCategories(),
     listSelectableTenants(),
   ]);
