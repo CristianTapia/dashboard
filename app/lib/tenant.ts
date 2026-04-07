@@ -6,15 +6,6 @@ import { cookies } from "next/headers";
 import { createServer } from "@/app/lib/supabase/server";
 import { createAdmin } from "@/app/lib/supabase";
 
-type TenantMembership = {
-  tenant_id: string;
-  role: string | null;
-  tenant: {
-    id: string;
-    name: string;
-  } | null;
-};
-
 const getCurrentUserCached = cache(async () => {
   const supabase = await createServer();
   const {
