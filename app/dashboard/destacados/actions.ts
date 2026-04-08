@@ -3,10 +3,15 @@
 import { revalidateTag } from "next/cache";
 import { createHighlight, listHighlights, updateHighlight, deleteHighlight } from "@/app/lib/data/highlights";
 import { requireUser } from "@/app/lib/auth";
+import { CreateHighlightSchema, UpdateHighlightSchema } from "@/app/lib/validators/highlights";
 
-export async function createHighlightAction(payload: { description: string; image_path: string; tenant_id?: string }) {
+export async function createHighlightAction(payload: unknown) {
   await requireUser();
-  const created = await createHighlight({ description: payload.description, image_path: payload.image_path }, payload.tenant_id);
+  const parsed = CreateHighlightSchema.safeParse(payload);
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Datos invalidos");
+
+  const tenantId = typeof payload === "object" && payload !== null && "tenant_id" in payload ? (payload as { tenant_id?: string }).tenant_id : undefined;
+  const created = await createHighlight(parsed.data, tenantId);
   // refresca el listado
   revalidateTag("/dashboard/destacados");
   return { ok: true, created };
@@ -27,12 +32,15 @@ export async function deleteHighlightAction(id: number) {
   return { ok: true };
 }
 
-export async function updateHighlightAction(id: number, payload: { description?: string; image_path?: string | null }) {
+export async function updateHighlightAction(id: number, payload: unknown) {
   await requireUser();
-  const cleanedPayload: typeof payload = { ...payload };
-  if (payload.image_path === undefined) {
+  const parsed = UpdateHighlightSchema.safeParse(payload);
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Datos invalidos");
+
+  const cleanedPayload: typeof parsed.data = { ...parsed.data };
+  if (cleanedPayload.image_path === undefined) {
     delete cleanedPayload.image_path;
-  } else if (payload.image_path === null) {
+  } else if (cleanedPayload.image_path === null) {
     cleanedPayload.image_path = null;
   }
   const updated = await updateHighlight(id, cleanedPayload);

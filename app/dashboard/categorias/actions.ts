@@ -3,10 +3,15 @@
 import { revalidateTag } from "next/cache";
 import { createCategory, listCategories, deleteCategory, updateCategory } from "@/app/lib/data/categories";
 import { requireUser } from "@/app/lib/auth";
+import { CreateCategorySchema, UpdateCategorySchema } from "@/app/lib/validators/categories";
 
-export async function createCategoryAction(payload: { name: string; tenant_id?: string }) {
+export async function createCategoryAction(payload: unknown) {
   await requireUser();
-  const created = await createCategory({ name: payload.name }, payload.tenant_id);
+  const parsed = CreateCategorySchema.safeParse(payload);
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Datos invalidos");
+
+  const tenantId = typeof payload === "object" && payload !== null && "tenant_id" in payload ? (payload as { tenant_id?: string }).tenant_id : undefined;
+  const created = await createCategory(parsed.data, tenantId);
   // refresca el listado
   revalidateTag("categories");
   return { ok: true, created };
@@ -27,9 +32,12 @@ export async function deleteCategoryAction(id: number) {
   return { ok: true };
 }
 
-export async function updateCategoryAction(id: number, payload: { name: string }) {
+export async function updateCategoryAction(id: number, payload: unknown) {
   await requireUser();
-  const updated = await updateCategory(id, payload);
+  const parsed = UpdateCategorySchema.safeParse(payload);
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Datos invalidos");
+
+  const updated = await updateCategory(id, parsed.data);
   revalidateTag("categories");
   return { ok: true, updated };
 }

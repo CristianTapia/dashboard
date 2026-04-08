@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { updateProduct, deleteProduct } from "@/app/lib/data/products";
 import { requireUser } from "@/app/lib/auth";
+import { UpdateProductSchema } from "@/app/lib/validators/products";
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -12,29 +14,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (!Number.isFinite(productId)) {
       return NextResponse.json({ error: "Invalid product id" }, { status: 400 });
     }
-
-    const payload: {
-      name?: string;
-      price?: number;
-      stock?: number;
-      category_id?: number;
-      description?: string;
-      image_path?: string | null;
-    } = {};
-
-    if (typeof body.name === "string") payload.name = body.name;
-    if (typeof body.price !== "undefined") payload.price = Number(body.price);
-    if (typeof body.stock !== "undefined") payload.stock = Number(body.stock);
-    if (typeof body.category_id !== "undefined") payload.category_id = Number(body.category_id);
-    if (typeof body.description !== "undefined") payload.description = body.description;
-    if (Object.prototype.hasOwnProperty.call(body, "image_path")) {
-      const raw = body.image_path;
-      payload.image_path = typeof raw === "string" && raw.trim() !== "" ? raw : null;
-    }
-
+    const payload = UpdateProductSchema.parse(body);
     const data = await updateProduct(productId, payload);
     return NextResponse.json(data, { status: 200 });
   } catch (err: unknown) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json({ error: err.issues[0]?.message ?? "Payload invalido" }, { status: 400 });
+    }
     const message = err instanceof Error ? err.message : "Server error";
     const status = message === "Sesion no valida" ? 401 : 500;
     return NextResponse.json({ error: message }, { status });

@@ -4,21 +4,20 @@ import { revalidatePath } from "next/cache";
 
 import { requireUser } from "@/app/lib/auth";
 import { createRestaurantTable, deleteRestaurantTable, updateRestaurantTableActive } from "@/app/lib/data/tables";
+import { CreateRestaurantTableSchema, UpdateRestaurantTableActiveSchema } from "@/app/lib/validators/tables";
 
-export async function createRestaurantTableAction(payload: {
-  name?: string;
-  number?: string;
-  active?: boolean;
-  tenant_id?: string;
-}) {
+export async function createRestaurantTableAction(payload: unknown) {
   await requireUser();
+  const parsed = CreateRestaurantTableSchema.safeParse(payload);
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Datos invalidos");
+
   const created = await createRestaurantTable(
     {
-      name: payload.name,
-      number: payload.number,
-      active: payload.active,
+      name: parsed.data.name,
+      number: parsed.data.number,
+      active: parsed.data.active,
     },
-    payload.tenant_id,
+    parsed.data.tenant_id,
   );
 
   revalidatePath("/dashboard/mesas");
@@ -27,7 +26,10 @@ export async function createRestaurantTableAction(payload: {
 
 export async function updateRestaurantTableActiveAction(id: string, active: boolean) {
   await requireUser();
-  const updated = await updateRestaurantTableActive(id, active);
+  const parsed = UpdateRestaurantTableActiveSchema.safeParse({ active });
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Datos invalidos");
+
+  const updated = await updateRestaurantTableActive(id, parsed.data.active);
   revalidatePath("/dashboard/mesas");
   return { ok: true, updated };
 }

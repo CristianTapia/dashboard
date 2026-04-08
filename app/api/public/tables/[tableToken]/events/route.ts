@@ -3,19 +3,13 @@ import { z } from "zod";
 
 import { createPublicTableEvent, resolvePublicTableByToken } from "@/app/lib/data/public-tables";
 import { limitByKey } from "@/app/lib/rate-limit";
+import { CreatePublicTableEventSchema, PublicTableTokenSchema } from "@/app/lib/validators/public-tables";
 
 const corsHeaders = {
   ...(process.env.CORS_ORIGIN ? { "Access-Control-Allow-Origin": process.env.CORS_ORIGIN } : {}),
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
-
-const CreatePublicTableEventSchema = z.object({
-  event_type: z.string().trim().min(1).max(64),
-  source: z.string().trim().min(1).max(64).optional(),
-  route: z.string().trim().min(1).max(64).optional(),
-  metadata: z.record(z.string(), z.unknown()).optional(),
-});
 
 export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: corsHeaders });
@@ -41,9 +35,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ tableTo
       return NextResponse.json({ error: "Token de mesa invalido" }, { status: 400, headers: corsHeaders });
     }
 
-    if (!tableToken) {
-      return NextResponse.json({ error: "Token de mesa invalido" }, { status: 400, headers: corsHeaders });
-    }
+    tableToken = PublicTableTokenSchema.parse(tableToken);
 
     const body = await req.json();
     const parsed = CreatePublicTableEventSchema.parse(body);

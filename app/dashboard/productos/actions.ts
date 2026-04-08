@@ -3,18 +3,15 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { createProduct, listProducts, updateProduct, deleteProduct } from "@/app/lib/data/products";
 import { requireUser } from "@/app/lib/auth";
+import { CreateProductSchema, UpdateProductSchema } from "@/app/lib/validators/products";
 
-export async function createProductAction(payload: {
-  name: string;
-  price: number;
-  stock: number;
-  category_id: number;
-  description: string;
-  image_path: string | null;
-  tenant_id?: string;
-}) {
+export async function createProductAction(payload: unknown) {
   await requireUser();
-  const created = await createProduct(payload, payload.tenant_id);
+  const parsed = CreateProductSchema.safeParse(payload);
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Datos invalidos");
+
+  const tenantId = typeof payload === "object" && payload !== null && "tenant_id" in payload ? (payload as { tenant_id?: string }).tenant_id : undefined;
+  const created = await createProduct(parsed.data, tenantId);
   // refresca el listado
   revalidatePath("/dashboard/productos/todos");
   return { ok: true, created };
@@ -37,20 +34,16 @@ export async function deleteProductAction(id: number) {
 
 export async function updateProductAction(
   id: number,
-  payload: {
-    name?: string;
-    price?: number;
-    stock?: number;
-    category_id?: number;
-    description?: string;
-    image_path?: string | null;
-  }
+  payload: unknown,
 ) {
   await requireUser();
-  const cleanedPayload: typeof payload = { ...payload };
-  if (payload.image_path === undefined) {
+  const parsed = UpdateProductSchema.safeParse(payload);
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Datos invalidos");
+
+  const cleanedPayload: typeof parsed.data = { ...parsed.data };
+  if (cleanedPayload.image_path === undefined) {
     delete cleanedPayload.image_path;
-  } else if (payload.image_path === null) {
+  } else if (cleanedPayload.image_path === null) {
     cleanedPayload.image_path = null;
   }
   const updated = await updateProduct(id, cleanedPayload);
