@@ -6,6 +6,10 @@ type TenantRow = {
   id: string;
   name: string;
   domain: string | null;
+  address?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  maps_url?: string | null;
 };
 
 type CategoryShape = { id: number; name: string };
@@ -23,23 +27,35 @@ type ProductRow = {
 export async function resolveTenantByPublicKey(tenantKey: string) {
   const admin = createAdmin();
 
-  const { data: byDomain, error: byDomainError } = await admin
-    .from("tenants")
-    .select("id,name,domain")
-    .eq("domain", tenantKey)
-    .maybeSingle<TenantRow>();
+  const tenantSelect = "id,name,domain,address,latitude,longitude,maps_url";
+  const fallbackSelect = "id,name,domain";
+  const isMissingLocationColumn = (message: string) =>
+    ["address", "latitude", "longitude", "maps_url"].some((column) => message.includes(column));
 
-  if (byDomainError) throw new Error(byDomainError.message);
+  const selectTenant = async (column: "domain" | "id", value: string) => {
+    const { data, error } = await admin
+      .from("tenants")
+      .select(tenantSelect)
+      .eq(column, value)
+      .maybeSingle<TenantRow>();
+
+    if (!error) return data;
+    if (!isMissingLocationColumn(error.message)) throw new Error(error.message);
+
+    const { data: fallbackData, error: fallbackError } = await admin
+      .from("tenants")
+      .select(fallbackSelect)
+      .eq(column, value)
+      .maybeSingle<TenantRow>();
+
+    if (fallbackError) throw new Error(fallbackError.message);
+    return fallbackData;
+  };
+
+  const byDomain = await selectTenant("domain", tenantKey);
   if (byDomain) return byDomain;
 
-  const { data: byId, error: byIdError } = await admin
-    .from("tenants")
-    .select("id,name,domain")
-    .eq("id", tenantKey)
-    .maybeSingle<TenantRow>();
-
-  if (byIdError) throw new Error(byIdError.message);
-  return byId ?? null;
+  return (await selectTenant("id", tenantKey)) ?? null;
 }
 
 export async function listPublicProductsByTenant(

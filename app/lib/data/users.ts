@@ -3,7 +3,13 @@ import { createAdmin } from "@/app/lib/supabase/admin";
 import { CreateUserInput, UpdateUserInput } from "@/app/lib/validators/users";
 import { unstable_cache } from "next/cache";
 
-type TenantShape = { id: string; name: string; domain: string | null };
+type TenantShape = {
+  id: string;
+  name: string;
+  domain: string | null;
+  address: string | null;
+  maps_url: string | null;
+};
 type MembershipRow = {
   user_id: string;
   role: string | null;
@@ -58,7 +64,7 @@ const listUsersCached = unstable_cache(
 
     const { data: memberships, error: membershipError } = await supabase
       .from("tenant_members")
-      .select("user_id, role, tenant_id, tenants:tenant_id ( id, name, domain )")
+      .select("user_id, role, tenant_id, tenants:tenant_id ( id, name, domain, address, maps_url )")
       .order("created_at", { ascending: false });
 
     if (membershipError) throw new Error(membershipError.message);
@@ -88,6 +94,8 @@ const listUsersCached = unstable_cache(
         tenantId: m.tenant_id,
         tenantName: tenantValue?.name ?? "Sin nombre",
         tenantDomain: tenantValue?.domain ?? null,
+        tenantAddress: tenantValue?.address ?? null,
+        tenantMapsUrl: tenantValue?.maps_url ?? null,
       };
     });
   },
@@ -113,7 +121,12 @@ export async function createUser(input: CreateUserInput) {
 
   const { data: tenant, error: tenantError } = await supabase
     .from("tenants")
-    .insert({ name: input.tenantName, domain: tenantDomain })
+    .insert({
+      name: input.tenantName,
+      domain: tenantDomain,
+      address: input.tenantAddress || null,
+      maps_url: input.tenantMapsUrl || null,
+    })
     .select()
     .single();
 
@@ -140,11 +153,13 @@ export async function createUser(input: CreateUserInput) {
 export async function updateUser(id: string, input: UpdateUserInput) {
   const supabase = createAdmin();
 
-  const tenantUpdates: { name?: string; domain?: string } = {};
+  const tenantUpdates: { name?: string; domain?: string; address?: string | null; maps_url?: string | null } = {};
   if (input.tenantName) tenantUpdates.name = input.tenantName;
   if (input.tenantDomain) {
     tenantUpdates.domain = await ensureUniqueTenantDomain(supabase, input.tenantDomain, id);
   }
+  if (input.tenantAddress !== undefined) tenantUpdates.address = input.tenantAddress || null;
+  if (input.tenantMapsUrl !== undefined) tenantUpdates.maps_url = input.tenantMapsUrl || null;
 
   let tenantData: unknown = null;
 

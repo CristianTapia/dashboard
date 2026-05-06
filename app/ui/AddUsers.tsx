@@ -6,6 +6,8 @@ import { createUserAction } from "@/app/dashboard/usuarios/actions";
 export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => void; onSuccess?: () => void }) {
   const [tenantName, setTenantName] = useState("");
   const [tenantDomain, setTenantDomain] = useState("");
+  const [tenantAddress, setTenantAddress] = useState("");
+  const [tenantMapsUrl, setTenantMapsUrl] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"admin" | "member">("member");
@@ -21,6 +23,8 @@ export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => voi
         const res = await createUserAction({
           tenantName: tenantName.trim(),
           tenantDomain: tenantDomain.trim() || undefined,
+          tenantAddress: tenantAddress.trim() || undefined,
+          tenantMapsUrl: tenantMapsUrl.trim() || undefined,
           email: email.trim(),
           password,
           role,
@@ -29,6 +33,8 @@ export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => voi
           alert("Usuario creado con exito");
           setTenantName("");
           setTenantDomain("");
+          setTenantAddress("");
+          setTenantMapsUrl("");
           setEmail("");
           setPassword("");
           setRole("member");
@@ -72,6 +78,35 @@ export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => voi
           />
           <p className="text-xs text-[var(--color-txt-secondary)] mt-2">
             Si lo dejas vacio, se genera automaticamente a partir del nombre.
+          </p>
+        </div>
+
+        <div className="flex flex-col">
+          <label className="text-sm pb-2 font-semibold">Direccion del local</label>
+          <input
+            type="text"
+            name="tenantAddress"
+            value={tenantAddress}
+            onChange={(e) => setTenantAddress(e.target.value)}
+            placeholder="Ej: Av. Siempre Viva 123, Santiago"
+            disabled={pending}
+            className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm text-sm"
+          />
+        </div>
+
+        <div className="flex flex-col">
+          <label className="text-sm pb-2 font-semibold">Link de Google Maps</label>
+          <input
+            type="url"
+            name="tenantMapsUrl"
+            value={tenantMapsUrl}
+            onChange={(e) => setTenantMapsUrl(e.target.value)}
+            placeholder="https://maps.app.goo.gl/..."
+            disabled={pending}
+            className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm text-sm"
+          />
+          <p className="text-xs text-[var(--color-txt-secondary)] mt-2">
+            Este link se comparte desde el boton Ubicacion de la carta publica.
           </p>
         </div>
 

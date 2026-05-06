@@ -8,6 +8,8 @@ export default function EditUsers({
   tenantId,
   tenantName,
   tenantDomain,
+  tenantAddress,
+  tenantMapsUrl,
   role,
   onCancel,
   onSuccess,
@@ -16,12 +18,16 @@ export default function EditUsers({
   tenantId: string;
   tenantName: string;
   tenantDomain?: string | null;
+  tenantAddress?: string | null;
+  tenantMapsUrl?: string | null;
   role?: string | null;
   onCancel?: () => void;
   onSuccess?: () => void;
 }) {
   const [name, setName] = useState(tenantName);
   const [domain, setDomain] = useState(tenantDomain ?? "");
+  const [address, setAddress] = useState(tenantAddress ?? "");
+  const [mapsUrl, setMapsUrl] = useState(tenantMapsUrl ?? "");
   const [selectedRole, setSelectedRole] = useState<"admin" | "member">(role === "admin" ? "admin" : "member");
   const [pending, startTransition] = useTransition();
 
@@ -37,6 +43,8 @@ export default function EditUsers({
           userId,
           tenantName: name.trim(),
           tenantDomain: domain.trim(),
+          tenantAddress: address.trim() || undefined,
+          tenantMapsUrl: mapsUrl.trim() || undefined,
           role: selectedRole,
         });
         if (res?.ok) {
@@ -86,6 +94,35 @@ export default function EditUsers({
             required
           />
           <p className="text-xs text-[var(--color-txt-secondary)] mt-2">Esta clave es la que usa la URL publica.</p>
+        </div>
+
+        <div className="flex flex-col">
+          <label className="text-sm pb-2 font-semibold">Direccion del local</label>
+          <input
+            type="text"
+            name="tenantAddress"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Ej: Av. Siempre Viva 123, Santiago"
+            disabled={pending}
+            className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm text-sm"
+          />
+        </div>
+
+        <div className="flex flex-col">
+          <label className="text-sm pb-2 font-semibold">Link de Google Maps</label>
+          <input
+            type="url"
+            name="tenantMapsUrl"
+            value={mapsUrl}
+            onChange={(e) => setMapsUrl(e.target.value)}
+            placeholder="https://maps.app.goo.gl/..."
+            disabled={pending}
+            className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm text-sm"
+          />
+          <p className="text-xs text-[var(--color-txt-secondary)] mt-2">
+            Este link se comparte desde el boton Ubicacion de la carta publica.
+          </p>
         </div>
 
         <div className="flex flex-col">

@@ -10,6 +10,8 @@ const TenantDomainSchema = z
 export const CreateUserSchema = z.object({
   tenantName: z.string().min(1, "El nombre del local es obligatorio"),
   tenantDomain: TenantDomainSchema.optional(),
+  tenantAddress: z.string().trim().max(240, "La direccion es demasiado larga").optional(),
+  tenantMapsUrl: z.string().trim().url("El link de Maps no es valido").optional(),
   email: z.string().email("Correo invalido"),
   password: z.string().min(6, "La contrasena debe tener al menos 6 caracteres"),
   role: z.enum(["admin", "member"]).optional(),
@@ -20,6 +22,8 @@ export type CreateUserInput = z.infer<typeof CreateUserSchema>;
 export const UpdateUserSchema = z.object({
   tenantName: z.string().min(1).optional(),
   tenantDomain: TenantDomainSchema.optional(),
+  tenantAddress: z.string().trim().max(240, "La direccion es demasiado larga").optional(),
+  tenantMapsUrl: z.string().trim().url("El link de Maps no es valido").optional(),
   role: z.enum(["admin", "member"]).optional(),
   userId: z.string().min(1).optional(),
 });

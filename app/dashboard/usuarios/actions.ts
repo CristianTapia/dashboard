@@ -34,7 +34,14 @@ export async function deleteUserAction(id: string) {
 
 export async function updateUserAction(
   id: string,
-  payload: { tenantName?: string; tenantDomain?: string; role?: "admin" | "member"; userId?: string },
+  payload: {
+    tenantName?: string;
+    tenantDomain?: string;
+    tenantAddress?: string;
+    tenantMapsUrl?: string;
+    role?: "admin" | "member";
+    userId?: string;
+  },
 ) {
   await requireAdmin();
   const parsed = UpdateUserSchema.safeParse(payload);

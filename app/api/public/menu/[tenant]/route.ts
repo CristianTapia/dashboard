@@ -43,7 +43,15 @@ export async function GET(req: Request, { params }: { params: Promise<{ tenant: 
 
     return NextResponse.json(
       {
-        tenant: { id: tenant.id, name: tenant.name, domain: tenant.domain },
+        tenant: {
+          id: tenant.id,
+          name: tenant.name,
+          domain: tenant.domain,
+          address: tenant.address,
+          latitude: tenant.latitude,
+          longitude: tenant.longitude,
+          maps_url: tenant.maps_url,
+        },
         products: items,
       },
       { status: 200, headers: corsHeaders }

@@ -15,6 +15,8 @@ type UserTenantRow = {
   tenantId: string | null;
   tenantName: string;
   tenantDomain: string | null;
+  tenantAddress: string | null;
+  tenantMapsUrl: string | null;
 };
 
 export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenantRow[] }) {
@@ -172,6 +174,8 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
               tenantId={selectedRow.tenantId}
               tenantName={selectedRow.tenantName}
               tenantDomain={selectedRow.tenantDomain}
+              tenantAddress={selectedRow.tenantAddress}
+              tenantMapsUrl={selectedRow.tenantMapsUrl}
               role={selectedRow.role}
               onCancel={() => setActiveModal(null)}
               onSuccess={() => {
