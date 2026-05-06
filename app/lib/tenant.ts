@@ -3,7 +3,7 @@ import "server-only";
 import { cache } from "react";
 import { cookies } from "next/headers";
 
-import { createServer } from "@/app/lib/supabase/server";
+import { createServer } from "@/app/lib/supabase/Server";
 import { createAdmin } from "@/app/lib/supabase";
 
 const getCurrentUserCached = cache(async () => {

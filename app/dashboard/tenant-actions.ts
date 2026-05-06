@@ -1,7 +1,7 @@
 ﻿"use server";
 
 import { cookies } from "next/headers";
-import { createServer } from "@/app/lib/supabase/server";
+import { createServer } from "@/app/lib/supabase/Server";
 
 /**
  * Cambia el tenant activo guardando la cookie `tenantId`.

@@ -1,5 +1,5 @@
 import "server-only";
-import { createAdmin } from "@/app/lib/supabase/admin";
+import { createAdmin } from "@/app/lib/supabase/Admin";
 import { CreateUserInput, UpdateUserInput } from "@/app/lib/validators/users";
 import { unstable_cache } from "next/cache";
 

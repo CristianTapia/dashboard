@@ -1,5 +1,5 @@
 import "server-only";
-import { createServer } from "@/app/lib/supabase/server";
+import { createServer } from "@/app/lib/supabase/Server";
 import { createAdmin } from "@/app/lib/supabase";
 import { CreateProductInput, UpdateProductInput } from "@/app/lib/validators";
 import { signPaths } from "@/app/lib/data/images";

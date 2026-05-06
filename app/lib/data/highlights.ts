@@ -1,6 +1,6 @@
 import "server-only";
 import { createAdmin } from "@/app/lib/supabase";
-import { createServer } from "@/app/lib/supabase/server";
+import { createServer } from "@/app/lib/supabase/Server";
 import { CreateHighlightInput, UpdateHighlightInput } from "@/app/lib/validators";
 import { signPaths } from "@/app/lib/data/images";
 import { getCurrentTenantId, isCurrentUserAdmin, resolveWritableTenantId } from "@/app/lib/tenant";

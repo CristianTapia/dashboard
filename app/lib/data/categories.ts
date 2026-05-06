@@ -3,7 +3,7 @@ import { createAdmin } from "@/app/lib/supabase";
 import { getCurrentTenantId, isCurrentUserAdmin, resolveWritableTenantId } from "@/app/lib/tenant";
 import { CreateCategoryInput, UpdateCategoryInput } from "../validators";
 import type { Category } from "../validators/types";
-import { createServer } from "@/app/lib/supabase/server";
+import { createServer } from "@/app/lib/supabase/Server";
 
 type TenantShape = { id: string; name: string };
 type CategoryRow = {
