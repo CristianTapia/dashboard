@@ -36,7 +36,7 @@ export default async function PublicTableMenuPage({
 
       <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {products.map((product) => (
-          <article key={product.id} className="border rounded-xl p-4 bg-white">
+          <article key={product.id} className="border border-[var(--color-border-box)] rounded-xl p-4 bg-[var(--color-foreground)]">
             <h2 className="font-semibold text-lg">{product.name}</h2>
             <p className="text-sm opacity-70 mb-2">{product.category?.name ?? "Sin categoria"}</p>
             {product.description ? <p className="text-sm mb-2">{product.description}</p> : null}

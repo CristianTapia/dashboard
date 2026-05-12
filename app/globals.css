@@ -1,30 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  --color-background: #f6f7f8; /* Color para el fondo principal */
-  --color-foreground: #ffffff; /* Color para el fondo de la barra lateral */
-  --color-bg-selected: #e7f2fd; /* Color para el botón/texto seleccionado */
-  --color-txt-selected: #137fec; /* Color para el botón/texto seleccionado */
-  --color-txt-secondary: #52585d; /* Color gris claro para textos secundarios */
-  --color-light: #616161; /* Color gris medio */
-  --color-light-hover: #020617; /* Color gris oscuro para hover */
-  --color-delete: #f44336; /* Color rojo para acciones de eliminación */
-  --color-delete-hover: #dc2626; /* Color rojo más oscuro para hover de eliminación */
-  --color-cancel: #f3f4f6; /* Color gris claro para botones de cancelar */
-  --color-cancel-hover: #e5e7eb; /* Color gris más oscuro para hover de botones de cancelar */
-  --color-button-send: #137fec; /* Azul vibrante para botones de envío */
-  --color-button-send-hover: #2d92f7; /* Azul más claro para hover de botones de envío */
-  --color-txt-placeholder: #9ca3af; /* Color gris para placeholders */
-  --color-non-interactive: #6b7280; /* Color gris para elementos no interactivos */
-  --color-line-limit: #e0e7f1; /* Color para líneas divisorias */
-  --color-border-box: #d1d5dc; /* Color para bordes de cajas */
-  /* Opcion para la caja de los select */
-  select option {
-    color: black;
-  }
-  select option[disabled] {
-    color: gray;
-  }
+  color-scheme: light;
+  --background: #f6f7f8;
+  --foreground: #0f172a;
+  --color-background: #f6f7f8;
+  --color-foreground: #ffffff;
+  --color-surface-muted: #f1f5f9;
+  --color-bg-selected: #e7f2fd;
+  --color-txt-selected: #137fec;
+  --color-category: #334155;
+  --color-txt-secondary: #52585d;
+  --color-light: #616161;
+  --color-light-hover: #020617;
+  --color-delete: #f44336;
+  --color-delete-hover: #dc2626;
+  --color-cancel: #f3f4f6;
+  --color-cancel-hover: #e5e7eb;
+  --color-button-send: #137fec;
+  --color-button-send-hover: #2d92f7;
+  --color-txt-placeholder: #9ca3af;
+  --color-non-interactive: #6b7280;
+  --color-line-limit: #e0e7f1;
+  --color-border-box: #d1d5dc;
+}
+
+select option {
+  color: var(--foreground);
+  background: var(--color-foreground);
+}
+
+select option[disabled] {
+  color: var(--color-txt-secondary);
 }
 
 @theme inline {
@@ -36,8 +43,68 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    color-scheme: dark;
+    --background: #0f172a;
+    --foreground: #e5edf7;
+    --color-background: #0f172a;
+    --color-foreground: #172033;
+    --color-surface-muted: #111827;
+    --color-bg-selected: #123456;
+    --color-txt-selected: #6eb6ff;
+    --color-category: #d7e0ee;
+    --color-txt-secondary: #a6b3c4;
+    --color-light: #a6b3c4;
+    --color-light-hover: #f8fafc;
+    --color-delete: #f87171;
+    --color-delete-hover: #fca5a5;
+    --color-cancel: #273247;
+    --color-cancel-hover: #334155;
+    --color-button-send: #1f8cff;
+    --color-button-send-hover: #4ba3ff;
+    --color-txt-placeholder: #74839a;
+    --color-non-interactive: #94a3b8;
+    --color-line-limit: #263247;
+    --color-border-box: #334155;
+  }
+
+  .bg-white {
+    background-color: var(--color-foreground);
+  }
+
+  .bg-gray-50,
+  .bg-gray-100,
+  .bg-slate-100,
+  .bg-slate-200 {
+    background-color: var(--color-cancel);
+  }
+
+  .text-black,
+  .text-gray-700,
+  .text-gray-800,
+  .text-gray-900,
+  .text-slate-700,
+  .text-slate-900 {
+    color: var(--foreground);
+  }
+
+  .text-gray-400,
+  .text-gray-500,
+  .text-gray-600,
+  .text-slate-400,
+  .text-slate-500 {
+    color: var(--color-txt-secondary);
+  }
+
+  .border-gray-300,
+  .border-slate-100,
+  .border-slate-200 {
+    border-color: var(--color-border-box);
+  }
+
+  .hover\:bg-gray-100:hover,
+  .hover\:bg-slate-100:hover,
+  .hover\:bg-red-50:hover {
+    background-color: var(--color-cancel-hover);
   }
 }
 
