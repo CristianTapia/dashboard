@@ -82,13 +82,37 @@ export async function deleteCategory(id: number) {
   const tenantId = isAdmin ? null : await getCurrentTenantId();
   const db = isAdmin ? createAdmin() : await createServer();
 
-  let query = db.from("categories").delete().eq("id", id);
+  let categoryQuery = db.from("categories").select("id, tenant_id").eq("id", id);
   if (tenantId) {
-    query = query.eq("tenant_id", tenantId);
+    categoryQuery = categoryQuery.eq("tenant_id", tenantId);
   }
 
-  const { data, error } = await query.select("id, tenant_id").maybeSingle<{ id: number; tenant_id: string | null }>();
+  const { data: category, error: categoryError } = await categoryQuery.maybeSingle<{
+    id: number;
+    tenant_id: string | null;
+  }>();
 
+  if (categoryError) throw new Error(categoryError.message);
+  if (!category) throw new Error("Categoria no encontrada o sin permisos");
+
+  let productsQuery = db.from("products").select("id", { count: "exact", head: true }).eq("category_id", id);
+  if (category.tenant_id) {
+    productsQuery = productsQuery.eq("tenant_id", category.tenant_id);
+  }
+
+  const { count, error: productsError } = await productsQuery;
+  if (productsError) throw new Error(productsError.message);
+  if ((count ?? 0) > 0) {
+    throw new Error("No puedes eliminar una categoria que aun tiene productos asociados");
+  }
+
+  let deleteQuery = db.from("categories").delete().eq("id", id);
+  if (tenantId) {
+    deleteQuery = deleteQuery.eq("tenant_id", tenantId);
+  }
+
+  const { error } = await deleteQuery;
   if (error) throw new Error(error.message);
-  return { ok: true, tenant_id: data?.tenant_id ?? null };
+
+  return { ok: true, tenant_id: category.tenant_id };
 }

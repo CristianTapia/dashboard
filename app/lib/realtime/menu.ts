@@ -20,7 +20,11 @@ export async function broadcastMenuUpdated(tenantId?: string | null) {
   if (!tenantId) return;
 
   const supabase = createAdmin();
-  const channel = supabase.channel(`public-menu:${tenantId}`);
+  const channel = supabase.channel(`public-menu:${tenantId}`, {
+    config: {
+      broadcast: { ack: true },
+    },
+  });
 
   try {
     await withTimeout(
