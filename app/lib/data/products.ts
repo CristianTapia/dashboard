@@ -159,7 +159,9 @@ export async function deleteProduct(id: number) {
     query = query.eq("tenant_id", tenantId);
   }
 
-  const { data, error } = await query.select("id, image_path").maybeSingle<{ id: number; image_path: string | null }>();
+  const { data, error } = await query
+    .select("id, tenant_id, image_path")
+    .maybeSingle<{ id: number; tenant_id: string | null; image_path: string | null }>();
 
   if (error) throw new Error(error.message);
 
@@ -176,5 +178,5 @@ export async function deleteProduct(id: number) {
     }
   }
 
-  return { ok: true };
+  return { ok: true, tenant_id: data.tenant_id };
 }

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { listPublicProductsByTenant } from "@/app/lib/data/public-menu";
 import { resolvePublicTableByToken } from "@/app/lib/data/public-tables";
+import PublicMenuRealtimeRefresh from "@/app/ui/PublicMenuRealtimeRefresh";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +32,7 @@ export default async function PublicTableMenuPage({
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8">
+      <PublicMenuRealtimeRefresh tenantId={tableData.tenant.id} />
       <h1 className="text-2xl font-bold mb-2">Menu de {tableData.tenant.name}</h1>
       <p className="text-sm opacity-70 mb-6">{tableData.table.label}</p>
 

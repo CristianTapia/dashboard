@@ -3,6 +3,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { createProduct, listProducts, updateProduct, deleteProduct } from "@/app/lib/data/products";
 import { requireUser } from "@/app/lib/auth";
+import { broadcastMenuUpdated } from "@/app/lib/realtime/menu";
 import { CreateProductSchema, UpdateProductSchema } from "@/app/lib/validators/products";
 
 export async function createProductAction(payload: unknown) {
@@ -14,6 +15,7 @@ export async function createProductAction(payload: unknown) {
   const created = await createProduct(parsed.data, tenantId);
   // refresca el listado
   revalidatePath("/dashboard/productos/todos");
+  await broadcastMenuUpdated(created.tenant_id);
   return { ok: true, created };
 }
 
@@ -26,9 +28,10 @@ export async function listProductsAction() {
 
 export async function deleteProductAction(id: number) {
   await requireUser();
-  await deleteProduct(id);
+  const deleted = await deleteProduct(id);
   // refresca el listado
   revalidateTag("Products");
+  await broadcastMenuUpdated(deleted.tenant_id);
   return { ok: true };
 }
 
@@ -49,5 +52,6 @@ export async function updateProductAction(
   const updated = await updateProduct(id, cleanedPayload);
   revalidateTag("Products");
   // revalidatePath("/dashboard/productos/todos");
+  await broadcastMenuUpdated(updated.tenant_id);
   return { ok: true, updated };
 }

@@ -1,4 +1,5 @@
 import { listPublicProductsByTenant, resolveTenantByPublicKey } from "@/app/lib/data/public-menu";
+import PublicMenuRealtimeRefresh from "@/app/ui/PublicMenuRealtimeRefresh";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +20,7 @@ export default async function PublicMenuPage({ params }: { params: Promise<{ ten
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8">
+      <PublicMenuRealtimeRefresh tenantId={tenantData.id} />
       <h1 className="text-2xl font-bold mb-2">Menu de {tenantData.name}</h1>
       <p className="text-sm opacity-70 mb-6">Productos disponibles</p>
 
