@@ -18,6 +18,7 @@ import {
 
 import AddTable from "@/app/ui/AddTable";
 import Modal from "@/app/ui/Modals/Modal";
+import TableQrCode from "@/app/ui/TableQrCode";
 import { deleteRestaurantTableAction, updateRestaurantTableActiveAction } from "@/app/dashboard/mesas/actions";
 import { RestaurantTable, TenantOption } from "@/app/lib/validators/types";
 
@@ -256,6 +257,8 @@ export default function TablesClient({
                   </a>
                 </div>
               </div>
+
+              <TableQrCode value={table.short_url} label={table.label} />
 
               <div className="flex justify-end">
                 <button

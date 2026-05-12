@@ -24,6 +24,7 @@ export const UpdateUserSchema = z.object({
   tenantDomain: TenantDomainSchema.optional(),
   tenantAddress: z.string().trim().max(240, "La direccion es demasiado larga").optional(),
   tenantMapsUrl: z.string().trim().url("El link de Maps no es valido").optional(),
+  password: z.string().min(6, "La contrasena debe tener al menos 6 caracteres").optional(),
   role: z.enum(["admin", "member"]).optional(),
   userId: z.string().min(1).optional(),
 });

@@ -181,6 +181,16 @@ export async function updateUser(id: string, input: UpdateUserInput) {
     if (error) throw new Error(error.message);
   }
 
+  if (input.password) {
+    if (!input.userId) throw new Error("Falta el usuario para actualizar la contrasena");
+
+    const { error } = await supabase.auth.admin.updateUserById(input.userId, {
+      password: input.password,
+    });
+
+    if (error) throw new Error(error.message);
+  }
+
   return tenantData;
 }
 

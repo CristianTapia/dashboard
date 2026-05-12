@@ -1,4 +1,8 @@
-export default function Overview() {
+import { requireAdmin } from "@/app/lib/auth";
+
+export default async function Overview() {
+  await requireAdmin();
+
   return (
     <div className="flex flex-col">
       <div className="flex flex-wrap gap-8 justify-center">

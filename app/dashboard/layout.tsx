@@ -2,9 +2,11 @@ import DashboardNavButton from "../ui/DashboardNavButton";
 import LogoutButton from "../ui/LogoutButton";
 import { ChartNoAxesColumn, BadgeDollarSign, UtensilsCrossed, Shapes, Settings, Users, Table2 } from "lucide-react";
 import { requireUserRedirect } from "@/app/lib/auth";
+import { getTenantAccessContext } from "@/app/lib/tenant";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   await requireUserRedirect("/dashboard");
+  const { isAdmin } = await getTenantAccessContext();
 
   // Nav tab icon size
   const iconSize = 20;
@@ -22,7 +24,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </div>
         <nav>
           <ul className="gap-2 flex flex-col p-4">
-            <DashboardNavButton icon={<ChartNoAxesColumn size={iconSize} />} name="Resumen" href="/dashboard/resumen" />
+            {isAdmin ? (
+              <DashboardNavButton icon={<ChartNoAxesColumn size={iconSize} />} name="Resumen" href="/dashboard/resumen" />
+            ) : null}
 
             <DashboardNavButton
               icon={<BadgeDollarSign size={iconSize} />}
@@ -40,12 +44,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
             <DashboardNavButton icon={<Table2 size={iconSize} />} name="Mesas" href="/dashboard/mesas" />
 
-            <DashboardNavButton
-              icon={<Settings size={iconSize} />}
-              name="Configuración"
-              href="/dashboard/configuracion"
-            />
-            <DashboardNavButton icon={<Users size={iconSize} />} name="Usuarios" href="/dashboard/usuarios" />
+            {isAdmin ? (
+              <>
+                <DashboardNavButton
+                  icon={<Settings size={iconSize} />}
+                  name="Configuración"
+                  href="/dashboard/configuracion"
+                />
+                <DashboardNavButton icon={<Users size={iconSize} />} name="Usuarios" href="/dashboard/usuarios" />
+              </>
+            ) : null}
           </ul>
         </nav>
         <div className="p-4 pt-0">

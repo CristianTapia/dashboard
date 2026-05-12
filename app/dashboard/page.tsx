@@ -1,8 +1,8 @@
-export default function DashboardPage() {
-  return (
-    <div style={{ padding: 24 }}>
-      <h1>Dashboard</h1>
-      <p>Bienvenido.</p>
-    </div>
-  );
+import { redirect } from "next/navigation";
+
+import { getTenantAccessContext } from "@/app/lib/tenant";
+
+export default async function DashboardPage() {
+  const { isAdmin } = await getTenantAccessContext();
+  redirect(isAdmin ? "/dashboard/resumen" : "/dashboard/destacados");
 }

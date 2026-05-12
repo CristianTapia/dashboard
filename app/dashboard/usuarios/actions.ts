@@ -39,6 +39,7 @@ export async function updateUserAction(
     tenantDomain?: string;
     tenantAddress?: string;
     tenantMapsUrl?: string;
+    password?: string;
     role?: "admin" | "member";
     userId?: string;
   },
