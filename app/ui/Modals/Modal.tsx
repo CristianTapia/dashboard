@@ -67,7 +67,7 @@ export default function Modal({
             {body ? <div className="p-4 flex-1 min-h-0 overflow-y-auto">{body}</div> : null}
 
             {/* Model Body fijo */}
-            {fixedBody ? <div className="px-4 shrink-0">{fixedBody}</div> : null}
+            {fixedBody ? <div className="px-4 flex-1 min-h-0 overflow-y-auto">{fixedBody}</div> : null}
 
             {/* Modal footer buttons*/}
             {buttonAName || buttonBName ? (
