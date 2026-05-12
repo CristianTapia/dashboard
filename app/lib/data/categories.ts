@@ -61,27 +61,34 @@ export async function createCategory(input: CreateCategoryInput, requestedTenant
 }
 
 export async function updateCategory(id: number, input: UpdateCategoryInput) {
-  const supabase = await createServer();
-  const tenantId = await getCurrentTenantId();
+  const isAdmin = await isCurrentUserAdmin();
+  const tenantId = isAdmin ? null : await getCurrentTenantId();
+  const db = isAdmin ? createAdmin() : await createServer();
 
-  const { data, error } = await supabase
-    .from("categories")
-    .update(input)
-    .eq("id", id)
-    .eq("tenant_id", tenantId)
-    .select()
-    .single();
+  let query = db.from("categories").update(input).eq("id", id);
+  if (tenantId) {
+    query = query.eq("tenant_id", tenantId);
+  }
+
+  const { data, error } = await query.select().maybeSingle();
 
   if (error) throw new Error(error.message);
+  if (!data) throw new Error("Categoria no encontrada o sin permisos");
   return data;
 }
 
 export async function deleteCategory(id: number) {
-  const supabase = await createServer();
-  const tenantId = await getCurrentTenantId();
+  const isAdmin = await isCurrentUserAdmin();
+  const tenantId = isAdmin ? null : await getCurrentTenantId();
+  const db = isAdmin ? createAdmin() : await createServer();
 
-  const { error } = await supabase.from("categories").delete().eq("id", id).eq("tenant_id", tenantId);
+  let query = db.from("categories").delete().eq("id", id);
+  if (tenantId) {
+    query = query.eq("tenant_id", tenantId);
+  }
+
+  const { data, error } = await query.select("id, tenant_id").maybeSingle<{ id: number; tenant_id: string | null }>();
 
   if (error) throw new Error(error.message);
-  return { ok: true };
+  return { ok: true, tenant_id: data?.tenant_id ?? null };
 }

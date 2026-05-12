@@ -3,6 +3,7 @@
 import { revalidateTag } from "next/cache";
 import { createHighlight, listHighlights, updateHighlight, deleteHighlight } from "@/app/lib/data/highlights";
 import { requireUser } from "@/app/lib/auth";
+import { broadcastMenuUpdated } from "@/app/lib/realtime/menu";
 import { CreateHighlightSchema, UpdateHighlightSchema } from "@/app/lib/validators/highlights";
 
 export async function createHighlightAction(payload: unknown) {
@@ -14,6 +15,7 @@ export async function createHighlightAction(payload: unknown) {
   const created = await createHighlight(parsed.data, tenantId);
   // refresca el listado
   revalidateTag("/dashboard/destacados");
+  await broadcastMenuUpdated(created.tenant_id);
   return { ok: true, created };
 }
 
@@ -26,9 +28,10 @@ export async function listHighlightsAction() {
 
 export async function deleteHighlightAction(id: number) {
   await requireUser();
-  await deleteHighlight(id);
+  const deleted = await deleteHighlight(id);
   // refresca el listado
   revalidateTag("Highlights");
+  await broadcastMenuUpdated(deleted.tenant_id);
   return { ok: true };
 }
 
@@ -46,5 +49,6 @@ export async function updateHighlightAction(id: number, payload: unknown) {
   const updated = await updateHighlight(id, cleanedPayload);
   revalidateTag("Highlights");
   // revalidatePath("/dashboard/destacados");
+  await broadcastMenuUpdated(updated.tenant_id);
   return { ok: true, updated };
 }

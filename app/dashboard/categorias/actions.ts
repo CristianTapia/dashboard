@@ -3,6 +3,7 @@
 import { revalidateTag } from "next/cache";
 import { createCategory, listCategories, deleteCategory, updateCategory } from "@/app/lib/data/categories";
 import { requireUser } from "@/app/lib/auth";
+import { broadcastMenuUpdated } from "@/app/lib/realtime/menu";
 import { CreateCategorySchema, UpdateCategorySchema } from "@/app/lib/validators/categories";
 
 export async function createCategoryAction(payload: unknown) {
@@ -14,6 +15,7 @@ export async function createCategoryAction(payload: unknown) {
   const created = await createCategory(parsed.data, tenantId);
   // refresca el listado
   revalidateTag("categories");
+  await broadcastMenuUpdated(created.tenant_id);
   return { ok: true, created };
 }
 
@@ -26,9 +28,10 @@ export async function listCategoriesAction() {
 
 export async function deleteCategoryAction(id: number) {
   await requireUser();
-  await deleteCategory(id);
+  const deleted = await deleteCategory(id);
   // refresca el listado
   revalidateTag("categories");
+  await broadcastMenuUpdated(deleted.tenant_id);
   return { ok: true };
 }
 
@@ -39,5 +42,6 @@ export async function updateCategoryAction(id: number, payload: unknown) {
 
   const updated = await updateCategory(id, parsed.data);
   revalidateTag("categories");
+  await broadcastMenuUpdated(updated.tenant_id);
   return { ok: true, updated };
 }
