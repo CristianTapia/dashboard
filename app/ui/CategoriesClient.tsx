@@ -76,10 +76,14 @@ export default function CategoriesPage({
 
   const onDelete = (id: number) => {
     startTransition(async () => {
-      await deleteCategoryAction(id);
+      const result = await deleteCategoryAction(id);
+      if (!result.ok) {
+        alert(result.error);
+        return;
+      }
       setActiveModal(null);
       setOpenDropdownId(null);
-      // router.refresh();
+      router.refresh();
     });
   };
 

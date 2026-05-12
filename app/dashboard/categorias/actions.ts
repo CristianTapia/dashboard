@@ -28,11 +28,16 @@ export async function listCategoriesAction() {
 
 export async function deleteCategoryAction(id: number) {
   await requireUser();
-  const deleted = await deleteCategory(id);
-  // refresca el listado
-  revalidateTag("categories");
-  await broadcastMenuUpdated(deleted.tenant_id);
-  return { ok: true };
+  try {
+    const deleted = await deleteCategory(id);
+    // refresca el listado
+    revalidateTag("categories");
+    await broadcastMenuUpdated(deleted.tenant_id);
+    return { ok: true };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "No se pudo eliminar la categoria";
+    return { ok: false, error: message };
+  }
 }
 
 export async function updateCategoryAction(id: number, payload: unknown) {
