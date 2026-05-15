@@ -23,7 +23,7 @@ export default function AllHighlights({
 }) {
   const [activeModal, setActiveModal] = useState<null | "addHighlight" | "editHighlight" | "confirmDelete">(null);
   const [selectedHighlight, setSelectedHighlight] = useState<Highlight | null>(null);
-  const [tenantFilter, setTenantFilter] = useState("all");
+  const [tenantFilter, setTenantFilter] = useState(isAdmin ? "all" : activeTenantId);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -41,6 +41,10 @@ export default function AllHighlights({
   };
 
   const tenantOptions = useMemo(() => {
+    if (isAdmin) {
+      return [...tenants].sort((a, b) => a.name.localeCompare(b.name));
+    }
+
     const map = new Map<string, string>();
     for (const highlight of highlights) {
       const tenantId = highlight.tenant_id ?? highlight.tenant?.id;
@@ -52,15 +56,17 @@ export default function AllHighlights({
     return Array.from(map.entries())
       .map(([id, name]) => ({ id, name }))
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [highlights]);
+  }, [highlights, isAdmin, tenants]);
 
   const filteredHighlights = useMemo(() => {
+    const effectiveTenantFilter = isAdmin ? tenantFilter : activeTenantId;
+
     return highlights.filter((highlight) => {
-      if (tenantFilter === "all") return true;
+      if (effectiveTenantFilter === "all") return true;
       const tenantId = highlight.tenant_id ?? highlight.tenant?.id ?? null;
-      return tenantId === tenantFilter;
+      return tenantId === effectiveTenantFilter;
     });
-  }, [highlights, tenantFilter]);
+  }, [activeTenantId, highlights, isAdmin, tenantFilter]);
 
   return (
     <div className="max-w-auto p-4 flex flex-col">
@@ -80,21 +86,23 @@ export default function AllHighlights({
           <CirclePlus /> Añadir nuevo destacado
         </button>
       </div>
-      <div className="mt-4">
-        <select
-          className="w-56 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 text-sm"
-          value={tenantFilter}
-          onChange={(e) => setTenantFilter(e.target.value)}
-          disabled={tenantOptions.length === 0}
-        >
-          <option value="all">{tenantOptions.length === 0 ? "Global (sin tenant)" : "Todos los tenants"}</option>
-          {tenantOptions.map((tenant) => (
-            <option key={tenant.id} value={tenant.id}>
-              {tenant.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      {isAdmin && (
+        <div className="mt-4">
+          <select
+            className="w-56 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 text-sm"
+            value={tenantFilter}
+            onChange={(e) => setTenantFilter(e.target.value)}
+            disabled={tenantOptions.length === 0}
+          >
+            <option value="all">{tenantOptions.length === 0 ? "Global (sin tenant)" : "Todos los tenants"}</option>
+            {tenantOptions.map((tenant) => (
+              <option key={tenant.id} value={tenant.id}>
+                {tenant.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 mt-6">
         {filteredHighlights.map((highlight) => (
           <div

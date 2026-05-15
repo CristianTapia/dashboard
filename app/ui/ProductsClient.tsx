@@ -25,7 +25,7 @@ export default function Products({
 }) {
   // ESTADOS PRINCIPALES
   const [search, setSearch] = useState({ term: "" });
-  const [tenantFilter, setTenantFilter] = useState("all");
+  const [tenantFilter, setTenantFilter] = useState(isAdmin ? "all" : activeTenantId);
 
   const [activeModal, setActiveModal] = useState<null | "addProduct" | "confirmDelete" | "editProduct" | "useFilter">(
     null,
@@ -53,6 +53,10 @@ export default function Products({
   }
 
   const tenantOptions = useMemo(() => {
+    if (isAdmin) {
+      return [...tenants].sort((a, b) => a.name.localeCompare(b.name));
+    }
+
     const map = new Map<string, string>();
     for (const product of products) {
       const tenantId = product.tenant_id ?? product.tenant?.id;
@@ -64,17 +68,19 @@ export default function Products({
     return Array.from(map.entries())
       .map(([id, name]) => ({ id, name }))
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [products]);
+  }, [isAdmin, products, tenants]);
 
   const filteredProducts = useMemo(() => {
     const term = search.term.trim().toLowerCase();
+    const effectiveTenantFilter = isAdmin ? tenantFilter : activeTenantId;
+
     return products.filter((product) => {
       const tenantId = product.tenant_id ?? product.tenant?.id ?? null;
-      const byTenant = tenantFilter === "all" || tenantId === tenantFilter;
+      const byTenant = effectiveTenantFilter === "all" || tenantId === effectiveTenantFilter;
       const bySearch = !term || product.name.toLowerCase().includes(term);
       return byTenant && bySearch;
     });
-  }, [products, search.term, tenantFilter]);
+  }, [activeTenantId, isAdmin, products, search.term, tenantFilter]);
 
   // RENDERIZADO
   return (
@@ -99,18 +105,20 @@ export default function Products({
       </div>
       {/* Búsqueda */}
       <div className="flex w-full flex-1 items-stretch rounded-lg h-full mt-6 mb-6 gap-3">
-        <select
-          className="w-56 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 text-sm"
-          value={tenantFilter}
-          onChange={(e) => setTenantFilter(e.target.value)}
-        >
-          <option value="all">Todos los tenants</option>
-          {tenantOptions.map((tenant) => (
-            <option key={tenant.id} value={tenant.id}>
-              {tenant.name}
-            </option>
-          ))}
-        </select>
+        {isAdmin && (
+          <select
+            className="w-56 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 text-sm"
+            value={tenantFilter}
+            onChange={(e) => setTenantFilter(e.target.value)}
+          >
+            <option value="all">Todos los tenants</option>
+            {tenantOptions.map((tenant) => (
+              <option key={tenant.id} value={tenant.id}>
+                {tenant.name}
+              </option>
+            ))}
+          </select>
+        )}
         <div className="text-slate-500 dark:text-slate-400 flex bg-[var(--color-foreground)] dark:bg-background-dark items-center justify-center p-2 rounded-l-lg border border-[var(--color-border-box)] border-r-0">
           <Search />
         </div>

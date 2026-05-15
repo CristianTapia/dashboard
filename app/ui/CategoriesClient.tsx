@@ -24,7 +24,7 @@ export default function CategoriesPage({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState("");
-  const [tenantFilter, setTenantFilter] = useState("all");
+  const [tenantFilter, setTenantFilter] = useState(isAdmin ? "all" : activeTenantId);
 
   // Modals
   const [activeModal, setActiveModal] = useState<null | "addCategory" | "confirmDelete" | "editCategory">(null);
@@ -88,6 +88,10 @@ export default function CategoriesPage({
   };
 
   const tenantOptions = useMemo(() => {
+    if (isAdmin) {
+      return [...tenants].sort((a, b) => a.name.localeCompare(b.name));
+    }
+
     const map = new Map<string, string>();
     for (const category of categories) {
       const tenantId = category.tenant_id ?? category.tenant?.id;
@@ -99,17 +103,19 @@ export default function CategoriesPage({
     return Array.from(map.entries())
       .map(([id, name]) => ({ id, name }))
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [categories]);
+  }, [categories, isAdmin, tenants]);
 
   const filteredCategories = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
+    const effectiveTenantFilter = isAdmin ? tenantFilter : activeTenantId;
+
     return categories.filter((category) => {
       const tenantId = category.tenant_id ?? category.tenant?.id ?? null;
-      const byTenant = tenantFilter === "all" || tenantId === tenantFilter;
+      const byTenant = effectiveTenantFilter === "all" || tenantId === effectiveTenantFilter;
       const bySearch = !term || category.name.toLowerCase().includes(term);
       return byTenant && bySearch;
     });
-  }, [categories, searchTerm, tenantFilter]);
+  }, [activeTenantId, categories, isAdmin, searchTerm, tenantFilter]);
 
   return (
     <div className="max-w-auto p-4 flex flex-col">
@@ -135,18 +141,20 @@ export default function CategoriesPage({
       </div>
       {/* Búsqueda */}
       <div className="flex w-full flex-1 items-stretch rounded-lg h-full mt-6 mb-6 gap-3">
-        <select
-          className="w-56 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 text-sm"
-          value={tenantFilter}
-          onChange={(e) => setTenantFilter(e.target.value)}
-        >
-          <option value="all">Todos los tenants</option>
-          {tenantOptions.map((tenant) => (
-            <option key={tenant.id} value={tenant.id}>
-              {tenant.name}
-            </option>
-          ))}
-        </select>
+        {isAdmin && (
+          <select
+            className="w-56 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 text-sm"
+            value={tenantFilter}
+            onChange={(e) => setTenantFilter(e.target.value)}
+          >
+            <option value="all">Todos los tenants</option>
+            {tenantOptions.map((tenant) => (
+              <option key={tenant.id} value={tenant.id}>
+                {tenant.name}
+              </option>
+            ))}
+          </select>
+        )}
         <div className="text-slate-500 dark:text-slate-400 flex bg-[var(--color-foreground)] dark:bg-background-dark items-center justify-center p-2 rounded-l-lg border border-[var(--color-border-box)] border-r-0">
           <Search />
         </div>
