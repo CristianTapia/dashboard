@@ -10,6 +10,7 @@ import { deleteUserAction } from "@/app/dashboard/usuarios/actions";
 
 type UserTenantRow = {
   userId: string;
+  loginName: string | null;
   email: string | null;
   role: string | null;
   tenantId: string | null;
@@ -41,6 +42,7 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
     return rows.filter((r) => {
       if (!term) return true;
       return (
+        r.loginName?.toLowerCase().includes(term) ||
         r.email?.toLowerCase().includes(term) ||
         r.tenantName.toLowerCase().includes(term) ||
         (r.tenantDomain ?? "").toLowerCase().includes(term) ||
@@ -85,7 +87,7 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
           type="text"
           name="search"
           className="w-full bg-[var(--color-foreground)] rounded-r-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
-          placeholder="Buscar por email, tenant, clave o rol"
+          placeholder="Buscar por acceso, email, tenant, clave o rol"
           value={search.term}
           onChange={(e) => setSearch((prev) => ({ ...prev, term: e.target.value }))}
         />
@@ -101,6 +103,7 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
               <thead>
                 <tr className="text-left border-b border-[var(--color-line-limit)]">
                   <th className="py-2">Email</th>
+                  <th className="py-2">Acceso</th>
                   <th className="py-2">Tenant</th>
                   <th className="py-2">Clave publica</th>
                   <th className="py-2">Rol</th>
@@ -111,6 +114,7 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
                 {filteredRows.map((row) => (
                   <tr key={`${row.userId}-${row.tenantId}`} className="border-b border-[var(--color-line-limit)]">
                     <td className="py-2">{row.email ?? "Sin email"}</td>
+                    <td className="py-2 font-mono text-xs">{row.loginName ?? "Sin acceso"}</td>
                     <td className="py-2">{row.tenantName}</td>
                     <td className="py-2 font-mono text-xs">{row.tenantDomain ?? row.tenantId ?? "Sin clave"}</td>
                     <td className="py-2">{row.role ?? "Sin rol"}</td>
@@ -176,6 +180,7 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
               tenantDomain={selectedRow.tenantDomain}
               tenantAddress={selectedRow.tenantAddress}
               tenantMapsUrl={selectedRow.tenantMapsUrl}
+              loginName={selectedRow.loginName}
               role={selectedRow.role}
               onCancel={() => setActiveModal(null)}
               onSuccess={() => {

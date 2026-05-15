@@ -17,6 +17,12 @@ type MembershipRow = {
   tenants: TenantShape | TenantShape[] | null;
 };
 
+type AuthUserSummary = {
+  id: string;
+  email: string | null;
+  loginName: string | null;
+};
+
 function slugifyTenantDomain(value: string) {
   return value
     .normalize("NFD")
@@ -26,6 +32,10 @@ function slugifyTenantDomain(value: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .replace(/-{2,}/g, "-");
+}
+
+function normalizeLoginName(value: string) {
+  return value.trim().toLowerCase();
 }
 
 async function ensureUniqueTenantDomain(
@@ -58,6 +68,53 @@ async function ensureUniqueTenantDomain(
   throw new Error("No se pudo generar una clave publica disponible");
 }
 
+async function listAuthUsers(supabase: ReturnType<typeof createAdmin>) {
+  const allUsers: AuthUserSummary[] = [];
+  let page = 1;
+
+  while (true) {
+    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 1000 });
+    if (error) throw new Error(error.message);
+
+    const users = data?.users ?? [];
+    allUsers.push(
+      ...users.map((user) => ({
+        id: user.id,
+        email: user.email ?? null,
+        loginName: typeof user.user_metadata?.login_name === "string" ? user.user_metadata.login_name : null,
+      })),
+    );
+
+    if (users.length < 1000) break;
+    page += 1;
+  }
+
+  return allUsers;
+}
+
+async function ensureUniqueLoginName(
+  supabase: ReturnType<typeof createAdmin>,
+  desiredValue: string,
+  excludeUserId?: string,
+) {
+  const loginName = normalizeLoginName(desiredValue);
+  const users = await listAuthUsers(supabase);
+  const found = users.find((user) => user.loginName === loginName && user.id !== excludeUserId);
+
+  if (found) throw new Error("El nombre de acceso ya esta en uso");
+
+  return loginName;
+}
+
+export async function resolveEmailByLoginName(loginName: string) {
+  const supabase = createAdmin();
+  const normalizedLoginName = normalizeLoginName(loginName);
+  if (!normalizedLoginName) return null;
+
+  const users = await listAuthUsers(supabase);
+  return users.find((user) => user.loginName === normalizedLoginName)?.email ?? null;
+}
+
 const listUsersCached = unstable_cache(
   async () => {
     const supabase = createAdmin();
@@ -72,24 +129,20 @@ const listUsersCached = unstable_cache(
     const normalizedMemberships = ((memberships ?? []) as unknown) as MembershipRow[];
 
     const userIds = Array.from(new Set(normalizedMemberships.map((m) => m.user_id))).filter(Boolean);
-    let usersById = new Map<string, { id: string; email: string | null }>();
+    let usersById = new Map<string, AuthUserSummary>();
 
     if (userIds.length > 0) {
-      const { data: usersData, error: usersError } = await supabase.auth.admin.listUsers({
-        page: 1,
-        perPage: 1000,
-      });
-
-      if (usersError) throw new Error(usersError.message);
-      const filtered = (usersData?.users ?? []).filter((u) => userIds.includes(u.id));
-      usersById = new Map(filtered.map((u) => [u.id, { id: u.id, email: u.email ?? null }]));
+      const filtered = (await listAuthUsers(supabase)).filter((u) => userIds.includes(u.id));
+      usersById = new Map(filtered.map((u) => [u.id, u]));
     }
 
     return normalizedMemberships.map((m) => {
+      const user = usersById.get(m.user_id);
       const tenantValue = Array.isArray(m.tenants) ? m.tenants[0] ?? null : m.tenants;
       return {
         userId: m.user_id,
-        email: usersById.get(m.user_id)?.email ?? null,
+        loginName: user?.loginName ?? null,
+        email: user?.email ?? null,
         role: m.role,
         tenantId: m.tenant_id,
         tenantName: tenantValue?.name ?? "Sin nombre",
@@ -110,11 +163,16 @@ export async function listUsers() {
 export async function createUser(input: CreateUserInput) {
   const supabase = createAdmin();
   const tenantDomain = await ensureUniqueTenantDomain(supabase, input.tenantDomain ?? input.tenantName);
+  const loginName = await ensureUniqueLoginName(supabase, input.loginName);
 
   const { data: authData, error: authError } = await supabase.auth.admin.createUser({
     email: input.email,
     password: input.password,
     email_confirm: true,
+    user_metadata: {
+      login_name: loginName,
+      contact_email: input.email,
+    },
   });
 
   if (authError || !authData?.user) throw new Error(authError?.message || "Error creando usuario");
@@ -177,6 +235,23 @@ export async function updateUser(id: string, input: UpdateUserInput) {
       .update({ role: input.role })
       .eq("tenant_id", id)
       .eq("user_id", input.userId);
+
+    if (error) throw new Error(error.message);
+  }
+
+  if (input.loginName) {
+    if (!input.userId) throw new Error("Falta el usuario para actualizar el nombre de acceso");
+
+    const loginName = await ensureUniqueLoginName(supabase, input.loginName, input.userId);
+    const { data: currentUser, error: currentUserError } = await supabase.auth.admin.getUserById(input.userId);
+    if (currentUserError) throw new Error(currentUserError.message);
+
+    const { error } = await supabase.auth.admin.updateUserById(input.userId, {
+      user_metadata: {
+        ...(currentUser.user?.user_metadata ?? {}),
+        login_name: loginName,
+      },
+    });
 
     if (error) throw new Error(error.message);
   }
