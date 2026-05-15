@@ -8,6 +8,7 @@ export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => voi
   const [tenantDomain, setTenantDomain] = useState("");
   const [tenantAddress, setTenantAddress] = useState("");
   const [tenantMapsUrl, setTenantMapsUrl] = useState("");
+  const [loginName, setLoginName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"admin" | "member">("member");
@@ -17,6 +18,7 @@ export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => voi
     e.preventDefault();
 
     if (!tenantName.trim()) return alert("El nombre del local es obligatorio");
+    if (!loginName.trim()) return alert("El nombre de acceso es obligatorio");
 
     startTransition(async () => {
       try {
@@ -25,6 +27,7 @@ export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => voi
           tenantDomain: tenantDomain.trim() || undefined,
           tenantAddress: tenantAddress.trim() || undefined,
           tenantMapsUrl: tenantMapsUrl.trim() || undefined,
+          loginName: loginName.trim().toLowerCase(),
           email: email.trim(),
           password,
           role,
@@ -35,6 +38,7 @@ export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => voi
           setTenantDomain("");
           setTenantAddress("");
           setTenantMapsUrl("");
+          setLoginName("");
           setEmail("");
           setPassword("");
           setRole("member");
@@ -107,6 +111,23 @@ export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => voi
           />
           <p className="text-xs text-[var(--color-txt-secondary)] mt-2">
             Este link se comparte desde el boton Ubicacion de la carta publica.
+          </p>
+        </div>
+
+        <div className="flex flex-col">
+          <label className="text-sm pb-2 font-semibold">Nombre de acceso *</label>
+          <input
+            type="text"
+            name="loginName"
+            value={loginName}
+            onChange={(e) => setLoginName(e.target.value.toLowerCase())}
+            placeholder="Ej: local12"
+            disabled={pending}
+            className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm text-sm"
+            required
+          />
+          <p className="text-xs text-[var(--color-txt-secondary)] mt-2">
+            Este nombre reemplaza al correo para iniciar sesion.
           </p>
         </div>
 

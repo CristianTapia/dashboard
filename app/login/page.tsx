@@ -2,23 +2,33 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabaseClient } from "@/app/lib/supabase/client";
 import { Box, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [loginName, setLoginName] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [pending, setPending] = useState(false);
 
   async function handleLogin() {
-    const { error } = await supabaseClient.auth.signInWithPassword({
-      email,
-      password,
-    });
+    setPending(true);
 
-    if (error) alert(error.message);
-    else router.push("/dashboard");
+    try {
+      const identifier = loginName.trim().toLowerCase();
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ loginName: identifier, password }),
+      });
+
+      if (!response.ok) throw new Error("Credenciales invalidas");
+      router.push("/dashboard");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Credenciales invalidas");
+    } finally {
+      setPending(false);
+    }
   }
 
   return (
@@ -55,16 +65,17 @@ export default function LoginPage() {
                   handleLogin();
                 }}
               >
-                {/* Email */}
+                {/* User */}
                 <div className="flex flex-col gap-2">
-                  <label className="dark:text-slate-200 font-semibold text-sm">Correo Electrónico</label>
+                  <label className="dark:text-slate-200 font-semibold text-sm">Usuario</label>
                   <input
                     className="form-input text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 mb-4"
-                    placeholder="ejemplo@correo.com"
+                    placeholder="nombre-de-acceso"
                     required
-                    type="email"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
+                    type="text"
+                    value={loginName}
+                    disabled={pending}
+                    onChange={(event) => setLoginName(event.target.value)}
                   />
                 </div>
                 {/* Password */}
@@ -78,6 +89,7 @@ export default function LoginPage() {
                       required
                       type={showPassword ? "text" : "password"}
                       value={password}
+                      disabled={pending}
                       onChange={(event) => setPassword(event.target.value)}
                     />
                     <button
@@ -112,8 +124,9 @@ export default function LoginPage() {
                 <button
                   className="w-full bg-[var(--color-button-send)] flex cursor-pointer items-center justify-center rounded-lg h-14 text-white font-bold hover:bg-primary/90 shadow-md shadow-primary/20 active:scale-[0.98] transition-all"
                   type="submit"
+                  disabled={pending}
                 >
-                  <span className="truncate">Acceder al Dashboard</span>
+                  <span className="truncate">{pending ? "Ingresando..." : "Acceder al Dashboard"}</span>
                 </button>
               </form>
               {/* Footer */}
