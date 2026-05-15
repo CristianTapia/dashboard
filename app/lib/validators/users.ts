@@ -12,7 +12,7 @@ const LoginNameSchema = z
   .trim()
   .min(3, "El nombre de acceso debe tener al menos 3 caracteres")
   .max(60, "El nombre de acceso es demasiado largo")
-  .regex(/^[a-z0-9._-]+$/, "El nombre de acceso solo permite minusculas, numeros, puntos, guiones y guion bajo");
+  .regex(/^[\p{L}\p{N}._-]+$/u, "El nombre de acceso solo permite letras, numeros, puntos, guiones y guion bajo");
 
 export const CreateUserSchema = z.object({
   tenantName: z.string().min(1, "El nombre del local es obligatorio"),
