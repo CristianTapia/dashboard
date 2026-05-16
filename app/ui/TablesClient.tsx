@@ -202,10 +202,10 @@ export default function TablesClient({
             <div className="mt-4 space-y-3">
               <div className="rounded-lg border border-[var(--color-border-box)] p-3">
                 <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-txt-secondary)]">
-                  Link publico corto
+                  Link publico
                 </p>
                 <p className="text-xs text-[var(--color-txt-secondary)] mt-1">
-                  Recomendado para QR. Usa solo el identificador publico de la mesa.
+                  Incluye el tenant y el identificador publico de la mesa.
                 </p>
                 <p className="text-sm break-all mt-1">{table.short_url}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -219,35 +219,6 @@ export default function TablesClient({
                   </button>
                   <a
                     href={table.short_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg border border-[var(--color-border-box)]"
-                  >
-                    <ExternalLink size={14} />
-                    Abrir
-                  </a>
-                </div>
-              </div>
-
-              <div className="rounded-lg border border-[var(--color-border-box)] p-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-txt-secondary)]">
-                  Link publico con tenant
-                </p>
-                <p className="text-xs text-[var(--color-txt-secondary)] mt-1">
-                  Incluye el tenant en la URL ademas del identificador publico de la mesa.
-                </p>
-                <p className="text-sm break-all mt-1">{table.tenant_url}</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => copyToClipboard(table.tenant_url)}
-                    className="inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg bg-[var(--color-bg-selected)] hover:opacity-90 cursor-pointer"
-                  >
-                    <Copy size={14} />
-                    Copiar
-                  </button>
-                  <a
-                    href={table.tenant_url}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg border border-[var(--color-border-box)]"
