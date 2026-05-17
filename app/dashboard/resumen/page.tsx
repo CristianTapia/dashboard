@@ -4,9 +4,9 @@ export default async function Overview() {
   await requireAdmin();
 
   return (
-    <div className="flex flex-col">
-      <div className="flex flex-wrap gap-8 justify-center">
-        <div className="relative box-border border p-4 rounded shadow-md bg-gray w-[400px]">
+    <div className="flex flex-col p-2 sm:p-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 sm:gap-8">
+        <div className="relative box-border border p-4 rounded shadow-md bg-[var(--color-foreground)] w-full">
           <div className="flex justify-between items-center mb-5">📊 Estádisticas mensuales</div>
           <div className="flex justify-between items-center mb-5">🧾 Ventas </div>
           <div className="flex items-end">
@@ -24,7 +24,7 @@ export default async function Overview() {
             </div>
           </div>
         </div>
-        <div className="relative box-border border p-4 rounded shadow-md bg-gray w-[400px]">
+        <div className="relative box-border border p-4 rounded shadow-md bg-[var(--color-foreground)] w-full">
           <div className="flex justify-between items-center mb-5">📊 Estádisticas semanales</div>
           <div className="flex justify-between items-center mb-5">🧾 Ventas </div>
           <div className="flex items-end">
@@ -42,7 +42,7 @@ export default async function Overview() {
             </div>
           </div>
         </div>
-        <div className="relative box-border border p-4 rounded shadow-md bg-gray w-[400px]">
+        <div className="relative box-border border p-4 rounded shadow-md bg-[var(--color-foreground)] w-full">
           <div className="flex justify-between items-center mb-5">📊 Estádisticas diarias</div>
           <div className="flex justify-between items-center mb-5">🧾 Ventas </div>
           <div className="flex items-end">

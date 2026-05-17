@@ -69,7 +69,7 @@ export default function AllHighlights({
   }, [activeTenantId, highlights, isAdmin, tenantFilter]);
 
   return (
-    <div className="max-w-auto p-4 flex flex-col">
+    <div className="w-full max-w-full p-2 sm:p-4 flex flex-col">
       <div className="flex flex-col items-start gap-2">
         <h1 className="text-3xl font-bold">Todos los Destacados</h1>
         <p className="text-md text-[var(--color-txt-secondary)]">
@@ -81,7 +81,7 @@ export default function AllHighlights({
         <button
           type="button"
           onClick={() => openModal("addHighlight")}
-          className="p-2 pl-5 pr-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
+          className="w-full sm:w-auto p-3 sm:px-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
         >
           <CirclePlus /> Añadir nuevo destacado
         </button>
@@ -89,7 +89,7 @@ export default function AllHighlights({
       {isAdmin && (
         <div className="mt-4">
           <select
-            className="w-56 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 text-sm"
+            className="w-full sm:w-56 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 text-sm"
             value={tenantFilter}
             onChange={(e) => setTenantFilter(e.target.value)}
             disabled={tenantOptions.length === 0}
@@ -103,7 +103,7 @@ export default function AllHighlights({
           </select>
         </div>
       )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 mt-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6 mt-6">
         {filteredHighlights.map((highlight) => (
           <div
             key={highlight.id}

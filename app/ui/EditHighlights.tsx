@@ -180,11 +180,11 @@ export default function EditHighlights({
         </div>
 
         {/* Botón para enviar el formulario */}
-        <div className="flex justify-end text-sm font-bold">
+        <div className="flex justify-stretch sm:justify-end text-sm font-bold">
           <button
             type="submit"
             disabled={pending || uploading}
-            className="flex px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-button-send)] text-white
+            className="flex w-full sm:w-auto justify-center px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-button-send)] text-white
                        disabled:opacity-60 items-center justify-center transition hover:bg-[var(--color-button-send-hover)]"
           >
             {pending ? "Creando..." : uploading ? "Guardar Cambios" : "Guardar Cambios"}

@@ -32,117 +32,97 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display transition-colors duration-300">
-      <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-        <div className="layout-container flex h-full grow flex-col">
-          {/* Header */}
-          <header className="flex items-center justify-between whitespace-nowrap border-b border-[var(--color-line-limit)] dark:border-slate-800 px-6 md:px-10 py-3 bg-[var(--color-foreground)] dark:bg-slate-900">
-            <div className="flex items-center gap-2 text-slate-900 dark:text-white">
-              <Box size={30} color="#137fec" />
-              <h2 className="dark:text-white text-lg font-bold">Panel de Administración</h2>
+    <div className="min-h-[100dvh] bg-[var(--color-background)] text-[var(--foreground)]">
+      <div className="flex min-h-[100dvh] flex-col">
+        <header className="shrink-0 border-b border-[var(--color-line-limit)] bg-[var(--color-foreground)] px-4 py-3 sm:px-6">
+          <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2 text-slate-900 dark:text-white">
+              <Box size={28} color="#137fec" className="shrink-0" />
+              <h2 className="truncate text-base font-bold sm:text-lg">Panel de Administracion</h2>
             </div>
-            <div className="flex flex-1 justify-end gap-4">
-              <button className="flex cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-[var(--color-button-send)] text-white text-sm font-bold hover:bg-[var(--color-button-send-hover)] transition-colors">
-                <span>Ayuda</span>
-              </button>
-            </div>
-          </header>
-          {/* Main Content Area */}
-          <main className="flex-1 flex items-center justify-center p-4 bg-[var(--color-background)]">
-            <div className="w-full max-w-[480px] bg-[var(--color-foreground)] dark:bg-slate-900 p-8 rounded-xl shadow-sm border border-[var(--color-border-box)] dark:border-slate-800">
-              {/* Headline */}
-              <div className="text-center mb-8">
-                <h1 className="dark:text-white text-3xl font-bold pb-2">Iniciar Sesión</h1>
-                <p className="text-[var(--color-txt-secondary)] dark:text-slate-400">
-                  Ingresa tus credenciales para gestionar el contenido del menú
-                </p>
-              </div>
-              {/* Form */}
-              <form
-                className="space-y-4"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  handleLogin();
-                }}
-              >
-                {/* User */}
-                <div className="flex flex-col gap-2">
-                  <label className="dark:text-slate-200 font-semibold text-sm">Usuario</label>
-                  <input
-                    className="form-input text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 mb-4"
-                    placeholder="nombre-de-acceso"
-                    required
-                    type="text"
-                    value={loginName}
-                    disabled={pending}
-                    onChange={(event) => setLoginName(event.target.value)}
-                  />
-                </div>
-                {/* Password */}
-                <div className="flex flex-col gap-2">
-                  <label className="dark:text-slate-200 font-semibold text-sm">Contraseña</label>
+            <a
+              className="shrink-0 rounded-lg border border-[var(--color-border-box)] px-3 py-2 text-sm font-semibold text-[var(--color-button-send)]"
+              href="#"
+            >
+              Ayuda
+            </a>
+          </div>
+        </header>
 
-                  <div className="flex w-full rounded-lg">
-                    <input
-                      className="flex-1 form-input text-sm bg-[var(--color-foreground)] rounded-l-lg border border-r-0 border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 mb-4"
-                      placeholder="••••••••"
-                      required
-                      type={showPassword ? "text" : "password"}
-                      value={password}
-                      disabled={pending}
-                      onChange={(event) => setPassword(event.target.value)}
-                    />
-                    <button
-                      aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                      className="cursor-pointer text-sm bg-[var(--color-foreground)] rounded-r-lg border border-l-0 border-[var(--color-border-box)] p-3 mb-4"
-                      type="button"
-                      onClick={() => setShowPassword((prev) => !prev)}
-                    >
-                      {showPassword ? <EyeOff color="#62748E" /> : <Eye color="#62748E" />}
-                    </button>
-                  </div>
-                </div>
-                {/* Options */}
-                <div className="flex items-center justify-between py-2">
-                  <label className="flex items-center gap-2 cursor-pointer group">
-                    <input
-                      className="cursor-pointer rounded border-[var(--color-border-box)] dark:border-slate-700 text-primary focus:ring-primarydark:bg-slate-800 transition-all"
-                      type="checkbox"
-                    />
-                    <span className="text-sm text-[var(--color-txt-secondary)] dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
-                      Recordarme
-                    </span>
-                  </label>
-                  <a
-                    className="text-sm text-[var(--color-button-send)] font-semibold text-primary hover:underline"
-                    href="#"
-                  >
-                    ¿Olvidaste tu contraseña?
-                  </a>
-                </div>
-                {/* Botón */}
-                <button
-                  className="w-full bg-[var(--color-button-send)] flex cursor-pointer items-center justify-center rounded-lg h-14 text-white font-bold hover:bg-primary/90 shadow-md shadow-primary/20 active:scale-[0.98] transition-all"
-                  type="submit"
-                  disabled={pending}
-                >
-                  <span className="truncate">{pending ? "Ingresando..." : "Acceder al Dashboard"}</span>
-                </button>
-              </form>
-              {/* Footer */}
-              <div className="mt-8 text-center pt-6 border-t border-slate-100 dark:border-slate-800">
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  ¿Necesitas una cuenta?{" "}
-                  <a className="text-[var(--color-button-send)] font-semibold hover:underline" href="#">
-                    Contacta a soporte
-                  </a>
-                </p>
-              </div>
+        <main className="flex flex-1 items-center justify-center px-4 py-6 sm:px-6 sm:py-10">
+          <section className="w-full max-w-[440px] rounded-2xl border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-5 shadow-sm sm:p-8">
+            <div className="mb-6 text-left sm:mb-8 sm:text-center">
+              <h1 className="text-2xl font-bold sm:text-3xl">Iniciar sesion</h1>
+              <p className="mt-2 text-sm leading-6 text-[var(--color-txt-secondary)]">
+                Ingresa tus credenciales para gestionar el contenido del menu.
+              </p>
             </div>
-          </main>
-          {/* <!-- Bottom Background Decoration (Abstract) --> */}
-          <div className="fixed bottom-0 left-0 w-full h-1 bg-gradient-to-r from-primary/10 via-primary to-primary/10"></div>
-        </div>
+
+            <form
+              className="space-y-5"
+              onSubmit={(event) => {
+                event.preventDefault();
+                handleLogin();
+              }}
+            >
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold">Usuario</label>
+                <input
+                  className="h-12 w-full rounded-lg border border-[var(--color-border-box)] bg-[var(--color-foreground)] px-3 text-base outline-none transition focus:border-[var(--color-button-send)] disabled:opacity-60"
+                  placeholder="nombre-de-acceso"
+                  required
+                  autoComplete="username"
+                  type="text"
+                  value={loginName}
+                  disabled={pending}
+                  onChange={(event) => setLoginName(event.target.value)}
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold">Contrasena</label>
+                <div className="flex w-full">
+                  <input
+                    className="h-12 min-w-0 flex-1 rounded-l-lg border border-r-0 border-[var(--color-border-box)] bg-[var(--color-foreground)] px-3 text-base outline-none transition focus:border-[var(--color-button-send)] disabled:opacity-60"
+                    placeholder="********"
+                    required
+                    autoComplete="current-password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    disabled={pending}
+                    onChange={(event) => setPassword(event.target.value)}
+                  />
+                  <button
+                    aria-label={showPassword ? "Ocultar contrasena" : "Mostrar contrasena"}
+                    className="flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-r-lg border border-l-0 border-[var(--color-border-box)] bg-[var(--color-foreground)] disabled:cursor-not-allowed disabled:opacity-60"
+                    type="button"
+                    disabled={pending}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                  >
+                    {showPassword ? <EyeOff color="#62748E" /> : <Eye color="#62748E" />}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                className="flex h-12 w-full cursor-pointer items-center justify-center rounded-lg bg-[var(--color-button-send)] px-4 font-bold text-white transition hover:bg-[var(--color-button-send-hover)] disabled:cursor-not-allowed disabled:opacity-60"
+                type="submit"
+                disabled={pending}
+              >
+                <span className="truncate">{pending ? "Ingresando..." : "Acceder al dashboard"}</span>
+              </button>
+            </form>
+
+            <div className="mt-6 border-t border-[var(--color-line-limit)] pt-5 text-center">
+              <p className="text-sm text-[var(--color-txt-secondary)]">
+                Necesitas una cuenta?{" "}
+                <a className="font-semibold text-[var(--color-button-send)] hover:underline" href="#">
+                  Contacta a soporte
+                </a>
+              </p>
+            </div>
+          </section>
+        </main>
       </div>
     </div>
   );

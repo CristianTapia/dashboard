@@ -1,6 +1,17 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { resolveEmailByLoginName } from "@/app/lib/data/users";
 import { createServer } from "@/app/lib/supabase/Server";
+
+async function clearSupabaseAuthCookies() {
+  const cookieStore = await cookies();
+
+  for (const cookie of cookieStore.getAll()) {
+    if (cookie.name.startsWith("sb-") && cookie.name.includes("-auth-token")) {
+      cookieStore.delete(cookie.name);
+    }
+  }
+}
 
 export async function POST(req: Request) {
   try {
@@ -17,6 +28,8 @@ export async function POST(req: Request) {
     if (!email) {
       return NextResponse.json({ error: "Credenciales invalidas" }, { status: 401 });
     }
+
+    await clearSupabaseAuthCookies();
 
     const supabase = await createServer();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
