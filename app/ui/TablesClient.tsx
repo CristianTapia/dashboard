@@ -37,10 +37,14 @@ export default function TablesClient({
   const [activeModal, setActiveModal] = useState<null | "addTable" | "confirmDelete">(null);
   const [selectedTable, setSelectedTable] = useState<RestaurantTable | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [tenantFilter, setTenantFilter] = useState("all");
+  const [tenantFilter, setTenantFilter] = useState(isAdmin ? "all" : activeTenantId);
   const [isPending, startTransition] = useTransition();
 
   const tenantOptions = useMemo(() => {
+    if (isAdmin) {
+      return [...tenants].sort((a, b) => a.name.localeCompare(b.name));
+    }
+
     const map = new Map<string, string>();
     for (const table of tables) {
       const tenantId = table.tenant_id ?? table.tenant?.id;
@@ -52,13 +56,15 @@ export default function TablesClient({
     return Array.from(map.entries())
       .map(([id, name]) => ({ id, name }))
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [tables]);
+  }, [isAdmin, tables, tenants]);
 
   const filteredTables = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
+    const effectiveTenantFilter = isAdmin ? tenantFilter : activeTenantId;
+
     return tables.filter((table) => {
       const tenantId = table.tenant_id ?? table.tenant?.id ?? null;
-      const byTenant = tenantFilter === "all" || tenantId === tenantFilter;
+      const byTenant = effectiveTenantFilter === "all" || tenantId === effectiveTenantFilter;
       const bySearch =
         !term ||
         table.label.toLowerCase().includes(term) ||
@@ -67,7 +73,7 @@ export default function TablesClient({
         (table.name ?? "").toLowerCase().includes(term);
       return byTenant && bySearch;
     });
-  }, [searchTerm, tables, tenantFilter]);
+  }, [activeTenantId, isAdmin, searchTerm, tables, tenantFilter]);
 
   function copyToClipboard(value: string) {
     startTransition(async () => {
@@ -112,7 +118,7 @@ export default function TablesClient({
   }
 
   return (
-    <div className="max-w-auto p-4 flex flex-col">
+    <div className="w-full max-w-full p-2 sm:p-4 flex flex-col">
       <div className="flex flex-col items-start gap-2">
         <h1 className="text-3xl font-bold">Mesas</h1>
         <p className="text-md text-[var(--color-txt-secondary)]">
@@ -124,45 +130,49 @@ export default function TablesClient({
         <button
           type="button"
           onClick={() => setActiveModal("addTable")}
-          className="p-2 pl-5 pr-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
+          className="w-full sm:w-auto p-3 sm:px-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
         >
           <CirclePlus /> Añadir mesa
         </button>
       </div>
 
-      <div className="flex w-full flex-1 items-stretch rounded-lg h-full mt-6 mb-6 gap-3">
-        <select
-          className="w-56 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 text-sm"
-          value={tenantFilter}
-          onChange={(e) => setTenantFilter(e.target.value)}
-        >
-          <option value="all">Todos los tenants</option>
-          {tenantOptions.map((tenant) => (
-            <option key={tenant.id} value={tenant.id}>
-              {tenant.name}
-            </option>
-          ))}
-        </select>
-        <div className="text-slate-500 flex bg-[var(--color-foreground)] items-center justify-center p-2 rounded-l-lg border border-[var(--color-border-box)] border-r-0">
-          <Search />
+      <div className="flex w-full flex-col sm:flex-row sm:items-stretch rounded-lg h-full mt-6 mb-6 gap-3">
+        {isAdmin && (
+          <select
+            className="w-full sm:w-56 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 text-sm"
+            value={tenantFilter}
+            onChange={(e) => setTenantFilter(e.target.value)}
+          >
+            <option value="all">Todos los tenants</option>
+            {tenantOptions.map((tenant) => (
+              <option key={tenant.id} value={tenant.id}>
+                {tenant.name}
+              </option>
+            ))}
+          </select>
+        )}
+        <div className="flex w-full">
+          <div className="text-slate-500 flex bg-[var(--color-foreground)] items-center justify-center p-2 rounded-l-lg border border-[var(--color-border-box)] border-r-0">
+            <Search />
+          </div>
+          <input
+            type="text"
+            name="search"
+            className="w-full min-w-0 bg-[var(--color-foreground)] rounded-r-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
+            placeholder="Buscar mesas por nombre, numero o token"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
-        <input
-          type="text"
-          name="search"
-          className="w-full bg-[var(--color-foreground)] rounded-r-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
-          placeholder="Buscar mesas por nombre, numero o token"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
         {filteredTables.map((table) => (
           <div
             key={table.id}
-            className="rounded-xl bg-(--color-foreground) border border-[var(--color-border-box)] p-5"
+            className="rounded-xl bg-[var(--color-foreground)] border border-[var(--color-border-box)] p-4 sm:p-5 min-w-0"
           >
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start justify-between gap-3 sm:gap-4">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <Table2 size={18} />

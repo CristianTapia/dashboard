@@ -177,18 +177,18 @@ export default function EditUsers({
           </select>
         </div>
 
-        <div className="flex gap-4 px-4 text-sm font-bold justify-center">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 px-0 sm:px-4 text-sm font-bold justify-center">
           <button
             type="button"
             onClick={onCancel}
-            className="flex px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-cancel)] text-black hover:bg-[var(--color-cancel-hover)]"
+            className="flex justify-center px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-cancel)] text-black hover:bg-[var(--color-cancel-hover)]"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={pending}
-            className="flex px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-button-send)] text-white disabled:opacity-60 items-center justify-center transition font-bold hover:bg-[var(--color-button-send-hover)]"
+            className="flex justify-center px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-button-send)] text-white disabled:opacity-60 items-center transition font-bold hover:bg-[var(--color-button-send-hover)]"
           >
             {pending ? "Guardando..." : "Guardar cambios"}
           </button>

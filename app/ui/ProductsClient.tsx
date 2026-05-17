@@ -84,7 +84,7 @@ export default function Products({
 
   // RENDERIZADO
   return (
-    <div className="max-w-auto p-4 flex flex-col">
+    <div className="w-full max-w-full p-2 sm:p-4 flex flex-col">
       <div className="flex flex-col items-start gap-2">
         <h1 className="text-3xl font-bold">Todos los Productos</h1>
         <p className="text-md text-[var(--color-txt-secondary)]">
@@ -98,16 +98,16 @@ export default function Products({
         <button
           type="button"
           onClick={() => openModal("addProduct")}
-          className="p-2 pl-5 pr-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
+          className="w-full sm:w-auto p-3 sm:px-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
         >
           <CirclePlus /> Añadir nuevo producto
         </button>
       </div>
       {/* Búsqueda */}
-      <div className="flex w-full flex-1 items-stretch rounded-lg h-full mt-6 mb-6 gap-3">
+      <div className="flex w-full flex-col sm:flex-row sm:items-stretch rounded-lg h-full mt-6 mb-6 gap-3">
         {isAdmin && (
           <select
-            className="w-56 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 text-sm"
+            className="w-full sm:w-56 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 text-sm"
             value={tenantFilter}
             onChange={(e) => setTenantFilter(e.target.value)}
           >
@@ -119,20 +119,22 @@ export default function Products({
             ))}
           </select>
         )}
-        <div className="text-slate-500 dark:text-slate-400 flex bg-[var(--color-foreground)] dark:bg-background-dark items-center justify-center p-2 rounded-l-lg border border-[var(--color-border-box)] border-r-0">
-          <Search />
+        <div className="flex w-full">
+          <div className="text-slate-500 dark:text-slate-400 flex bg-[var(--color-foreground)] dark:bg-background-dark items-center justify-center p-2 rounded-l-lg border border-[var(--color-border-box)] border-r-0">
+            <Search />
+          </div>
+          <input
+            type="text"
+            name="search"
+            className="w-full min-w-0 bg-[var(--color-foreground)] rounded-r-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
+            placeholder="Buscar productos por nombre"
+            value={search.term}
+            onChange={(e) => setSearch((prev) => ({ ...prev, term: e.target.value }))}
+          />
         </div>
-        <input
-          type="text"
-          name="search"
-          className="w-full bg-[var(--color-foreground)] rounded-r-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
-          placeholder="Buscar productos por nombre"
-          value={search.term}
-          onChange={(e) => setSearch((prev) => ({ ...prev, term: e.target.value }))}
-        />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6">
         {filteredProducts.map((product) => (
           <div
             key={product.id}
