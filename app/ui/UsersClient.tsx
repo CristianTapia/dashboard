@@ -10,6 +10,7 @@ import { deleteUserAction } from "@/app/dashboard/usuarios/actions";
 
 type UserTenantRow = {
   userId: string;
+  loginName: string | null;
   email: string | null;
   role: string | null;
   tenantId: string | null;
@@ -41,6 +42,7 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
     return rows.filter((r) => {
       if (!term) return true;
       return (
+        r.loginName?.toLowerCase().includes(term) ||
         r.email?.toLowerCase().includes(term) ||
         r.tenantName.toLowerCase().includes(term) ||
         (r.tenantDomain ?? "").toLowerCase().includes(term) ||
@@ -59,7 +61,7 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
   };
 
   return (
-    <div className="max-w-auto p-4 flex flex-col">
+    <div className="w-full max-w-full p-2 sm:p-4 flex flex-col">
       <div className="flex flex-col items-start gap-2">
         <h1 className="text-3xl font-bold">Usuarios</h1>
         <p className="text-md text-[var(--color-txt-secondary)]">
@@ -71,7 +73,7 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
         <button
           type="button"
           onClick={() => openModal("addUser")}
-          className="p-2 pl-5 pr-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
+          className="w-full sm:w-auto p-3 sm:px-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
         >
           <CirclePlus /> Anadir nuevo usuario
         </button>
@@ -85,22 +87,23 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
           type="text"
           name="search"
           className="w-full bg-[var(--color-foreground)] rounded-r-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
-          placeholder="Buscar por email, tenant, clave o rol"
+          placeholder="Buscar por acceso, email, tenant, clave o rol"
           value={search.term}
           onChange={(e) => setSearch((prev) => ({ ...prev, term: e.target.value }))}
         />
       </div>
 
-      <section className="bg-[var(--color-foreground)] border border-[var(--color-line-limit)] rounded-xl p-6">
+      <section className="bg-[var(--color-foreground)] border border-[var(--color-line-limit)] rounded-xl p-3 sm:p-6">
         <h2 className="text-lg font-semibold mb-2">Usuarios del tenant</h2>
         {filteredRows.length === 0 ? (
           <p className="text-sm text-[var(--color-txt-secondary)]">Aun no hay usuarios.</p>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left border-b border-[var(--color-line-limit)]">
                   <th className="py-2">Email</th>
+                  <th className="py-2">Acceso</th>
                   <th className="py-2">Tenant</th>
                   <th className="py-2">Clave publica</th>
                   <th className="py-2">Rol</th>
@@ -111,6 +114,7 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
                 {filteredRows.map((row) => (
                   <tr key={`${row.userId}-${row.tenantId}`} className="border-b border-[var(--color-line-limit)]">
                     <td className="py-2">{row.email ?? "Sin email"}</td>
+                    <td className="py-2 font-mono text-xs">{row.loginName ?? "Sin acceso"}</td>
                     <td className="py-2">{row.tenantName}</td>
                     <td className="py-2 font-mono text-xs">{row.tenantDomain ?? row.tenantId ?? "Sin clave"}</td>
                     <td className="py-2">{row.role ?? "Sin rol"}</td>
@@ -176,6 +180,7 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
               tenantDomain={selectedRow.tenantDomain}
               tenantAddress={selectedRow.tenantAddress}
               tenantMapsUrl={selectedRow.tenantMapsUrl}
+              loginName={selectedRow.loginName}
               role={selectedRow.role}
               onCancel={() => setActiveModal(null)}
               onSuccess={() => {

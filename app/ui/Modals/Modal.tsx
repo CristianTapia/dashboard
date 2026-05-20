@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 
-const baseClassNameButton = "flex px-4 p-3 gap-2 rounded-xl cursor-pointer";
+const baseClassNameButton = "flex justify-center px-4 p-3 gap-2 rounded-xl cursor-pointer";
 
 export default function Modal({
   isOpen,
@@ -42,12 +42,12 @@ export default function Modal({
       {isOpen && (
         // Cierra el modal al hacer clic fuera
         <div
-          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 transition-opacity"
+          className="fixed inset-0 z-50 flex items-end sm:items-start justify-center overflow-y-auto bg-black/60 transition-opacity"
           onClick={onCloseAction}
         >
           {/* Evita que el click dentro del modal lo cierre */}
           <div
-            className="bg-white p-6 rounded-lg w-full mx-4 my-6 max-w-3xl max-h-[90vh] overflow-hidden flex flex-col"
+            className="bg-white p-4 sm:p-6 rounded-t-2xl sm:rounded-lg w-full mx-0 sm:mx-4 my-0 sm:my-6 max-w-3xl max-h-[92dvh] sm:max-h-[90vh] overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal header */}
@@ -64,14 +64,14 @@ export default function Modal({
               <h1 className="text-md font-bold">{title}</h1>
             </div>
             {/* Modal body scrolleable*/}
-            {body ? <div className="p-4 flex-1 min-h-0 overflow-y-auto">{body}</div> : null}
+            {body ? <div className="p-2 sm:p-4 flex-1 min-h-0 overflow-y-auto">{body}</div> : null}
 
             {/* Model Body fijo */}
-            {fixedBody ? <div className="px-4 flex-1 min-h-0 overflow-y-auto">{fixedBody}</div> : null}
+            {fixedBody ? <div className="px-2 sm:px-4 flex-1 min-h-0 overflow-y-auto">{fixedBody}</div> : null}
 
             {/* Modal footer buttons*/}
             {buttonAName || buttonBName ? (
-              <div className="flex gap-4 px-4 text-sm font-bold justify-center shrink-0">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 px-2 sm:px-4 text-sm font-bold justify-center shrink-0">
                 {buttonAName ? (
                   <button
                     onClick={onButtonAClickAction}

@@ -23,7 +23,7 @@ export default function AllHighlights({
 }) {
   const [activeModal, setActiveModal] = useState<null | "addHighlight" | "editHighlight" | "confirmDelete">(null);
   const [selectedHighlight, setSelectedHighlight] = useState<Highlight | null>(null);
-  const [tenantFilter, setTenantFilter] = useState("all");
+  const [tenantFilter, setTenantFilter] = useState(isAdmin ? "all" : activeTenantId);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -41,6 +41,10 @@ export default function AllHighlights({
   };
 
   const tenantOptions = useMemo(() => {
+    if (isAdmin) {
+      return [...tenants].sort((a, b) => a.name.localeCompare(b.name));
+    }
+
     const map = new Map<string, string>();
     for (const highlight of highlights) {
       const tenantId = highlight.tenant_id ?? highlight.tenant?.id;
@@ -52,18 +56,20 @@ export default function AllHighlights({
     return Array.from(map.entries())
       .map(([id, name]) => ({ id, name }))
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [highlights]);
+  }, [highlights, isAdmin, tenants]);
 
   const filteredHighlights = useMemo(() => {
+    const effectiveTenantFilter = isAdmin ? tenantFilter : activeTenantId;
+
     return highlights.filter((highlight) => {
-      if (tenantFilter === "all") return true;
+      if (effectiveTenantFilter === "all") return true;
       const tenantId = highlight.tenant_id ?? highlight.tenant?.id ?? null;
-      return tenantId === tenantFilter;
+      return tenantId === effectiveTenantFilter;
     });
-  }, [highlights, tenantFilter]);
+  }, [activeTenantId, highlights, isAdmin, tenantFilter]);
 
   return (
-    <div className="max-w-auto p-4 flex flex-col">
+    <div className="w-full max-w-full p-2 sm:p-4 flex flex-col">
       <div className="flex flex-col items-start gap-2">
         <h1 className="text-3xl font-bold">Todos los Destacados</h1>
         <p className="text-md text-[var(--color-txt-secondary)]">
@@ -75,27 +81,29 @@ export default function AllHighlights({
         <button
           type="button"
           onClick={() => openModal("addHighlight")}
-          className="p-2 pl-5 pr-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
+          className="w-full sm:w-auto p-3 sm:px-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
         >
           <CirclePlus /> Añadir nuevo destacado
         </button>
       </div>
-      <div className="mt-4">
-        <select
-          className="w-56 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 text-sm"
-          value={tenantFilter}
-          onChange={(e) => setTenantFilter(e.target.value)}
-          disabled={tenantOptions.length === 0}
-        >
-          <option value="all">{tenantOptions.length === 0 ? "Global (sin tenant)" : "Todos los tenants"}</option>
-          {tenantOptions.map((tenant) => (
-            <option key={tenant.id} value={tenant.id}>
-              {tenant.name}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 mt-6">
+      {isAdmin && (
+        <div className="mt-4">
+          <select
+            className="w-full sm:w-56 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 text-sm"
+            value={tenantFilter}
+            onChange={(e) => setTenantFilter(e.target.value)}
+            disabled={tenantOptions.length === 0}
+          >
+            <option value="all">{tenantOptions.length === 0 ? "Global (sin tenant)" : "Todos los tenants"}</option>
+            {tenantOptions.map((tenant) => (
+              <option key={tenant.id} value={tenant.id}>
+                {tenant.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6 mt-6">
         {filteredHighlights.map((highlight) => (
           <div
             key={highlight.id}

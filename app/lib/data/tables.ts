@@ -78,8 +78,8 @@ function mapTable(row: RestaurantTableRow, tenant: TenantRow | null): Restaurant
     active: row.active,
     created_at: row.created_at,
     label: buildLabel(row),
-    short_url: `${menuBase}/m/${encodeURIComponent(row.public_token)}`,
-    tenant_url: `${menuBase}/menu/${encodeURIComponent(tenantKey)}/${encodeURIComponent(row.public_token)}`,
+    short_url: `${menuBase}/${encodeURIComponent(tenantKey)}/${encodeURIComponent(row.public_token)}`,
+    tenant_url: `${menuBase}/${encodeURIComponent(tenantKey)}/${encodeURIComponent(row.public_token)}`,
     tenant: tenant
       ? {
           id: tenant.id,
