@@ -24,7 +24,9 @@ type RestaurantTableRow = {
 
 function isMissingTablesRelation(error: { code?: string; message?: string } | null) {
   if (!error) return false;
-  return error.code === "42P01" || error.message?.includes('relation "public.restaurant_tables" does not exist') === true;
+  return (
+    error.code === "42P01" || error.message?.includes('relation "public.restaurant_tables" does not exist') === true
+  );
 }
 
 function normalizeOptionalText(value?: string | null) {
@@ -39,7 +41,10 @@ function buildLabel(table: Pick<RestaurantTableRow, "name" | "number">) {
 }
 
 function getMenuBaseUrl() {
-  return (process.env.NEXT_PUBLIC_MENU_BASE_URL ?? "http://localhost:3000").replace(/\/+$/, "");
+  const baseUrl = process.env.NEXT_PUBLIC_MENU_BASE_URL;
+  if (baseUrl) return baseUrl.replace(/\/+$/, "");
+
+  return process.env.NODE_ENV === "production" ? "https://menu.lab3c.app" : "http://localhost:3000";
 }
 
 function buildPublicToken() {
@@ -47,7 +52,10 @@ function buildPublicToken() {
   return `t-${randomToken}`;
 }
 
-async function loadTenantsMap(db: ReturnType<typeof createAdmin> | Awaited<ReturnType<typeof createServer>>, tenantIds: string[]) {
+async function loadTenantsMap(
+  db: ReturnType<typeof createAdmin> | Awaited<ReturnType<typeof createServer>>,
+  tenantIds: string[],
+) {
   const uniqueTenantIds = Array.from(new Set(tenantIds.filter(Boolean)));
   if (uniqueTenantIds.length === 0) return new Map<string, TenantRow>();
 
@@ -103,7 +111,10 @@ export async function listRestaurantTables() {
   }
 
   const rows = (data ?? []) as RestaurantTableRow[];
-  const tenantsMap = await loadTenantsMap(db, rows.map((row) => row.tenant_id));
+  const tenantsMap = await loadTenantsMap(
+    db,
+    rows.map((row) => row.tenant_id),
+  );
   return rows.map((row) => mapTable(row, tenantsMap.get(row.tenant_id) ?? null));
 }
 
