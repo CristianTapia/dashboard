@@ -120,7 +120,7 @@ export default function AddHighlights({
             className="flex justify-center px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-button-send)] text-white
                        disabled:opacity-60 items-center justify-center transition font-bold hover:bg-[var(--color-button-send-hover)]"
           >
-            {saving ? "Creando..." : uploading ? "Subiendo imagen..." : "Anadir"}
+            {saving ? "Creando..." : uploading ? "Subiendo imagen..." : "Añadir"}
           </button>
         </div>
       </form>

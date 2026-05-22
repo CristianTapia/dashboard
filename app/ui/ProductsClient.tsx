@@ -7,7 +7,7 @@ import AddProducts from "@/app/ui/AddProducts";
 import Image from "next/image";
 import { Product, Category, TenantOption } from "../lib/validators/types";
 import { useRouter } from "next/navigation";
-import { CirclePlus, Trash, Pencil, Search, ToggleLeft, ToggleRight, TriangleAlert, Upload } from "lucide-react";
+import { CirclePlus, Trash, Pencil, Search, TriangleAlert, Upload } from "lucide-react";
 import { deleteProductAction, updateProductActiveAction } from "@/app/dashboard/productos/actions";
 
 export default function Products({
@@ -163,7 +163,7 @@ export default function Products({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-4 sm:gap-6">
         {filteredProducts.map((product) => (
           (() => {
             const active = getProductActive(product);
@@ -190,16 +190,7 @@ export default function Products({
                   {product.tenant?.name && (
                     <p className="text-xs text-[var(--color-txt-secondary)] mb-1">Tenant: {product.tenant.name}</p>
                   )}
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-lg font-semibold text-text-light dark:text-text-dark min-w-0">{product.name}</h3>
-                    <span
-                      className={`shrink-0 text-xs px-2 py-1 rounded-full ${
-                        active ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-700"
-                      }`}
-                    >
-                      {active ? "Disponible" : "Sin stock"}
-                    </span>
-                  </div>
+                  <h3 className="text-lg font-semibold text-text-light dark:text-text-dark min-w-0">{product.name}</h3>
                   <p className="text-sm mt-1 flex-grow">{product.description}</p>
                   {/* <div className="mt-4">
                     <div className="flex items-baseline gap-2">
@@ -214,28 +205,52 @@ export default function Products({
                       minimumFractionDigits: 0,
                     }).format(product.price)}
                   </p>
-                  <div className="mt-4 pt-4 border-t border-[var(--color-border-box)] dark:border-border-dark flex items-center justify-end gap-2">
+                  <div className="mt-4 pt-4 border-t border-[var(--color-border-box)] dark:border-border-dark flex flex-wrap items-center justify-between gap-2">
                     <button
                       type="button"
                       disabled={Boolean(pendingActiveById[product.id])}
                       onClick={() => onToggleActive(product)}
-                      className="cursor-pointer p-2 rounded-2xl text-[var(--color-light)] hover:text-[var(--color-light-hover)] hover:bg-[var(--color-bg-selected)] transition-colors disabled:opacity-60"
+                      className={`inline-flex h-9 min-w-0 flex-1 items-center justify-between gap-2 rounded-xl px-2.5 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 sm:flex-none lg:flex-1 xl:flex-none ${
+                        active
+                          ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:hover:bg-emerald-500/25"
+                          : "bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
+                      }`}
                       title={active ? "Marcar sin stock" : "Marcar disponible"}
+                      aria-pressed={active}
+                      aria-label={active ? "Producto con stock. Marcar sin stock" : "Producto sin stock. Marcar con stock"}
                     >
-                      {active ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
+                      <span className="truncate">{active ? "Con stock" : "Sin stock"}</span>
+                      <span
+                        className={`relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200 ${
+                          active ? "bg-emerald-500 dark:bg-emerald-400" : "bg-slate-400 dark:bg-slate-500"
+                        }`}
+                        aria-hidden="true"
+                      >
+                        <span
+                          className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${
+                            active ? "translate-x-5" : "translate-x-0"
+                          }`}
+                        />
+                      </span>
                     </button>
-                    <button
-                      onClick={() => openModal("editProduct", product)}
-                      className="cursor-pointer p-2 rounded-2xl text-[var(--color-light)] hover:text-[var(--color-light-hover)] hover:bg-[var(--color-cancel)] transition-colors"
-                    >
-                      <Pencil size={18} />
-                    </button>
-                    <button
-                      onClick={() => openModal("confirmDelete", product)}
-                      className="cursor-pointer p-2 rounded-2xl text-[var(--color-delete)] hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-[var(--color-delete-hover)] transition-colors"
-                    >
-                      <Trash size={18} />
-                    </button>
+                    <div className="flex shrink-0 items-center justify-end gap-1.5 xl:gap-2">
+                      <button
+                        type="button"
+                        onClick={() => openModal("editProduct", product)}
+                        className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-[var(--color-light)] transition-colors hover:bg-[var(--color-cancel)] hover:text-[var(--color-light-hover)]"
+                        title="Editar producto"
+                      >
+                        <Pencil size={17} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => openModal("confirmDelete", product)}
+                        className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-[var(--color-delete)] transition-colors hover:bg-red-50 hover:text-[var(--color-delete-hover)] dark:hover:bg-red-900/20"
+                        title="Eliminar producto"
+                      >
+                        <Trash size={17} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

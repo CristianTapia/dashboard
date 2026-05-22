@@ -75,7 +75,7 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
           onClick={() => openModal("addUser")}
           className="w-full sm:w-auto p-3 sm:px-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
         >
-          <CirclePlus /> Anadir nuevo usuario
+          <CirclePlus /> Añadir nuevo usuario
         </button>
       </div>
 
@@ -153,7 +153,7 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
         icon={<Upload color="#137fec" />}
         iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
         onCloseAction={() => setActiveModal(null)}
-        title="Anadir usuario"
+        title="Añadir usuario"
         fixedBody={
           <AddUsers
             onCancel={() => setActiveModal(null)}

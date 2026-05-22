@@ -182,7 +182,7 @@ export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => voi
             disabled={pending}
             className="flex justify-center px-4 p-3 gap-2 rounded-xl cursor-pointer bg-[var(--color-button-send)] text-white disabled:opacity-60 items-center transition font-bold hover:bg-[var(--color-button-send-hover)]"
           >
-            {pending ? "Anadiendo..." : "Anadir"}
+            {pending ? "Añadiendo..." : "Añadir"}
           </button>
         </div>
       </form>
