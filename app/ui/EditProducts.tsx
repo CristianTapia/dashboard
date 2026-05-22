@@ -79,6 +79,10 @@ export default function EditProducts({
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const nextName = name.trim() || product.name;
+    if (!/^\d+$/.test(price.trim()) || Number(price) <= 0) {
+      alert("Precio inválido");
+      return;
+    }
     const parsedPrice = Number(price);
     const nextPrice = Number.isFinite(parsedPrice) ? parsedPrice : product.price;
     const finalDescription = description.trim() || product.description || "";
@@ -217,12 +221,11 @@ export default function EditProducts({
           />
           <label className="text-sm pb-2 font-semibold">Nuevo Precio</label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            onKeyDown={(e) => {
-              if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault();
-            }}
+            onChange={(e) => setPrice(e.target.value.replace(/\D/g, ""))}
             className="form-input text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 mb-4"
             placeholder="Introduce el precio del producto"
             disabled={pending || uploading}

@@ -15,6 +15,7 @@ type PublicTableRow = {
   name: string | null;
   number: string | null;
   active: boolean;
+  tenant: TenantRow | TenantRow[] | null;
 };
 
 function isMissingTablesRelation(error: { code?: string; message?: string } | null) {
@@ -33,7 +34,7 @@ export async function resolvePublicTableByToken(tableToken: string) {
 
   const { data, error } = await admin
     .from("restaurant_tables")
-    .select("id,tenant_id,public_token,name,number,active")
+    .select("id,tenant_id,public_token,name,number,active,tenant:tenants(id,name,domain)")
     .eq("public_token", tableToken)
     .eq("active", true)
     .maybeSingle<PublicTableRow>();
@@ -44,13 +45,8 @@ export async function resolvePublicTableByToken(tableToken: string) {
   }
   if (!data) return null;
 
-  const { data: tenant, error: tenantError } = await admin
-    .from("tenants")
-    .select("id,name,domain")
-    .eq("id", data.tenant_id)
-    .maybeSingle<TenantRow>();
-
-  if (tenantError) throw new Error(tenantError.message);
+  const tenantValue = Array.isArray(data.tenant) ? data.tenant[0] : data.tenant;
+  const tenant = tenantValue ?? null;
   if (!tenant) return null;
 
   return {

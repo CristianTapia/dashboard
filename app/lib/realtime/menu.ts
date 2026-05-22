@@ -7,6 +7,14 @@ type MenuUpdatedPayload = {
   updatedAt: string;
 };
 
+type TableUpdatedPayload = {
+  tableId: string;
+  tableToken: string;
+  tenantId: string;
+  action: "created" | "updated" | "deleted";
+  updatedAt: string;
+};
+
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
   return Promise.race([
     promise,
@@ -16,11 +24,9 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
   ]);
 }
 
-export async function broadcastMenuUpdated(tenantId?: string | null) {
-  if (!tenantId) return;
-
+async function sendBroadcast(channelName: string, event: string, payload: unknown) {
   const supabase = createAdmin();
-  const channel = supabase.channel(`public-menu:${tenantId}`, {
+  const channel = supabase.channel(channelName, {
     config: {
       broadcast: { ack: true },
     },
@@ -42,17 +48,57 @@ export async function broadcastMenuUpdated(tenantId?: string | null) {
     await withTimeout(
       channel.send({
         type: "broadcast",
-        event: "menu_updated",
-        payload: {
-          tenantId,
-          updatedAt: new Date().toISOString(),
-        } satisfies MenuUpdatedPayload,
+        event,
+        payload,
       }),
       2_000,
     );
-  } catch (error) {
-    console.error("broadcastMenuUpdated error:", error);
   } finally {
     await supabase.removeChannel(channel);
+  }
+}
+
+export async function broadcastMenuUpdated(tenantId?: string | null) {
+  if (!tenantId) return;
+
+  try {
+    await sendBroadcast(
+      `public-menu:${tenantId}`,
+      "menu_updated",
+      {
+        tenantId,
+        updatedAt: new Date().toISOString(),
+      } satisfies MenuUpdatedPayload,
+    );
+  } catch (error) {
+    console.error("broadcastMenuUpdated error:", error);
+  }
+}
+
+export async function broadcastTableUpdated({
+  tableId,
+  tableToken,
+  tenantId,
+  action = "updated",
+}: {
+  tableId?: string | null;
+  tableToken?: string | null;
+  tenantId?: string | null;
+  action?: TableUpdatedPayload["action"];
+}) {
+  if (!tableId || !tableToken || !tenantId) return;
+
+  const payload = {
+    tableId,
+    tableToken,
+    tenantId,
+    action,
+    updatedAt: new Date().toISOString(),
+  } satisfies TableUpdatedPayload;
+
+  try {
+    await sendBroadcast(`public-menu:${tenantId}`, "table_updated", payload);
+  } catch (error) {
+    console.error("broadcastTableUpdated error:", error);
   }
 }

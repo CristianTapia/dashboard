@@ -9,7 +9,11 @@ const corsHeaders = {
   ...(process.env.CORS_ORIGIN ? { "Access-Control-Allow-Origin": process.env.CORS_ORIGIN } : {}),
   "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Cache-Control": "no-store, max-age=0",
 };
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: corsHeaders });

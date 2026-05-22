@@ -21,7 +21,7 @@ export default function AddProducts({
   activeTenantId: string;
 }) {
   const [name, setName] = useState("");
-  const [price, setPrice] = useState<number | "">("");
+  const [price, setPrice] = useState("");
   const [tenantId, setTenantId] = useState<string>(activeTenantId);
   const [categoryId, setCategoryId] = useState<string>("");
   const [description, setDescription] = useState("");
@@ -46,7 +46,7 @@ export default function AddProducts({
     e.preventDefault();
 
     if (!name.trim()) return alert("El nombre es obligatorio");
-    if (price === "" || Number(price) <= 0) return alert("Precio invalido");
+    if (!/^\d+$/.test(price.trim()) || Number(price) <= 0) return alert("Precio inválido");
     if (isAdmin && !tenantId) return alert("Selecciona un tenant");
     if (categoryId === "") return alert("Selecciona una categoria");
     if (!description.trim()) return alert("La descripcion es obligatoria");
@@ -127,14 +127,15 @@ export default function AddProducts({
         <div className="flex flex-col">
           <label className="pb-2 font-semibold">Precio *</label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             value={price}
-            onChange={(e) => setPrice(e.target.value === "" ? "" : Number(e.target.value))}
+            onChange={(e) => setPrice(e.target.value.replace(/\D/g, ""))}
             placeholder="Ej: 5000"
             disabled={saving || uploading}
             className="w-full bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
                        focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
-            onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
             required
           />
         </div>

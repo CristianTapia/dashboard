@@ -2,9 +2,10 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CirclePlus, Copy, ExternalLink, Search, Table2, Trash, TriangleAlert, Upload } from "lucide-react";
+import { CirclePlus, Copy, ExternalLink, Pencil, Search, Table2, Trash, TriangleAlert, Upload } from "lucide-react";
 
 import AddTable from "@/app/ui/AddTable";
+import EditTable from "@/app/ui/EditTable";
 import Modal from "@/app/ui/Modals/Modal";
 import TableQrCode from "@/app/ui/TableQrCode";
 import { deleteRestaurantTableAction, updateRestaurantTableActiveAction } from "@/app/dashboard/mesas/actions";
@@ -22,7 +23,7 @@ export default function TablesClient({
   activeTenantId: string;
 }) {
   const router = useRouter();
-  const [activeModal, setActiveModal] = useState<null | "addTable" | "confirmDelete">(null);
+  const [activeModal, setActiveModal] = useState<null | "addTable" | "confirmDelete" | "editTable">(null);
   const [selectedTable, setSelectedTable] = useState<RestaurantTable | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [tenantFilter, setTenantFilter] = useState(isAdmin ? "all" : activeTenantId);
@@ -106,6 +107,11 @@ export default function TablesClient({
   function openDeleteModal(table: RestaurantTable) {
     setSelectedTable(table);
     setActiveModal("confirmDelete");
+  }
+
+  function openEditModal(table: RestaurantTable) {
+    setSelectedTable(table);
+    setActiveModal("editTable");
   }
 
   function onDelete(table: RestaurantTable) {
@@ -253,15 +259,26 @@ export default function TablesClient({
                       />
                     </span>
                   </button>
-                  <button
-                    type="button"
-                    disabled={isPending}
-                    onClick={() => openDeleteModal(table)}
-                    className="inline-flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-xl text-[var(--color-delete)] transition-colors hover:bg-red-50 hover:text-[var(--color-delete-hover)] disabled:opacity-60 dark:hover:bg-red-900/20"
-                    title="Eliminar mesa"
-                  >
-                    <Trash size={17} />
-                  </button>
+                  <div className="flex shrink-0 items-center justify-end gap-1.5">
+                    <button
+                      type="button"
+                      disabled={isPending}
+                      onClick={() => openEditModal(table)}
+                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-[var(--color-light)] transition-colors hover:bg-[var(--color-cancel)] hover:text-[var(--color-light-hover)] disabled:opacity-60"
+                      title="Editar mesa"
+                    >
+                      <Pencil size={17} />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isPending}
+                      onClick={() => openDeleteModal(table)}
+                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-[var(--color-delete)] transition-colors hover:bg-red-50 hover:text-[var(--color-delete-hover)] disabled:opacity-60 dark:hover:bg-red-900/20"
+                      title="Eliminar mesa"
+                    >
+                      <Trash size={17} />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -292,6 +309,33 @@ export default function TablesClient({
               router.refresh();
             }}
           />
+        }
+      />
+
+      <Modal
+        isOpen={activeModal === "editTable"}
+        icon={<Pencil color="#137fec" />}
+        iconBgOptionalClassName="bg-[var(--color-bg-selected)]"
+        onCloseAction={() => {
+          setActiveModal(null);
+          setSelectedTable(null);
+        }}
+        title={`Editar mesa ${selectedTable?.label ?? ""}`}
+        fixedBody={
+          selectedTable ? (
+            <EditTable
+              table={selectedTable}
+              onCancel={() => {
+                setActiveModal(null);
+                setSelectedTable(null);
+              }}
+              onSuccess={() => {
+                setActiveModal(null);
+                setSelectedTable(null);
+                router.refresh();
+              }}
+            />
+          ) : null
         }
       />
 

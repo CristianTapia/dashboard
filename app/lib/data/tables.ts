@@ -134,7 +134,7 @@ export async function createRestaurantTable(
   const number = normalizeOptionalText(input.number);
 
   if (!name && !number) {
-    throw new Error("Debes indicar un nombre o numero de mesa");
+    throw new Error("Debes indicar un nombre o número de mesa");
   }
 
   const insertPayload = {
@@ -188,6 +188,48 @@ export async function updateRestaurantTableActive(id: string, active: boolean) {
   return mapTable(data, tenantsMap.get(data.tenant_id) ?? null);
 }
 
+export async function updateRestaurantTable(
+  id: string,
+  input: {
+    name?: string | null;
+    number?: string | null;
+  },
+) {
+  const adminUser = await isCurrentUserAdmin();
+  const currentTenantId = await getCurrentTenantId();
+  const db = adminUser ? createAdmin() : await createServer();
+
+  const name = normalizeOptionalText(input.name);
+  const number = normalizeOptionalText(input.number);
+
+  if (!name && !number) {
+    throw new Error("Debes indicar un nombre o número de mesa");
+  }
+
+  let query = db
+    .from("restaurant_tables")
+    .update({ name, number, updated_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (!adminUser) {
+    query = query.eq("tenant_id", currentTenantId);
+  }
+
+  const { data, error } = await query
+    .select("id,tenant_id,public_token,name,number,active,created_at")
+    .single<RestaurantTableRow>();
+
+  if (error) {
+    if (isMissingTablesRelation(error)) {
+      throw new Error("La tabla restaurant_tables aun no existe en la base de datos. Aplica la migracion pendiente.");
+    }
+    throw new Error(error.message);
+  }
+
+  const tenantsMap = await loadTenantsMap(db, [data.tenant_id]);
+  return mapTable(data, tenantsMap.get(data.tenant_id) ?? null);
+}
+
 export async function deleteRestaurantTable(id: string) {
   const adminUser = await isCurrentUserAdmin();
   const currentTenantId = await getCurrentTenantId();
@@ -199,7 +241,9 @@ export async function deleteRestaurantTable(id: string) {
     query = query.eq("tenant_id", currentTenantId);
   }
 
-  const { error } = await query;
+  const { data, error } = await query
+    .select("id,tenant_id,public_token,name,number,active,created_at")
+    .single<RestaurantTableRow>();
 
   if (error) {
     if (isMissingTablesRelation(error)) {
@@ -208,5 +252,6 @@ export async function deleteRestaurantTable(id: string) {
     throw new Error(error.message);
   }
 
-  return { ok: true };
+  const tenantsMap = await loadTenantsMap(db, [data.tenant_id]);
+  return mapTable(data, tenantsMap.get(data.tenant_id) ?? null);
 }
