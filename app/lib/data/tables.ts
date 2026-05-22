@@ -44,7 +44,7 @@ function getMenuBaseUrl() {
   const baseUrl = process.env.NEXT_PUBLIC_MENU_BASE_URL;
   if (baseUrl) return baseUrl.replace(/\/+$/, "");
 
-  return process.env.NODE_ENV === "production" ? "https://menu.lab3c.app" : "http://localhost:3000";
+  return "https://menu.lab3c.app";
 }
 
 function buildPublicToken() {

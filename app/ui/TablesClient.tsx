@@ -2,19 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import {
-  CirclePlus,
-  Copy,
-  ExternalLink,
-  Search,
-  Store,
-  Table2,
-  ToggleLeft,
-  ToggleRight,
-  Trash,
-  TriangleAlert,
-  Upload,
-} from "lucide-react";
+import { CirclePlus, Copy, ExternalLink, Search, Table2, Trash, TriangleAlert, Upload } from "lucide-react";
 
 import AddTable from "@/app/ui/AddTable";
 import Modal from "@/app/ui/Modals/Modal";
@@ -38,7 +26,13 @@ export default function TablesClient({
   const [selectedTable, setSelectedTable] = useState<RestaurantTable | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [tenantFilter, setTenantFilter] = useState(isAdmin ? "all" : activeTenantId);
+  const [optimisticActiveById, setOptimisticActiveById] = useState<Record<string, boolean>>({});
+  const [pendingActiveById, setPendingActiveById] = useState<Record<string, boolean>>({});
   const [isPending, startTransition] = useTransition();
+
+  function getTableActive(table: RestaurantTable) {
+    return optimisticActiveById[table.id] ?? table.active;
+  }
 
   const tenantOptions = useMemo(() => {
     if (isAdmin) {
@@ -87,13 +81,24 @@ export default function TablesClient({
   }
 
   function onToggleActive(table: RestaurantTable) {
+    const previousActive = getTableActive(table);
+    const nextActive = !previousActive;
+    setOptimisticActiveById((prev) => ({ ...prev, [table.id]: nextActive }));
+    setPendingActiveById((prev) => ({ ...prev, [table.id]: true }));
+
     startTransition(async () => {
       try {
-        await updateRestaurantTableActiveAction(table.id, !table.active);
-        router.refresh();
+        await updateRestaurantTableActiveAction(table.id, nextActive);
       } catch (err: unknown) {
+        setOptimisticActiveById((prev) => ({ ...prev, [table.id]: previousActive }));
         const message = err instanceof Error ? err.message : "Error actualizando la mesa";
         alert(message);
+      } finally {
+        setPendingActiveById((prev) => {
+          const next = { ...prev };
+          delete next[table.id];
+          return next;
+        });
       }
     });
   }
@@ -118,11 +123,11 @@ export default function TablesClient({
   }
 
   return (
-    <div className="w-full max-w-full p-2 sm:p-4 flex flex-col">
+    <div className="flex w-full max-w-full flex-col p-2 sm:p-4">
       <div className="flex flex-col items-start gap-2">
         <h1 className="text-3xl font-bold">Mesas</h1>
         <p className="text-md text-[var(--color-txt-secondary)]">
-          Administra el nombre visible de cada mesa, su identificador publico y los links que se usaran en QR.
+          Administra el nombre de cada mesa, su identificador público y los links que se usarán en QR.
         </p>
       </div>
 
@@ -130,16 +135,16 @@ export default function TablesClient({
         <button
           type="button"
           onClick={() => setActiveModal("addTable")}
-          className="w-full sm:w-auto p-3 sm:px-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
+          className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[var(--color-button-send)] p-3 font-bold text-white transition disabled:opacity-60 sm:w-auto sm:px-5"
         >
-          <CirclePlus /> Añadir mesa
+          <CirclePlus /> Añadir Mesa
         </button>
       </div>
 
-      <div className="flex w-full flex-col sm:flex-row sm:items-stretch rounded-lg h-full mt-6 mb-6 gap-3">
+      <div className="mb-6 mt-6 flex h-full w-full flex-col gap-3 rounded-lg sm:flex-row sm:items-stretch">
         {isAdmin && (
           <select
-            className="w-full sm:w-56 bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 text-sm"
+            className="w-full rounded-lg border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-3 text-sm focus:border-[var(--color-button-send)] focus:outline-none focus:ring-0 sm:w-56"
             value={tenantFilter}
             onChange={(e) => setTenantFilter(e.target.value)}
           >
@@ -152,114 +157,121 @@ export default function TablesClient({
           </select>
         )}
         <div className="flex w-full">
-          <div className="text-slate-500 flex bg-[var(--color-foreground)] items-center justify-center p-2 rounded-l-lg border border-[var(--color-border-box)] border-r-0">
+          <div className="flex items-center justify-center rounded-l-lg border border-r-0 border-[var(--color-border-box)] bg-[var(--color-foreground)] p-2 text-slate-500">
             <Search />
           </div>
           <input
             type="text"
             name="search"
-            className="w-full min-w-0 bg-[var(--color-foreground)] rounded-r-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
-            placeholder="Buscar mesas por nombre, numero o token"
+            className="w-full min-w-0 rounded-r-lg border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-3 focus:border-[var(--color-button-send)] focus:outline-none focus:ring-0"
+            placeholder="Buscar mesas por nombre, número o token"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
-        {filteredTables.map((table) => (
-          <div
-            key={table.id}
-            className="rounded-xl bg-[var(--color-foreground)] border border-[var(--color-border-box)] p-4 sm:p-5 min-w-0"
-          >
-            <div className="flex items-start justify-between gap-3 sm:gap-4">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <Table2 size={18} />
-                  <h2 className="text-lg font-semibold">{table.label}</h2>
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full ${
-                      table.active ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-700"
-                    }`}
-                  >
-                    {table.active ? "Activa" : "Inactiva"}
-                  </span>
-                </div>
-                <div className="mt-2 space-y-1 text-sm text-[var(--color-txt-secondary)]">
-                  {table.tenant?.name ? (
-                    <p className="flex items-center gap-2">
-                      <Store size={14} />
-                      Tenant: {table.tenant.name}
-                    </p>
-                  ) : null}
-                  <p>Identificador publico: {table.public_token}</p>
-                  {table.number ? <p>Numero visible: {table.number}</p> : null}
-                  {table.name ? <p>Nombre visible: {table.name}</p> : null}
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,420px))] justify-center gap-4 sm:gap-6">
+        {filteredTables.map((table) => {
+          const active = getTableActive(table);
+
+          return (
+            <div
+              key={table.id}
+              className="min-w-0 rounded-xl border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-4 shadow-sm transition-shadow hover:shadow-card sm:p-5"
+            >
+              <div className="flex items-center gap-2">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--color-bg-selected)] text-[var(--color-button-send)]">
+                      <Table2 size={18} />
+                    </span>
+                    <div className="min-w-0">
+                      <h2 className="truncate text-lg font-semibold">{table.label}</h2>
+                      {table.name ? (
+                        <p className="truncate text-sm text-[var(--color-txt-secondary)]">{table.name}</p>
+                      ) : null}
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <button
-                type="button"
-                disabled={isPending}
-                onClick={() => onToggleActive(table)}
-                className="cursor-pointer p-2 rounded-xl border border-[var(--color-border-box)] hover:bg-[var(--color-bg-selected)] disabled:opacity-60"
-                title={table.active ? "Desactivar mesa" : "Activar mesa"}
-              >
-                {table.active ? <ToggleRight size={22} /> : <ToggleLeft size={22} />}
-              </button>
-            </div>
+              <div className="mt-4 space-y-3">
+                <div className="rounded-lg bg-[var(--color-bg-selected)] p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-txt-secondary)]">
+                    Link público
+                  </p>
+                  <p className="mt-1 break-all text-sm">{table.short_url}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(table.short_url)}
+                      className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-[var(--color-foreground)] px-3 py-2 text-sm hover:opacity-90"
+                    >
+                      <Copy size={14} />
+                      Copiar
+                    </button>
+                    <a
+                      href={table.short_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border-box)] bg-[var(--color-foreground)] px-3 py-2 text-sm"
+                    >
+                      <ExternalLink size={14} />
+                      Abrir
+                    </a>
+                  </div>
+                </div>
 
-            <div className="mt-4 space-y-3">
-              <div className="rounded-lg border border-[var(--color-border-box)] p-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-txt-secondary)]">
-                  Link publico
-                </p>
-                <p className="text-xs text-[var(--color-txt-secondary)] mt-1">
-                  Incluye el tenant y el identificador publico de la mesa.
-                </p>
-                <p className="text-sm break-all mt-1">{table.short_url}</p>
-                <div className="mt-3 flex flex-wrap gap-2">
+                <TableQrCode value={table.short_url} label={table.label} number={table.number} name={table.name} />
+
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--color-border-box)] pt-3">
                   <button
                     type="button"
-                    onClick={() => copyToClipboard(table.short_url)}
-                    className="inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg bg-[var(--color-bg-selected)] hover:opacity-90 cursor-pointer"
+                    disabled={Boolean(pendingActiveById[table.id])}
+                    onClick={() => onToggleActive(table)}
+                    className={`inline-flex h-9 min-w-0 flex-1 items-center justify-between gap-2 rounded-xl px-2.5 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 sm:flex-none ${
+                      active
+                        ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:hover:bg-emerald-500/25"
+                        : "bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
+                    }`}
+                    title={active ? "Desactivar mesa" : "Activar mesa"}
+                    aria-pressed={active}
+                    aria-label={active ? "Mesa activa. Desactivar mesa" : "Mesa inactiva. Activar mesa"}
                   >
-                    <Copy size={14} />
-                    Copiar
+                    <span className="truncate">{active ? "Mesa activa" : "Mesa inactiva"}</span>
+                    <span
+                      className={`relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200 ${
+                        active ? "bg-emerald-500 dark:bg-emerald-400" : "bg-slate-400 dark:bg-slate-500"
+                      }`}
+                      aria-hidden="true"
+                    >
+                      <span
+                        className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${
+                          active ? "translate-x-5" : "translate-x-0"
+                        }`}
+                      />
+                    </span>
                   </button>
-                  <a
-                    href={table.short_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg border border-[var(--color-border-box)]"
+                  <button
+                    type="button"
+                    disabled={isPending}
+                    onClick={() => openDeleteModal(table)}
+                    className="inline-flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-xl text-[var(--color-delete)] transition-colors hover:bg-red-50 hover:text-[var(--color-delete-hover)] disabled:opacity-60 dark:hover:bg-red-900/20"
+                    title="Eliminar mesa"
                   >
-                    <ExternalLink size={14} />
-                    Abrir
-                  </a>
+                    <Trash size={17} />
+                  </button>
                 </div>
               </div>
-
-              <TableQrCode value={table.short_url} label={table.label} />
-
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  disabled={isPending}
-                  onClick={() => openDeleteModal(table)}
-                  className="inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg border border-red-200 text-[var(--color-delete)] hover:bg-red-50 disabled:opacity-60 cursor-pointer"
-                >
-                  <Trash size={14} />
-                  Eliminar mesa
-                </button>
-              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {filteredTables.length === 0 ? (
         <div className="mt-6 rounded-xl border border-dashed border-[var(--color-border-box)] p-10 text-center text-sm text-[var(--color-txt-secondary)]">
-          Aun no hay mesas para los filtros seleccionados.
+          Aún no hay mesas para los filtros seleccionados.
         </div>
       ) : null}
 
@@ -293,8 +305,8 @@ export default function TablesClient({
         iconBgOptionalClassName="bg-[#fee2e2]"
         title={`Eliminar mesa ${selectedTable?.label ?? ""}`}
         fixedBody={
-          <div className="text-[var(--color-txt-secondary)] py-6 text-center text-sm flex flex-col gap-4 items-center">
-            <p>Esta accion eliminara la mesa y dejara inutilizable su link publico actual.</p>
+          <div className="flex flex-col items-center gap-4 py-6 text-center text-sm text-[var(--color-txt-secondary)]">
+            <p>Esta acción eliminará la mesa y dejará inutilizable su link público actual.</p>
             <p>No se puede deshacer.</p>
           </div>
         }
