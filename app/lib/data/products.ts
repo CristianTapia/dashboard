@@ -12,7 +12,7 @@ type ProductRow = {
   id: number;
   name: string;
   price: number;
-  stock: number | null;
+  active: boolean | null;
   description: string | null;
   image_path: string | null;
   tenant_id: string | null;
@@ -40,7 +40,7 @@ export async function listProducts({ limit = 20, offset = 0 }: { limit?: number;
 
   let query = db
     .from("products")
-    .select("id,name,price,stock,description,image_path,created_at,tenant_id,tenant:tenants(id,name),category:categories(id,name)")
+    .select("id,name,price,active,description,image_path,created_at,tenant_id,tenant:tenants(id,name),category:categories(id,name)")
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
@@ -60,7 +60,7 @@ export async function listProducts({ limit = 20, offset = 0 }: { limit?: number;
       id: row.id,
       name: row.name,
       price: row.price,
-      stock: row.stock ?? 0,
+      active: row.active ?? true,
       description: row.description ?? "",
       image_path: row.image_path,
       tenant_id: row.tenant_id,
@@ -141,6 +141,27 @@ export async function updateProduct(id: number, input: UpdateProductInput) {
   }
 
   const { data, error } = await query.select().maybeSingle();
+
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Producto no encontrado o sin permisos");
+  return data;
+}
+
+export async function updateProductActive(id: number, active: boolean) {
+  const isAdmin = await isCurrentUserAdmin();
+  const tenantId = isAdmin ? null : await getCurrentTenantId();
+  const db = createAdmin();
+
+  let query = db.from("products").update({ active }).eq("id", id);
+  if (!isAdmin) {
+    query = query.eq("tenant_id", tenantId);
+  }
+
+  const { data, error } = await query.select("id,tenant_id,active").maybeSingle<{
+    id: number;
+    tenant_id: string | null;
+    active: boolean | null;
+  }>();
 
   if (error) throw new Error(error.message);
   if (!data) throw new Error("Producto no encontrado o sin permisos");

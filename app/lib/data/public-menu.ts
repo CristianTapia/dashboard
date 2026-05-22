@@ -17,7 +17,7 @@ type ProductRow = {
   id: number;
   name: string;
   price: number;
-  stock: number | null;
+  active: boolean | null;
   description: string | null;
   image_path: string | null;
   created_at: string;
@@ -66,8 +66,9 @@ export async function listPublicProductsByTenant(
 
   const { data, error } = await admin
     .from("products")
-    .select("id,name,price,stock,description,image_path,created_at,category:categories(id,name)")
+    .select("id,name,price,active,description,image_path,created_at,category:categories(id,name)")
     .eq("tenant_id", tenantId)
+    .eq("active", true)
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
@@ -83,7 +84,7 @@ export async function listPublicProductsByTenant(
       id: p.id,
       name: p.name,
       price: p.price,
-      stock: p.stock,
+      active: p.active ?? true,
       description: p.description,
       created_at: p.created_at,
       category: categoryValue ? { id: categoryValue.id, name: categoryValue.name } : null,

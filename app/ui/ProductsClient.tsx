@@ -7,8 +7,8 @@ import AddProducts from "@/app/ui/AddProducts";
 import Image from "next/image";
 import { Product, Category, TenantOption } from "../lib/validators/types";
 import { useRouter } from "next/navigation";
-import { CirclePlus, Trash, Pencil, Search, TriangleAlert, Upload } from "lucide-react";
-import { deleteProductAction } from "@/app/dashboard/productos/actions";
+import { CirclePlus, Trash, Pencil, Search, ToggleLeft, ToggleRight, TriangleAlert, Upload } from "lucide-react";
+import { deleteProductAction, updateProductActiveAction } from "@/app/dashboard/productos/actions";
 
 export default function Products({
   products,
@@ -31,8 +31,14 @@ export default function Products({
     null,
   );
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [optimisticActiveById, setOptimisticActiveById] = useState<Record<number, boolean>>({});
+  const [pendingActiveById, setPendingActiveById] = useState<Record<number, boolean>>({});
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+
+  function getProductActive(product: Product) {
+    return optimisticActiveById[product.id] ?? product.active ?? true;
+  }
 
   // Delete product logic
   const onDelete = (id: number) => {
@@ -42,6 +48,29 @@ export default function Products({
       router.refresh();
     });
   };
+
+  function onToggleActive(product: Product) {
+    const previousActive = getProductActive(product);
+    const nextActive = !previousActive;
+    setOptimisticActiveById((prev) => ({ ...prev, [product.id]: nextActive }));
+    setPendingActiveById((prev) => ({ ...prev, [product.id]: true }));
+
+    startTransition(async () => {
+      try {
+        await updateProductActiveAction(product.id, nextActive);
+      } catch (err: unknown) {
+        setOptimisticActiveById((prev) => ({ ...prev, [product.id]: previousActive }));
+        const message = err instanceof Error ? err.message : "Error actualizando el producto";
+        alert(message);
+      } finally {
+        setPendingActiveById((prev) => {
+          const next = { ...prev };
+          delete next[product.id];
+          return next;
+        });
+      }
+    });
+  }
 
   // MODALES
   function openModal(
@@ -136,61 +165,82 @@ export default function Products({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6">
         {filteredProducts.map((product) => (
-          <div
-            key={product.id}
-            className="dark:bg-surface-dark rounded-xl shadow-card overflow-hidden flex flex-col bg-[var(--color-foreground)]"
-          >
-            <div className="relative">
-              {product.image_url ? (
-                <Image
-                  alt={product.description || "Product Image"}
-                  className="w-full h-36 object-cover"
-                  src={product.image_url ?? ""}
-                  width={400}
-                  height={400}
-                  unoptimized
-                />
-              ) : (
-                <div className="w-full h-36 bg-gray-200 flex items-center justify-center text-gray-500">Sin imagen</div>
-              )}
-            </div>
-            <div className="p-4 flex flex-col flex-grow">
-              {product.tenant?.name && (
-                <p className="text-xs text-[var(--color-txt-secondary)] mb-1">Tenant: {product.tenant.name}</p>
-              )}
-              <h3 className="text-lg font-semibold text-text-light dark:text-text-dark">{product.name}</h3>
-              <p className="text-sm mt-1 flex-grow">{product.description}</p>
-              {/* <div className="mt-4">
-                <div className="flex items-baseline gap-2">
-                  <p className="text-md font-bold text-red-500">$75.00</p>
-                  <p className="text-base text-text-light/50 dark:text-text-dark/50 line-through">$89.99</p>
+          (() => {
+            const active = getProductActive(product);
+            return (
+              <div
+                key={product.id}
+                className="dark:bg-surface-dark rounded-xl shadow-card overflow-hidden flex flex-col bg-[var(--color-foreground)]"
+              >
+                <div className="relative">
+                  {product.image_url ? (
+                    <Image
+                      alt={product.description || "Product Image"}
+                      className="w-full h-36 object-cover"
+                      src={product.image_url ?? ""}
+                      width={400}
+                      height={400}
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="w-full h-36 bg-gray-200 flex items-center justify-center text-gray-500">Sin imagen</div>
+                  )}
                 </div>
-              </div> */}
-              <p className="text-lg font-bold text-primary mt-4">
-                {new Intl.NumberFormat("es-CL", {
-                  style: "currency",
-                  currency: "CLP",
-                  minimumFractionDigits: 0,
-                }).format(product.price)}
-              </p>
-              <p className="text-sm font-medium text-green-600 dark:text-green-400 mt-4">Stock: {product.stock}</p>
-
-              <div className="mt-4 pt-4 border-t border-[var(--color-border-box)] dark:border-border-dark flex items-center justify-end gap-2">
-                <button
-                  onClick={() => openModal("editProduct", product)}
-                  className="cursor-pointer p-2 rounded-2xl text-[var(--color-light)] hover:text-[var(--color-light-hover)] hover:bg-[var(--color-cancel)] transition-colors"
-                >
-                  <Pencil size={18} />
-                </button>
-                <button
-                  onClick={() => openModal("confirmDelete", product)}
-                  className="cursor-pointer p-2 rounded-2xl text-[var(--color-delete)] hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-[var(--color-delete-hover)] transition-colors"
-                >
-                  <Trash size={18} />
-                </button>
+                <div className="p-4 flex flex-col flex-grow">
+                  {product.tenant?.name && (
+                    <p className="text-xs text-[var(--color-txt-secondary)] mb-1">Tenant: {product.tenant.name}</p>
+                  )}
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="text-lg font-semibold text-text-light dark:text-text-dark min-w-0">{product.name}</h3>
+                    <span
+                      className={`shrink-0 text-xs px-2 py-1 rounded-full ${
+                        active ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-700"
+                      }`}
+                    >
+                      {active ? "Disponible" : "Sin stock"}
+                    </span>
+                  </div>
+                  <p className="text-sm mt-1 flex-grow">{product.description}</p>
+                  {/* <div className="mt-4">
+                    <div className="flex items-baseline gap-2">
+                      <p className="text-md font-bold text-red-500">$75.00</p>
+                      <p className="text-base text-text-light/50 dark:text-text-dark/50 line-through">$89.99</p>
+                    </div>
+                  </div> */}
+                  <p className="text-lg font-bold text-primary mt-4">
+                    {new Intl.NumberFormat("es-CL", {
+                      style: "currency",
+                      currency: "CLP",
+                      minimumFractionDigits: 0,
+                    }).format(product.price)}
+                  </p>
+                  <div className="mt-4 pt-4 border-t border-[var(--color-border-box)] dark:border-border-dark flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      disabled={Boolean(pendingActiveById[product.id])}
+                      onClick={() => onToggleActive(product)}
+                      className="cursor-pointer p-2 rounded-2xl text-[var(--color-light)] hover:text-[var(--color-light-hover)] hover:bg-[var(--color-bg-selected)] transition-colors disabled:opacity-60"
+                      title={active ? "Marcar sin stock" : "Marcar disponible"}
+                    >
+                      {active ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
+                    </button>
+                    <button
+                      onClick={() => openModal("editProduct", product)}
+                      className="cursor-pointer p-2 rounded-2xl text-[var(--color-light)] hover:text-[var(--color-light-hover)] hover:bg-[var(--color-cancel)] transition-colors"
+                    >
+                      <Pencil size={18} />
+                    </button>
+                    <button
+                      onClick={() => openModal("confirmDelete", product)}
+                      className="cursor-pointer p-2 rounded-2xl text-[var(--color-delete)] hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-[var(--color-delete-hover)] transition-colors"
+                    >
+                      <Trash size={18} />
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            );
+          })()
         ))}
       </div>
 

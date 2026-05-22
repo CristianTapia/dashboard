@@ -22,7 +22,6 @@ export default function AddProducts({
 }) {
   const [name, setName] = useState("");
   const [price, setPrice] = useState<number | "">("");
-  const [stock, setStock] = useState<number | "">("");
   const [tenantId, setTenantId] = useState<string>(activeTenantId);
   const [categoryId, setCategoryId] = useState<string>("");
   const [description, setDescription] = useState("");
@@ -58,7 +57,6 @@ export default function AddProducts({
         const res = await createProductAction({
           name: name.trim(),
           price: Number(price),
-          stock: stock === "" ? 0 : Number(stock),
           category_id: Number(categoryId),
           description: description.trim(),
           image_path: imagePath ?? null,
@@ -69,7 +67,6 @@ export default function AddProducts({
           alert("Producto creado");
           setName("");
           setPrice("");
-          setStock("");
           setTenantId(activeTenantId);
           setCategoryId("");
           setDescription("");
@@ -127,35 +124,19 @@ export default function AddProducts({
           />
         </div>
 
-        <div className="flex flex-row flex-wrap gap-6">
-          <div className="flex flex-col flex-1 basis-0 min-w-full sm:min-w-[220px]">
-            <label className="pb-2 font-semibold">Precio *</label>
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value === "" ? "" : Number(e.target.value))}
-              placeholder="Ej: 5000"
-              disabled={saving || uploading}
-              className="w-full bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
-                         focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
-              onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
-              required
-            />
-          </div>
-
-          <div className="flex flex-col flex-1 basis-0 min-w-full sm:min-w-[220px]">
-            <label className="text-sm pb-2 font-semibold">Stock</label>
-            <input
-              type="number"
-              value={stock}
-              onChange={(e) => setStock(e.target.value === "" ? "" : Number(e.target.value))}
-              placeholder="Ej: 20"
-              disabled={saving || uploading}
-              className="w-full bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
-                         focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
-              onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
-            />
-          </div>
+        <div className="flex flex-col">
+          <label className="pb-2 font-semibold">Precio *</label>
+          <input
+            type="number"
+            value={price}
+            onChange={(e) => setPrice(e.target.value === "" ? "" : Number(e.target.value))}
+            placeholder="Ej: 5000"
+            disabled={saving || uploading}
+            className="w-full bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)]
+                       focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
+            onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+            required
+          />
         </div>
 
         <div className="flex flex-col">

@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath, revalidateTag } from "next/cache";
-import { createProduct, listProducts, updateProduct, deleteProduct } from "@/app/lib/data/products";
+import { createProduct, listProducts, updateProduct, updateProductActive, deleteProduct } from "@/app/lib/data/products";
 import { requireUser } from "@/app/lib/auth";
 import { broadcastMenuUpdated } from "@/app/lib/realtime/menu";
 import { CreateProductSchema, UpdateProductSchema } from "@/app/lib/validators/products";
@@ -52,6 +52,13 @@ export async function updateProductAction(
   const updated = await updateProduct(id, cleanedPayload);
   revalidateTag("Products");
   // revalidatePath("/dashboard/productos/todos");
+  await broadcastMenuUpdated(updated.tenant_id);
+  return { ok: true, updated };
+}
+
+export async function updateProductActiveAction(id: number, active: boolean) {
+  await requireUser();
+  const updated = await updateProductActive(id, active);
   await broadcastMenuUpdated(updated.tenant_id);
   return { ok: true, updated };
 }

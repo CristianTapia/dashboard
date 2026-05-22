@@ -18,7 +18,6 @@ export default function EditProducts({
 }) {
   const [name, setName] = useState(product.name);
   const [price, setPrice] = useState(product.price.toString());
-  const [stock, setStock] = useState((product.stock ?? 0).toString());
   const [description, setDescription] = useState(product.description ?? "");
   const [imagePath, setImagePath] = useState<string | null>(product.image_path ?? null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(product.image_url ?? null);
@@ -32,7 +31,6 @@ export default function EditProducts({
   useEffect(() => {
     setName(product.name);
     setPrice(product.price.toString());
-    setStock((product.stock ?? 0).toString());
     setDescription(product.description ?? "");
     setImagePath(product.image_path ?? null);
     setPreviewUrl(product.image_url ?? null);
@@ -83,8 +81,6 @@ export default function EditProducts({
     const nextName = name.trim() || product.name;
     const parsedPrice = Number(price);
     const nextPrice = Number.isFinite(parsedPrice) ? parsedPrice : product.price;
-    const parsedStock = Number(stock);
-    const nextStock = Number.isFinite(parsedStock) ? parsedStock : product.stock ?? 0;
     const finalDescription = description.trim() || product.description || "";
     if (!categoryId) {
       alert("Selecciona una categoría");
@@ -102,7 +98,6 @@ export default function EditProducts({
         const payload: {
           name?: string;
           price?: number;
-          stock?: number;
           description?: string;
           image_path?: string | null;
           category_id?: number;
@@ -112,9 +107,6 @@ export default function EditProducts({
         }
         if (nextPrice !== product.price) {
           payload.price = nextPrice;
-        }
-        if (nextStock !== product.stock) {
-          payload.stock = nextStock;
         }
         const originalDescription = product.description ?? "";
         if (finalDescription !== originalDescription) {
@@ -137,7 +129,6 @@ export default function EditProducts({
           alert("Producto editado");
           setName(nextName);
           setPrice(nextPrice.toString());
-          setStock(nextStock.toString());
           setDescription(finalDescription);
           setImagePath(imagePath ?? null);
           setCategoryId(nextCategoryId.toString());
@@ -229,18 +220,6 @@ export default function EditProducts({
             type="number"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
-            onKeyDown={(e) => {
-              if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault();
-            }}
-            className="form-input text-sm bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 mb-4"
-            placeholder="Introduce el precio del producto"
-            disabled={pending || uploading}
-          />
-          <label className="text-sm pb-2 font-semibold">Nuevo Stock</label>
-          <input
-            type="number"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
             onKeyDown={(e) => {
               if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault();
             }}

@@ -9,6 +9,7 @@ const corsHeaders = {
   ...(process.env.CORS_ORIGIN ? { "Access-Control-Allow-Origin": process.env.CORS_ORIGIN } : {}),
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Cache-Control": "no-store",
 };
 
 export async function OPTIONS() {
@@ -24,17 +25,16 @@ export async function GET(req: Request) {
     const user = await getCurrentUserOptional();
 
     let items;
-    if (user) {
-      items = await listProductsWithSigned({ limit, offset, expires: 3600 });
-    } else {
-      if (!tenantKey) {
-        return NextResponse.json({ error: "Sesion no valida" }, { status: 401, headers: corsHeaders });
-      }
+    if (tenantKey) {
       const tenant = await resolveTenantByPublicKey(tenantKey);
       if (!tenant) {
         return NextResponse.json({ error: "Tenant no encontrado" }, { status: 404, headers: corsHeaders });
       }
       items = await listPublicProductsByTenant(tenant.id, { limit, offset });
+    } else if (user) {
+      items = await listProductsWithSigned({ limit, offset, expires: 3600 });
+    } else {
+      return NextResponse.json({ error: "Sesion no valida" }, { status: 401, headers: corsHeaders });
     }
 
     return NextResponse.json(items, { status: 200, headers: corsHeaders });
