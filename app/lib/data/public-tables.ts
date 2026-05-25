@@ -36,7 +36,6 @@ export async function resolvePublicTableByToken(tableToken: string) {
     .from("restaurant_tables")
     .select("id,tenant_id,public_token,name,number,active,tenant:tenants(id,name,domain)")
     .eq("public_token", tableToken)
-    .eq("active", true)
     .maybeSingle<PublicTableRow>();
 
   if (error) {
@@ -55,6 +54,7 @@ export async function resolvePublicTableByToken(tableToken: string) {
       tenant_id: data.tenant_id,
       public_token: data.public_token,
       label: buildLabel(data),
+      active: data.active,
     },
     tenant: {
       id: tenant.id,

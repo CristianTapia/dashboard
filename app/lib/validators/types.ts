@@ -30,6 +30,7 @@ export type Category = {
 export type Highlight = {
   id: number;
   description: string;
+  active?: boolean;
   tenant_id?: string | null;
   tenant?: {
     id: string;

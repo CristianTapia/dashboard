@@ -35,6 +35,7 @@ export async function createRestaurantTableAction(payload: unknown) {
     tableToken: created.public_token,
     tenantId: created.tenant_id,
     action: "created",
+    active: created.active,
   });
   revalidatePath("/dashboard/mesas");
   return { ok: true, created };
@@ -51,6 +52,7 @@ export async function updateRestaurantTableActiveAction(id: string, active: bool
     tableToken: updated.public_token,
     tenantId: updated.tenant_id,
     action: "updated",
+    active: updated.active,
   });
   revalidatePath("/dashboard/mesas");
   return { ok: true, updated };
@@ -67,6 +69,7 @@ export async function updateRestaurantTableAction(id: string, payload: unknown) 
     tableToken: updated.public_token,
     tenantId: updated.tenant_id,
     action: "updated",
+    active: updated.active,
   });
   revalidatePath("/dashboard/mesas");
   return { ok: true, updated };
@@ -80,6 +83,7 @@ export async function deleteRestaurantTableAction(id: string) {
     tableToken: deleted.public_token,
     tenantId: deleted.tenant_id,
     action: "deleted",
+    active: deleted.active,
   });
   revalidatePath("/dashboard/mesas");
   return { ok: true };

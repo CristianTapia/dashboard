@@ -187,7 +187,7 @@ export default function Products({
                   )}
                 </div>
                 <div className="p-4 flex flex-col flex-grow">
-                  {product.tenant?.name && (
+                  {isAdmin && product.tenant?.name && (
                     <p className="text-xs text-[var(--color-txt-secondary)] mb-1">Tenant: {product.tenant.name}</p>
                   )}
                   <h3 className="text-lg font-semibold text-text-light dark:text-text-dark min-w-0">{product.name}</h3>
@@ -205,12 +205,12 @@ export default function Products({
                       minimumFractionDigits: 0,
                     }).format(product.price)}
                   </p>
-                  <div className="mt-4 pt-4 border-t border-[var(--color-border-box)] dark:border-border-dark flex flex-wrap items-center justify-between gap-2">
+                  <div className="mt-4 flex items-center justify-between gap-1.5 border-t border-[var(--color-border-box)] pt-4 dark:border-border-dark">
                     <button
                       type="button"
                       disabled={Boolean(pendingActiveById[product.id])}
                       onClick={() => onToggleActive(product)}
-                      className={`inline-flex h-9 min-w-0 flex-1 items-center justify-between gap-2 rounded-xl px-2.5 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 sm:flex-none lg:flex-1 xl:flex-none ${
+                      className={`inline-flex h-9 min-w-0 max-w-[8.75rem] flex-1 items-center justify-between gap-1.5 rounded-xl px-2 text-[11px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 min-[360px]:gap-2 min-[360px]:px-2.5 min-[360px]:text-xs ${
                         active
                           ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:hover:bg-emerald-500/25"
                           : "bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
@@ -221,19 +221,19 @@ export default function Products({
                     >
                       <span className="truncate">{active ? "Con stock" : "Sin stock"}</span>
                       <span
-                        className={`relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200 ${
+                        className={`relative h-6 w-10 shrink-0 rounded-full transition-colors duration-200 min-[360px]:w-11 ${
                           active ? "bg-emerald-500 dark:bg-emerald-400" : "bg-slate-400 dark:bg-slate-500"
                         }`}
                         aria-hidden="true"
                       >
                         <span
                           className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${
-                            active ? "translate-x-5" : "translate-x-0"
+                            active ? "translate-x-4 min-[360px]:translate-x-5" : "translate-x-0"
                           }`}
                         />
                       </span>
                     </button>
-                    <div className="flex shrink-0 items-center justify-end gap-1.5 xl:gap-2">
+                    <div className="flex shrink-0 items-center justify-end gap-1.5">
                       <button
                         type="button"
                         onClick={() => openModal("editProduct", product)}

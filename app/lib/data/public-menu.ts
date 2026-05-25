@@ -109,8 +109,9 @@ export async function listPublicHighlightsByTenant(tenantId: string, { limit = 1
   const admin = createAdmin();
   const { data, error } = await admin
     .from("highlights")
-    .select("id,description,image_path,created_at")
+    .select("id,description,active,image_path,created_at")
     .eq("tenant_id", tenantId)
+    .eq("active", true)
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
@@ -122,6 +123,7 @@ export async function listPublicHighlightsByTenant(tenantId: string, { limit = 1
   return highlights.map((h) => ({
     id: h.id,
     description: h.description,
+    active: h.active ?? true,
     created_at: h.created_at,
     image_url: h.image_path ? urlMap.get(h.image_path) ?? null : null,
   }));

@@ -1,7 +1,13 @@
 "use server";
 
 import { revalidateTag } from "next/cache";
-import { createHighlight, listHighlights, updateHighlight, deleteHighlight } from "@/app/lib/data/highlights";
+import {
+  createHighlight,
+  listHighlights,
+  updateHighlight,
+  updateHighlightActive,
+  deleteHighlight,
+} from "@/app/lib/data/highlights";
 import { requireUser } from "@/app/lib/auth";
 import { broadcastMenuUpdated } from "@/app/lib/realtime/menu";
 import { CreateHighlightSchema, UpdateHighlightSchema } from "@/app/lib/validators/highlights";
@@ -49,6 +55,14 @@ export async function updateHighlightAction(id: number, payload: unknown) {
   const updated = await updateHighlight(id, cleanedPayload);
   revalidateTag("Highlights");
   // revalidatePath("/dashboard/destacados");
+  await broadcastMenuUpdated(updated.tenant_id);
+  return { ok: true, updated };
+}
+
+export async function updateHighlightActiveAction(id: number, active: boolean) {
+  await requireUser();
+  const updated = await updateHighlightActive(id, active);
+  revalidateTag("Highlights");
   await broadcastMenuUpdated(updated.tenant_id);
   return { ok: true, updated };
 }

@@ -178,7 +178,7 @@ export default function CategoriesPage({
             <div className="flex justify-between items-center">
               <div className="pr-2">
                 <p className="dark:text-white text-lg font-bold">{category.name}</p>
-                {category.tenant?.name && (
+                {isAdmin && category.tenant?.name && (
                   <p className="text-xs text-[var(--color-txt-secondary)] mt-1">Tenant: {category.tenant.name}</p>
                 )}
               </div>

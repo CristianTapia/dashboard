@@ -8,7 +8,7 @@ import Modal from "@/app/ui/Modals/Modal";
 import EditHighlights from "./EditHighlights";
 import AddHighlights from "./AddHighlights";
 import { useRouter } from "next/navigation";
-import { deleteHighlightAction } from "@/app/dashboard/destacados/actions";
+import { deleteHighlightAction, updateHighlightActiveAction } from "@/app/dashboard/destacados/actions";
 
 export default function AllHighlights({
   highlights,
@@ -24,8 +24,14 @@ export default function AllHighlights({
   const [activeModal, setActiveModal] = useState<null | "addHighlight" | "editHighlight" | "confirmDelete">(null);
   const [selectedHighlight, setSelectedHighlight] = useState<Highlight | null>(null);
   const [tenantFilter, setTenantFilter] = useState(isAdmin ? "all" : activeTenantId);
+  const [optimisticActiveById, setOptimisticActiveById] = useState<Record<number, boolean>>({});
+  const [pendingActiveById, setPendingActiveById] = useState<Record<number, boolean>>({});
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+
+  function getHighlightActive(highlight: Highlight) {
+    return optimisticActiveById[highlight.id] ?? highlight.active ?? true;
+  }
 
   function openModal(modalName: "addHighlight" | "editHighlight" | "confirmDelete", highlight?: Highlight | null) {
     setSelectedHighlight(highlight ?? null);
@@ -39,6 +45,29 @@ export default function AllHighlights({
       // router.refresh();
     });
   };
+
+  function onToggleActive(highlight: Highlight) {
+    const previousActive = getHighlightActive(highlight);
+    const nextActive = !previousActive;
+    setOptimisticActiveById((prev) => ({ ...prev, [highlight.id]: nextActive }));
+    setPendingActiveById((prev) => ({ ...prev, [highlight.id]: true }));
+
+    startTransition(async () => {
+      try {
+        await updateHighlightActiveAction(highlight.id, nextActive);
+      } catch (err: unknown) {
+        setOptimisticActiveById((prev) => ({ ...prev, [highlight.id]: previousActive }));
+        const message = err instanceof Error ? err.message : "Error actualizando el destacado";
+        alert(message);
+      } finally {
+        setPendingActiveById((prev) => {
+          const next = { ...prev };
+          delete next[highlight.id];
+          return next;
+        });
+      }
+    });
+  }
 
   const tenantOptions = useMemo(() => {
     if (isAdmin) {
@@ -103,50 +132,87 @@ export default function AllHighlights({
           </select>
         </div>
       )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6 mt-6">
-        {filteredHighlights.map((highlight) => (
-          <div
-            key={highlight.id}
-            className="dark:bg-surface-dark rounded-xl shadow-card overflow-hidden flex flex-col bg-[var(--color-foreground)]"
-          >
-            <div className="relative">
-              {highlight.image_url ? (
-                <Image
-                  alt={highlight.description || "Highlight Image"}
-                  className="w-full h-36 object-cover"
-                  src={highlight.image_url ?? ""}
-                  width={400}
-                  height={400}
-                  unoptimized
-                />
-              ) : (
-                <div className="w-full h-36 bg-gray-200 flex items-center justify-center text-gray-500">Sin imagen</div>
-              )}
-            </div>
-            <div className="p-4 flex flex-col flex-grow">
-              {highlight.tenant?.name && (
-                <p className="text-xs text-[var(--color-txt-secondary)] mb-1">Tenant: {highlight.tenant.name}</p>
-              )}
-              <p className="mt-1 text-sm text-text-light/70 dark:text-text-dark/70 flex-grow">
-                {highlight.description}
-              </p>
-              <div className="mt-4 pt-4 border-t border-[var(--color-border-box)] dark:border-border-dark flex items-center justify-end gap-2">
-                <button
-                  onClick={() => openModal("editHighlight", highlight)}
-                  className="cursor-pointer p-2 rounded-2xl text-[var(--color-light)] hover:text-[var(--color-light-hover)] hover:bg-[var(--color-cancel)] transition-colors"
-                >
-                  <Pencil size={18} />
-                </button>
-                <button
-                  onClick={() => openModal("confirmDelete", highlight)}
-                  className="cursor-pointer p-2 rounded-2xl text-[var(--color-delete)] hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-[var(--color-delete-hover)] transition-colors"
-                >
-                  <Trash size={18} />
-                </button>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-4 sm:gap-6 mt-6">
+        {filteredHighlights.map((highlight) => {
+          const active = getHighlightActive(highlight);
+
+          return (
+            <div
+              key={highlight.id}
+              className="dark:bg-surface-dark rounded-xl shadow-card overflow-hidden flex flex-col bg-[var(--color-foreground)]"
+            >
+              <div className="relative">
+                {highlight.image_url ? (
+                  <Image
+                    alt={highlight.description || "Highlight Image"}
+                    className={`w-full h-36 object-cover transition-opacity ${active ? "opacity-100" : "opacity-60"}`}
+                    src={highlight.image_url ?? ""}
+                    width={400}
+                    height={400}
+                    unoptimized
+                  />
+                ) : (
+                  <div className="w-full h-36 bg-gray-200 flex items-center justify-center text-gray-500">Sin imagen</div>
+                )}
+              </div>
+              <div className="p-4 flex flex-col flex-grow">
+                {isAdmin && highlight.tenant?.name && (
+                  <p className="text-xs text-[var(--color-txt-secondary)] mb-1">Tenant: {highlight.tenant.name}</p>
+                )}
+                <p className="mt-1 text-sm text-text-light/70 dark:text-text-dark/70 flex-grow">
+                  {highlight.description}
+                </p>
+                <div className="mt-4 flex items-center justify-between gap-1.5 border-t border-[var(--color-border-box)] pt-4 dark:border-border-dark">
+                  <button
+                    type="button"
+                    disabled={Boolean(pendingActiveById[highlight.id])}
+                    onClick={() => onToggleActive(highlight)}
+                    className={`inline-flex h-9 min-w-0 max-w-[8.75rem] flex-1 items-center justify-between gap-1.5 rounded-xl px-2 text-[11px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 min-[360px]:gap-2 min-[360px]:px-2.5 min-[360px]:text-xs ${
+                      active
+                        ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:hover:bg-emerald-500/25"
+                        : "bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
+                    }`}
+                    title={active ? "Desactivar destacado" : "Activar destacado"}
+                    aria-pressed={active}
+                    aria-label={active ? "Destacado activo. Desactivar destacado" : "Destacado inactivo. Activar destacado"}
+                  >
+                    <span className="truncate">{active ? "Activo" : "Inactivo"}</span>
+                    <span
+                      className={`relative h-6 w-10 shrink-0 rounded-full transition-colors duration-200 min-[360px]:w-11 ${
+                        active ? "bg-emerald-500 dark:bg-emerald-400" : "bg-slate-400 dark:bg-slate-500"
+                      }`}
+                      aria-hidden="true"
+                    >
+                      <span
+                        className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${
+                          active ? "translate-x-4 min-[360px]:translate-x-5" : "translate-x-0"
+                        }`}
+                      />
+                    </span>
+                  </button>
+                  <div className="flex shrink-0 items-center justify-end gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => openModal("editHighlight", highlight)}
+                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-[var(--color-light)] transition-colors hover:bg-[var(--color-cancel)] hover:text-[var(--color-light-hover)]"
+                      title="Editar destacado"
+                    >
+                      <Pencil size={17} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openModal("confirmDelete", highlight)}
+                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-[var(--color-delete)] transition-colors hover:bg-red-50 hover:text-[var(--color-delete-hover)] dark:hover:bg-red-900/20"
+                      title="Eliminar destacado"
+                    >
+                      <Trash size={17} />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Modal para añadir destacado */}

@@ -10,6 +10,7 @@ type TenantShape = { id: string; name: string };
 type HighlightRow = {
   id: number;
   description: string;
+  active: boolean | null;
   image_path: string | null;
   tenant_id: string | null;
   tenant: TenantShape | TenantShape[] | null;
@@ -22,7 +23,7 @@ export async function listHighlights({ limit = 20, offset = 0 }: { limit?: numbe
 
   let query = db
     .from("highlights")
-    .select("id,description,image_path,created_at,tenant_id,tenant:tenants(id,name)")
+    .select("id,description,active,image_path,created_at,tenant_id,tenant:tenants(id,name)")
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
@@ -40,6 +41,7 @@ export async function listHighlights({ limit = 20, offset = 0 }: { limit?: numbe
     return {
       id: row.id,
       description: row.description,
+      active: row.active ?? true,
       image_path: row.image_path,
       tenant_id: row.tenant_id,
       tenant: tenantValue ? { id: tenantValue.id, name: tenantValue.name } : null,
@@ -70,7 +72,7 @@ export async function createHighlight(input: CreateHighlightInput, requestedTena
 
   const { data, error } = await db
     .from("highlights")
-    .insert({ ...input, tenant_id: tenantId })
+    .insert({ ...input, active: input.active ?? true, tenant_id: tenantId })
     .select()
     .single();
   if (error) throw new Error(error.message);
@@ -88,6 +90,24 @@ export async function updateHighlight(id: number, input: UpdateHighlightInput) {
   }
 
   const { data, error } = await query.select().maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Destacado no encontrado o sin permisos");
+  return data;
+}
+
+export async function updateHighlightActive(id: number, active: boolean) {
+  const isAdmin = await isCurrentUserAdmin();
+  const tenantId = isAdmin ? null : await getCurrentTenantId();
+  const db = isAdmin ? createAdmin() : await createServer();
+
+  let query = db.from("highlights").update({ active }).eq("id", id);
+  if (tenantId) {
+    query = query.eq("tenant_id", tenantId);
+  }
+
+  const { data, error } = await query
+    .select("id, tenant_id, active")
+    .maybeSingle<{ id: number; tenant_id: string | null; active: boolean }>();
   if (error) throw new Error(error.message);
   if (!data) throw new Error("Destacado no encontrado o sin permisos");
   return data;

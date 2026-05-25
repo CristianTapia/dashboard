@@ -12,6 +12,7 @@ type TableUpdatedPayload = {
   tableToken: string;
   tenantId: string;
   action: "created" | "updated" | "deleted";
+  active?: boolean;
   updatedAt: string;
 };
 
@@ -80,11 +81,13 @@ export async function broadcastTableUpdated({
   tableToken,
   tenantId,
   action = "updated",
+  active,
 }: {
   tableId?: string | null;
   tableToken?: string | null;
   tenantId?: string | null;
   action?: TableUpdatedPayload["action"];
+  active?: boolean;
 }) {
   if (!tableId || !tableToken || !tenantId) return;
 
@@ -93,6 +96,7 @@ export async function broadcastTableUpdated({
     tableToken,
     tenantId,
     action,
+    ...(typeof active === "boolean" ? { active } : {}),
     updatedAt: new Date().toISOString(),
   } satisfies TableUpdatedPayload;
 
