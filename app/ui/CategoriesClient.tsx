@@ -120,11 +120,10 @@ export default function CategoriesPage({
   return (
     <div className="w-full max-w-full p-2 sm:p-4 flex flex-col">
       {/* Título */}
-      <div className="flex flex-col items-start gap-2">
-        <h1 className="text-3xl font-bold">Todas las Categorías</h1>
-        <p className="text-md text-[var(--color-txt-secondary)]">
-          Visualiza, edita o elimina las categorías existentes. Añade nuevas categorías para organizar el contenido. Se
-          visualizarán inmediatamente en el menú.
+      <div className="flex flex-col items-start gap-1.5">
+        <h1 className="text-2xl font-semibold sm:text-[1.7rem]">Categorías</h1>
+        <p className="max-w-2xl text-sm leading-6 text-[var(--color-txt-secondary)]">
+          Visualiza, edita o elimina categorías existentes. Los cambios se reflejarán inmediatamente en el menú.
         </p>
       </div>
 
@@ -134,9 +133,9 @@ export default function CategoriesPage({
         <button
           type="button"
           onClick={() => openModal("addCategory")}
-          className="w-full sm:w-auto p-3 sm:px-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
+          className="inline-flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[var(--color-border-box)] bg-[var(--color-bg-selected)] px-4 text-sm font-medium text-[var(--color-txt-selected)] transition hover:border-[var(--color-button-send)] hover:bg-[var(--color-bg-selected)] disabled:opacity-60 sm:w-auto"
         >
-          <CirclePlus /> Añadir nueva categoría
+          <CirclePlus size={18} /> Añadir categoría
         </button>
       </div>
       {/* Búsqueda */}
@@ -169,11 +168,11 @@ export default function CategoriesPage({
       </div>
       {/* </div> */}
       {/* Categorías */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-8">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4 sm:gap-6">
         {filteredCategories.map((category) => (
           <div
             key={category.id}
-            className="w-full bg-[var(--color-foreground)] dark:bg-slate-800/50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            className="w-full rounded-xl border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-4 shadow-sm transition-shadow hover:shadow-card dark:bg-slate-800/50"
           >
             <div className="flex justify-between items-center">
               <div className="pr-2">

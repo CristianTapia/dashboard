@@ -23,10 +23,10 @@ export default function DashboardNavButton({ href, name, icon, startsWith = fals
           href={href}
           prefetch={false}
           aria-current={isActive ? "page" : undefined}
-          className={`flex h-14 flex-col items-center justify-center gap-1 rounded-lg px-2 text-[11px] font-semibold ${
+          className={`flex h-14 flex-col items-center justify-center gap-1 rounded-xl px-2 text-[11px] font-semibold transition-colors ${
             isActive
-              ? "bg-[var(--color-bg-selected)] text-[var(--color-txt-selected)]"
-              : "text-[var(--color-category)]"
+              ? "bg-[var(--color-bg-selected)] text-[var(--color-txt-selected)] shadow-sm"
+              : "text-[var(--color-category)] hover:bg-[var(--color-bg-selected)]"
           }`}
         >
           <span>{icon}</span>
@@ -42,14 +42,14 @@ export default function DashboardNavButton({ href, name, icon, startsWith = fals
         href={href}
         prefetch={false}
         aria-current={isActive ? "page" : undefined}
-        className={`flex p-2 rounded-xl font-semibold text-md hover:bg-[var(--color-bg-selected)] items-center ${
+        className={`flex items-center rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${
           isActive
-            ? "bg-[var(--color-bg-selected)] text-[var(--color-txt-selected)]"
-            : "bg-[var(--color-foreground)] text-[var(--color-category)]"
+            ? "bg-[var(--color-bg-selected)] text-[var(--color-txt-selected)] shadow-sm"
+            : "text-[var(--color-category)] hover:bg-[var(--color-bg-selected)]"
         }`}
       >
-        <div className="pr-3">{icon}</div>
-        <div>{name}</div>
+        <span className="mr-3 flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-surface-muted)]">{icon}</span>
+        <span>{name}</span>
       </Link>
     </li>
   );

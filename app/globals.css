@@ -2,27 +2,27 @@
 
 :root {
   color-scheme: light;
-  --background: #f6f7f8;
-  --foreground: #0f172a;
-  --color-background: #f6f7f8;
+  --background: #f7f8fb;
+  --foreground: #111827;
+  --color-background: #f7f8fb;
   --color-foreground: #ffffff;
   --color-surface-muted: #f1f5f9;
-  --color-bg-selected: #e7f2fd;
+  --color-bg-selected: #e8f3ff;
   --color-txt-selected: #137fec;
   --color-category: #334155;
-  --color-txt-secondary: #52585d;
-  --color-light: #616161;
-  --color-light-hover: #020617;
-  --color-delete: #f44336;
-  --color-delete-hover: #dc2626;
-  --color-cancel: #f3f4f6;
-  --color-cancel-hover: #e5e7eb;
+  --color-txt-secondary: #5b6472;
+  --color-light: #64748b;
+  --color-light-hover: #0f172a;
+  --color-delete: #dc2626;
+  --color-delete-hover: #b91c1c;
+  --color-cancel: #eef2f7;
+  --color-cancel-hover: #e2e8f0;
   --color-button-send: #137fec;
-  --color-button-send-hover: #2d92f7;
-  --color-txt-placeholder: #9ca3af;
+  --color-button-send-hover: #0f6fdb;
+  --color-txt-placeholder: #94a3b8;
   --color-non-interactive: #6b7280;
-  --color-line-limit: #e0e7f1;
-  --color-border-box: #d1d5dc;
+  --color-line-limit: #e4e9f2;
+  --color-border-box: #d8deea;
 }
 
 select option {
@@ -44,27 +44,27 @@ select option[disabled] {
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --background: #0f172a;
-    --foreground: #e5edf7;
-    --color-background: #0f172a;
-    --color-foreground: #172033;
-    --color-surface-muted: #111827;
-    --color-bg-selected: #123456;
-    --color-txt-selected: #6eb6ff;
-    --color-category: #d7e0ee;
-    --color-txt-secondary: #a6b3c4;
-    --color-light: #a6b3c4;
+    --background: #111318;
+    --foreground: #eef2f7;
+    --color-background: #111318;
+    --color-foreground: #1b1f27;
+    --color-surface-muted: #242936;
+    --color-bg-selected: #172b3f;
+    --color-txt-selected: #8ecbff;
+    --color-category: #d8dee8;
+    --color-txt-secondary: #a2adbd;
+    --color-light: #a2adbd;
     --color-light-hover: #f8fafc;
-    --color-delete: #f87171;
-    --color-delete-hover: #fca5a5;
-    --color-cancel: #273247;
-    --color-cancel-hover: #334155;
-    --color-button-send: #1f8cff;
-    --color-button-send-hover: #4ba3ff;
-    --color-txt-placeholder: #74839a;
+    --color-delete: #fb7185;
+    --color-delete-hover: #fda4af;
+    --color-cancel: #262b36;
+    --color-cancel-hover: #323847;
+    --color-button-send: #46a6ff;
+    --color-button-send-hover: #74bdff;
+    --color-txt-placeholder: #7d8898;
     --color-non-interactive: #94a3b8;
-    --color-line-limit: #263247;
-    --color-border-box: #334155;
+    --color-line-limit: #2a2f3b;
+    --color-border-box: #363d4d;
   }
 
   .bg-white {
@@ -111,5 +111,23 @@ select option[disabled] {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.shadow-card {
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 0.06),
+    0 8px 24px rgb(15 23 42 / 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  .shadow-card {
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.03) inset,
+      0 16px 40px rgb(0 0 0 / 0.22);
+  }
 }

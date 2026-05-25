@@ -27,31 +27,53 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="min-h-[100dvh] bg-[var(--color-background)] md:flex">
-      <aside className="hidden md:block w-64 shrink-0 sticky top-0 h-[100dvh] overflow-auto bg-[var(--color-foreground)] border-r border-[var(--color-line-limit)]">
-        <div className="flex items-center justify-center h-20 border-b border-[var(--color-line-limit)] p-4">
-          <div className="w-12 h-12 border border-gray-300 rounded-xl flex items-center justify-center text-xs">
-            Foto
+      <aside className="hidden h-[100dvh] w-64 shrink-0 flex-col border-r border-[var(--color-line-limit)] bg-[var(--color-foreground)] md:sticky md:top-0 md:flex">
+        <div className="border-b border-[var(--color-line-limit)] p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--color-bg-selected)] text-sm font-bold text-[var(--color-txt-selected)]">
+              D
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-base font-bold leading-tight">Dashboard</h1>
+              <p className="truncate text-xs text-[var(--color-txt-secondary)]">
+                {isAdmin ? "Administración global" : "Panel de gestión"}
+              </p>
+            </div>
           </div>
-          <h1 className="pl-3 font-semibold text-lg">Administracion</h1>
         </div>
-        <nav>
-          <ul className="gap-2 flex flex-col p-4">
+        <nav className="min-h-0 flex-1 overflow-auto p-3">
+          <p className="px-3 pb-2 pt-1 text-xs font-semibold uppercase tracking-wide text-[var(--color-txt-secondary)]">
+            Secciones
+          </p>
+          <ul className="flex flex-col gap-1.5">
             {navItems.map((item) => (
               <DashboardNavButton key={item.href} icon={item.icon} name={item.name} href={item.href} />
             ))}
           </ul>
         </nav>
-        <div className="p-4 pt-0">
+        <div className="border-t border-[var(--color-line-limit)] p-3">
           <LogoutButton />
         </div>
       </aside>
 
-      <main className="w-full min-w-0 p-2 pb-24 sm:p-4 md:pb-4 overflow-y-auto bg-[var(--color-background)]">
-        {children}
+      <header className="fixed inset-x-0 top-0 z-40 border-b border-[var(--color-line-limit)] bg-[var(--color-foreground)]/95 px-4 py-3 backdrop-blur md:hidden">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--color-bg-selected)] text-sm font-bold text-[var(--color-txt-selected)]">
+            D
+          </div>
+          <div>
+            <p className="text-sm font-bold leading-tight">Dashboard</p>
+            <p className="text-xs text-[var(--color-txt-secondary)]">{isAdmin ? "Admin" : "Gestión"}</p>
+          </div>
+        </div>
+      </header>
+
+      <main className="w-full min-w-0 overflow-y-auto bg-[var(--color-background)] px-2 pb-24 pt-20 sm:px-4 md:p-4">
+        <div className="mx-auto w-full max-w-screen-2xl">{children}</div>
       </main>
 
       <nav className="md:hidden fixed inset-x-0 bottom-0 z-40 border-t border-[var(--color-line-limit)] bg-[var(--color-foreground)]/95 backdrop-blur">
-        <ul className="flex gap-1 overflow-x-auto px-2 py-2">
+        <ul className="flex gap-1 overflow-x-auto px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2">
           {navItems.map((item) => (
             <DashboardNavButton key={item.href} icon={item.icon} name={item.name} href={item.href} compact />
           ))}

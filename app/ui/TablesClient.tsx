@@ -130,10 +130,10 @@ export default function TablesClient({
 
   return (
     <div className="flex w-full max-w-full flex-col p-2 sm:p-4">
-      <div className="flex flex-col items-start gap-2">
-        <h1 className="text-3xl font-bold">Mesas</h1>
-        <p className="text-md text-[var(--color-txt-secondary)]">
-          Administra el nombre de cada mesa, su identificador público y los links que se usarán en QR.
+      <div className="flex flex-col items-start gap-1.5">
+        <h1 className="text-2xl font-semibold sm:text-[1.7rem]">Mesas</h1>
+        <p className="max-w-2xl text-sm leading-6 text-[var(--color-txt-secondary)]">
+          Administra el nombre de cada mesa y los links que se usarán en QR.
         </p>
       </div>
 
@@ -141,9 +141,9 @@ export default function TablesClient({
         <button
           type="button"
           onClick={() => setActiveModal("addTable")}
-          className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[var(--color-button-send)] p-3 font-bold text-white transition disabled:opacity-60 sm:w-auto sm:px-5"
+          className="inline-flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[var(--color-border-box)] bg-[var(--color-bg-selected)] px-4 text-sm font-medium text-[var(--color-txt-selected)] transition hover:border-[var(--color-button-send)] hover:bg-[var(--color-bg-selected)] disabled:opacity-60 sm:w-auto"
         >
-          <CirclePlus /> Añadir Mesa
+          <CirclePlus size={18} /> Añadir mesa
         </button>
       </div>
 

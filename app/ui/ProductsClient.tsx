@@ -114,9 +114,9 @@ export default function Products({
   // RENDERIZADO
   return (
     <div className="w-full max-w-full p-2 sm:p-4 flex flex-col">
-      <div className="flex flex-col items-start gap-2">
-        <h1 className="text-3xl font-bold">Todos los Productos</h1>
-        <p className="text-md text-[var(--color-txt-secondary)]">
+      <div className="flex flex-col items-start gap-1.5">
+        <h1 className="text-2xl font-semibold sm:text-[1.7rem]">Productos</h1>
+        <p className="max-w-2xl text-sm leading-6 text-[var(--color-txt-secondary)]">
           Visualiza los productos existentes. Los cambios se reflejarán inmediatamente en el menú.
         </p>
       </div>
@@ -127,9 +127,9 @@ export default function Products({
         <button
           type="button"
           onClick={() => openModal("addProduct")}
-          className="w-full sm:w-auto p-3 sm:px-5 bg-[var(--color-button-send)] text-white rounded-xl cursor-pointer font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 transition"
+          className="inline-flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[var(--color-border-box)] bg-[var(--color-bg-selected)] px-4 text-sm font-medium text-[var(--color-txt-selected)] transition hover:border-[var(--color-button-send)] hover:bg-[var(--color-bg-selected)] disabled:opacity-60 sm:w-auto"
         >
-          <CirclePlus /> Añadir nuevo producto
+          <CirclePlus size={18} /> Añadir producto
         </button>
       </div>
       {/* Búsqueda */}
