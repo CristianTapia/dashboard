@@ -7,6 +7,7 @@ type TenantShape = {
   id: string;
   name: string;
   domain: string | null;
+  active: boolean | null;
   address: string | null;
   maps_url: string | null;
 };
@@ -115,13 +116,34 @@ export async function resolveEmailByLoginName(loginName: string) {
   return users.find((user) => user.loginName === normalizedLoginName)?.email ?? null;
 }
 
+export async function userHasActiveTenant(email: string) {
+  const supabase = createAdmin();
+  const users = await listAuthUsers(supabase);
+  const user = users.find((item) => item.email?.toLowerCase() === email.toLowerCase());
+  if (!user) return false;
+
+  const { data, error } = await supabase
+    .from("tenant_members")
+    .select("tenant:tenants(active)")
+    .eq("user_id", user.id);
+
+  if (error) throw new Error(error.message);
+
+  return ((data ?? []) as Array<{ tenant: { active: boolean | null } | { active: boolean | null }[] | null }>).some(
+    (row) => {
+      const tenant = Array.isArray(row.tenant) ? row.tenant[0] ?? null : row.tenant;
+      return tenant?.active !== false;
+    },
+  );
+}
+
 const listUsersCached = unstable_cache(
   async () => {
     const supabase = createAdmin();
 
     const { data: memberships, error: membershipError } = await supabase
       .from("tenant_members")
-      .select("user_id, role, tenant_id, tenants:tenant_id ( id, name, domain, address, maps_url )")
+      .select("user_id, role, tenant_id, tenants:tenant_id ( id, name, domain, active, address, maps_url )")
       .order("created_at", { ascending: false });
 
     if (membershipError) throw new Error(membershipError.message);
@@ -147,6 +169,7 @@ const listUsersCached = unstable_cache(
         tenantId: m.tenant_id,
         tenantName: tenantValue?.name ?? "Sin nombre",
         tenantDomain: tenantValue?.domain ?? null,
+        tenantActive: tenantValue?.active ?? true,
         tenantAddress: tenantValue?.address ?? null,
         tenantMapsUrl: tenantValue?.maps_url ?? null,
       };
@@ -182,6 +205,7 @@ export async function createUser(input: CreateUserInput) {
     .insert({
       name: input.tenantName,
       domain: tenantDomain,
+      active: true,
       address: input.tenantAddress || null,
       maps_url: input.tenantMapsUrl || null,
     })
@@ -267,6 +291,13 @@ export async function updateUser(id: string, input: UpdateUserInput) {
   }
 
   return tenantData;
+}
+
+export async function updateTenantActive(id: string, active: boolean) {
+  const supabase = createAdmin();
+  const { data, error } = await supabase.from("tenants").update({ active }).eq("id", id).select("id, active").single();
+  if (error) throw new Error(error.message);
+  return data;
 }
 
 export async function deleteUser(id: string) {

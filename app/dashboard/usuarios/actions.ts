@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidateTag } from "next/cache";
-import { createUser, listUsers, deleteUser, updateUser } from "@/app/lib/data/users";
+import { createUser, listUsers, deleteUser, updateUser, updateTenantActive } from "@/app/lib/data/users";
 import { CreateUserSchema, UpdateUserSchema } from "@/app/lib/validators/users";
 import { requireAdmin } from "@/app/lib/auth";
 
@@ -50,6 +50,14 @@ export async function updateUserAction(
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Datos invalidos");
 
   const updated = await updateUser(id, parsed.data);
+  revalidateTag("users");
+  revalidateTag("tenants");
+  return { ok: true, updated };
+}
+
+export async function updateTenantActiveAction(id: string, active: boolean) {
+  await requireAdmin();
+  const updated = await updateTenantActive(id, active);
   revalidateTag("users");
   revalidateTag("tenants");
   return { ok: true, updated };

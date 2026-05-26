@@ -26,14 +26,14 @@ const getCurrentMembershipsCached = cache(async () => {
 
   const { data, error } = await supabase
     .from("tenant_members")
-    .select("tenant_id, role, tenant:tenants(id,name)")
+    .select("tenant_id, role, tenant:tenants(id,name,active)")
     .eq("user_id", user.id);
   if (error) throw new Error(error.message);
 
   const rows = (data ?? []) as Array<{
     tenant_id: string;
     role: string | null;
-    tenant: { id: string; name: string } | { id: string; name: string }[] | null;
+    tenant: { id: string; name: string; active?: boolean | null } | { id: string; name: string; active?: boolean | null }[] | null;
   }>;
 
   return rows.map((row) => {
@@ -42,7 +42,7 @@ const getCurrentMembershipsCached = cache(async () => {
     return {
       tenant_id: row.tenant_id,
       role: row.role,
-      tenant: tenantValue ? { id: tenantValue.id, name: tenantValue.name } : null,
+      tenant: tenantValue ? { id: tenantValue.id, name: tenantValue.name, active: tenantValue.active ?? true } : null,
     };
   });
 });
@@ -50,10 +50,11 @@ const getCurrentMembershipsCached = cache(async () => {
 const getTenantAccessContextCached = cache(async () => {
   const cookieStore = await cookies();
   const tenantIdFromCookie = cookieStore.get("tenantId")?.value ?? null;
-  const memberships = await getCurrentMembershipsCached();
+  const allMemberships = await getCurrentMembershipsCached();
+  const memberships = allMemberships.filter((membership) => membership.tenant?.active !== false);
 
   if (memberships.length === 0) {
-    throw new Error("El usuario no tiene tenants asignados");
+    throw new Error("El usuario no tiene tenants activos asignados");
   }
 
   const tenantIds = memberships.map((membership) => membership.tenant_id);

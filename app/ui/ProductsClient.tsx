@@ -210,26 +210,18 @@ export default function Products({
                       type="button"
                       disabled={Boolean(pendingActiveById[product.id])}
                       onClick={() => onToggleActive(product)}
-                      className={`inline-flex h-9 min-w-0 max-w-[8.75rem] flex-1 items-center justify-between gap-1.5 rounded-xl px-2 text-[11px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 min-[360px]:gap-2 min-[360px]:px-2.5 min-[360px]:text-xs ${
-                        active
-                          ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:hover:bg-emerald-500/25"
-                          : "bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
-                      }`}
+                      className={`dashboard-status-toggle ${active ? "is-on" : "is-off"}`}
                       title={active ? "Marcar sin stock" : "Marcar disponible"}
                       aria-pressed={active}
                       aria-label={active ? "Producto con stock. Marcar sin stock" : "Producto sin stock. Marcar con stock"}
                     >
                       <span className="truncate">{active ? "Con stock" : "Sin stock"}</span>
                       <span
-                        className={`relative h-6 w-10 shrink-0 rounded-full transition-colors duration-200 min-[360px]:w-11 ${
-                          active ? "bg-emerald-500 dark:bg-emerald-400" : "bg-slate-400 dark:bg-slate-500"
-                        }`}
+                        className="dashboard-status-track"
                         aria-hidden="true"
                       >
                         <span
-                          className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${
-                            active ? "translate-x-4 min-[360px]:translate-x-5" : "translate-x-0"
-                          }`}
+                          className="dashboard-status-thumb"
                         />
                       </span>
                     </button>

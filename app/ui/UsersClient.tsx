@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Modal from "@/app/ui/Modals/Modal";
 import AddUsers from "@/app/ui/AddUsers";
 import EditUsers from "@/app/ui/EditUsers";
-import { deleteUserAction } from "@/app/dashboard/usuarios/actions";
+import { deleteUserAction, updateTenantActiveAction } from "@/app/dashboard/usuarios/actions";
 
 type UserTenantRow = {
   userId: string;
@@ -16,6 +16,7 @@ type UserTenantRow = {
   tenantId: string | null;
   tenantName: string;
   tenantDomain: string | null;
+  tenantActive: boolean;
   tenantAddress: string | null;
   tenantMapsUrl: string | null;
 };
@@ -25,6 +26,7 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
   const [rows, setRows] = useState<UserTenantRow[]>(initialUsers);
   const [activeModal, setActiveModal] = useState<null | "addUser" | "confirmDelete" | "editUser">(null);
   const [selectedRow, setSelectedRow] = useState<UserTenantRow | null>(null);
+  const [pendingTenantById, setPendingTenantById] = useState<Record<string, boolean>>({});
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -46,7 +48,8 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
         r.email?.toLowerCase().includes(term) ||
         r.tenantName.toLowerCase().includes(term) ||
         (r.tenantDomain ?? "").toLowerCase().includes(term) ||
-        r.role?.toLowerCase().includes(term)
+        r.role?.toLowerCase().includes(term) ||
+        (r.tenantActive ? "activo" : "inactivo").includes(term)
       );
     });
   }, [rows, search.term]);
@@ -59,6 +62,34 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
       router.refresh();
     });
   };
+
+  function onToggleTenantActive(row: UserTenantRow) {
+    if (!row.tenantId) return;
+
+    const nextActive = !row.tenantActive;
+    setRows((current) =>
+      current.map((item) => (item.tenantId === row.tenantId ? { ...item, tenantActive: nextActive } : item)),
+    );
+    setPendingTenantById((prev) => ({ ...prev, [row.tenantId!]: true }));
+
+    startTransition(async () => {
+      try {
+        await updateTenantActiveAction(row.tenantId!, nextActive);
+      } catch (err: unknown) {
+        setRows((current) =>
+          current.map((item) => (item.tenantId === row.tenantId ? { ...item, tenantActive: row.tenantActive } : item)),
+        );
+        const message = err instanceof Error ? err.message : "Error actualizando el tenant";
+        alert(message);
+      } finally {
+        setPendingTenantById((prev) => {
+          const next = { ...prev };
+          delete next[row.tenantId!];
+          return next;
+        });
+      }
+    });
+  }
 
   return (
     <div className="w-full max-w-full p-2 sm:p-4 flex flex-col">
@@ -107,6 +138,7 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
                   <th className="py-2">Tenant</th>
                   <th className="py-2">Clave publica</th>
                   <th className="py-2">Rol</th>
+                  <th className="py-2">Estado</th>
                   <th className="py-2 text-right">Acciones</th>
                 </tr>
               </thead>
@@ -119,7 +151,36 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
                     <td className="py-2 font-mono text-xs">{row.tenantDomain ?? row.tenantId ?? "Sin clave"}</td>
                     <td className="py-2">{row.role ?? "Sin rol"}</td>
                     <td className="py-2">
+                      <span
+                        className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
+                          row.tenantActive
+                            ? "bg-sky-100 text-sky-800 dark:bg-cyan-400/12 dark:text-cyan-100"
+                            : "bg-slate-200 text-slate-700 dark:bg-slate-700/70 dark:text-slate-300"
+                        }`}
+                      >
+                        {row.tenantActive ? "Activo" : "Inactivo"}
+                      </span>
+                    </td>
+                    <td className="py-2">
                       <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          disabled={!row.tenantId || Boolean(row.tenantId && pendingTenantById[row.tenantId])}
+                          onClick={() => onToggleTenantActive(row)}
+                          className={`dashboard-status-toggle min-w-[8.75rem] ${row.tenantActive ? "is-on" : "is-off"}`}
+                          title={row.tenantActive ? "Desactivar tenant" : "Activar tenant"}
+                          aria-pressed={row.tenantActive}
+                        >
+                          <span className="truncate">{row.tenantActive ? "Activo" : "Inactivo"}</span>
+                          <span
+                            className="dashboard-status-track"
+                            aria-hidden="true"
+                          >
+                            <span
+                              className="dashboard-status-thumb"
+                            />
+                          </span>
+                        </button>
                         <button
                           type="button"
                           onClick={() => openModal("editUser", row)}

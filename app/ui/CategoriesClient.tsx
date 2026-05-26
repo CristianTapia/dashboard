@@ -154,17 +154,19 @@ export default function CategoriesPage({
             ))}
           </select>
         )}
-        <div className="text-slate-500 dark:text-slate-400 hidden sm:flex bg-[var(--color-foreground)] dark:bg-background-dark items-center justify-center p-2 rounded-l-lg border border-[var(--color-border-box)] border-r-0">
-          <Search />
-        </div>
-        <input
-          type="text"
-          name="search"
-          className="w-full min-w-0 bg-[var(--color-foreground)] rounded-lg sm:rounded-l-none border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
+        <div className="flex w-full min-w-0">
+          <div className="flex w-11 shrink-0 items-center justify-center rounded-l-lg border border-r-0 border-[var(--color-border-box)] bg-[var(--color-foreground)] text-slate-500 dark:text-slate-400">
+            <Search size={18} />
+          </div>
+          <input
+            type="text"
+            name="search"
+            className="w-full min-w-0 rounded-r-lg border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-3 focus:border-[var(--color-button-send)] focus:outline-none focus:ring-0"
           placeholder="Buscar categorías por nombre"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
       </div>
       {/* </div> */}
       {/* Categorías */}

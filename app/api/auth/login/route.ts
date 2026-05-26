@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { resolveEmailByLoginName } from "@/app/lib/data/users";
+import { resolveEmailByLoginName, userHasActiveTenant } from "@/app/lib/data/users";
 import { createServer } from "@/app/lib/supabase/Server";
 
 async function clearSupabaseAuthCookies() {
@@ -36,6 +36,13 @@ export async function POST(req: Request) {
 
     if (error) {
       return NextResponse.json({ error: "Credenciales invalidas" }, { status: 401 });
+    }
+
+    const hasActiveTenant = await userHasActiveTenant(email);
+    if (!hasActiveTenant) {
+      await supabase.auth.signOut();
+      await clearSupabaseAuthCookies();
+      return NextResponse.json({ error: "Este tenant se encuentra inactivo" }, { status: 403 });
     }
 
     return NextResponse.json({ ok: true });

@@ -6,7 +6,19 @@ import { getTenantAccessContext } from "@/app/lib/tenant";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   await requireUserRedirect("/dashboard");
-  const { isAdmin } = await getTenantAccessContext();
+  let isAdmin = false;
+
+  try {
+    const tenantCtx = await getTenantAccessContext();
+    isAdmin = tenantCtx.isAdmin;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    if (message === "El usuario no tiene tenants activos asignados") {
+      return <InactiveTenantState />;
+    }
+
+    throw error;
+  }
 
   const iconSize = 20;
   const navItems = [
@@ -83,5 +95,25 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </ul>
       </nav>
     </div>
+  );
+}
+
+function InactiveTenantState() {
+  return (
+    <main className="flex min-h-[100dvh] items-center justify-center bg-[var(--color-background)] p-4">
+      <section className="w-full max-w-md rounded-2xl border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-6 text-center shadow-card">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-bg-selected)] text-lg font-bold text-[var(--color-txt-selected)]">
+          D
+        </div>
+        <h1 className="mt-5 text-xl font-semibold">Acceso temporalmente desactivado</h1>
+        <p className="mt-3 text-sm leading-6 text-[var(--color-txt-secondary)]">
+          Tu tenant no se encuentra activo en este momento. Contacta a soporte o al administrador global para
+          restablecer el acceso.
+        </p>
+        <div className="mt-6 flex justify-center">
+          <LogoutButton />
+        </div>
+      </section>
+    </main>
   );
 }
