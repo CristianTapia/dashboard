@@ -12,7 +12,7 @@ export default function DashboardError({ error, reset }: { error: Error & { dige
           </div>
           <h1 className="mt-5 text-xl font-semibold">Acceso temporalmente desactivado</h1>
           <p className="mt-3 text-sm leading-6 text-[var(--color-txt-secondary)]">
-            Tu tenant no se encuentra activo en este momento. Contacta a soporte o al administrador global para
+            La acceso no se encuentra activo en este momento. Contacta a soporte o al administrador global para
             restablecer el acceso.
           </p>
           <div className="mt-6 flex justify-center">
