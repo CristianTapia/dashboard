@@ -10,6 +10,8 @@ type TenantShape = {
   active: boolean | null;
   address: string | null;
   maps_url: string | null;
+  menu_themes_enabled: boolean | null;
+  menu_theme: string | null;
 };
 type MembershipRow = {
   user_id: string;
@@ -143,7 +145,9 @@ const listUsersCached = unstable_cache(
 
     const { data: memberships, error: membershipError } = await supabase
       .from("tenant_members")
-      .select("user_id, role, tenant_id, tenants:tenant_id ( id, name, domain, active, address, maps_url )")
+      .select(
+        "user_id, role, tenant_id, tenants:tenant_id ( id, name, domain, active, address, maps_url, menu_themes_enabled, menu_theme )",
+      )
       .order("created_at", { ascending: false });
 
     if (membershipError) throw new Error(membershipError.message);
@@ -172,6 +176,8 @@ const listUsersCached = unstable_cache(
         tenantActive: tenantValue?.active ?? true,
         tenantAddress: tenantValue?.address ?? null,
         tenantMapsUrl: tenantValue?.maps_url ?? null,
+        tenantMenuThemesEnabled: tenantValue?.menu_themes_enabled ?? false,
+        tenantMenuTheme: tenantValue?.menu_theme ?? "default",
       };
     });
   },
@@ -208,6 +214,8 @@ export async function createUser(input: CreateUserInput) {
       active: true,
       address: input.tenantAddress || null,
       maps_url: input.tenantMapsUrl || null,
+      menu_themes_enabled: input.tenantMenuThemesEnabled ?? false,
+      menu_theme: input.tenantMenuTheme ?? "default",
     })
     .select()
     .single();
@@ -235,13 +243,22 @@ export async function createUser(input: CreateUserInput) {
 export async function updateUser(id: string, input: UpdateUserInput) {
   const supabase = createAdmin();
 
-  const tenantUpdates: { name?: string; domain?: string; address?: string | null; maps_url?: string | null } = {};
+  const tenantUpdates: {
+    name?: string;
+    domain?: string;
+    address?: string | null;
+    maps_url?: string | null;
+    menu_themes_enabled?: boolean;
+    menu_theme?: string;
+  } = {};
   if (input.tenantName) tenantUpdates.name = input.tenantName;
   if (input.tenantDomain) {
     tenantUpdates.domain = await ensureUniqueTenantDomain(supabase, input.tenantDomain, id);
   }
   if (input.tenantAddress !== undefined) tenantUpdates.address = input.tenantAddress || null;
   if (input.tenantMapsUrl !== undefined) tenantUpdates.maps_url = input.tenantMapsUrl || null;
+  if (input.tenantMenuThemesEnabled !== undefined) tenantUpdates.menu_themes_enabled = input.tenantMenuThemesEnabled;
+  if (input.tenantMenuTheme !== undefined) tenantUpdates.menu_theme = input.tenantMenuTheme;
 
   let tenantData: unknown = null;
 

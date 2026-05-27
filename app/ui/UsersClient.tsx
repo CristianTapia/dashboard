@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { CirclePlus, Pencil, Search, Trash, TriangleAlert, Upload } from "lucide-react";
+import { CirclePlus, Palette, Pencil, Search, Trash, TriangleAlert, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Modal from "@/app/ui/Modals/Modal";
 import AddUsers from "@/app/ui/AddUsers";
 import EditUsers from "@/app/ui/EditUsers";
 import { deleteUserAction, updateTenantActiveAction } from "@/app/dashboard/usuarios/actions";
+import { updateTenantMenuThemesEnabledAction } from "@/app/dashboard/themes/actions";
 
 type UserTenantRow = {
   userId: string;
@@ -19,6 +20,8 @@ type UserTenantRow = {
   tenantActive: boolean;
   tenantAddress: string | null;
   tenantMapsUrl: string | null;
+  tenantMenuThemesEnabled: boolean;
+  tenantMenuTheme: string;
 };
 
 export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenantRow[] }) {
@@ -85,6 +88,40 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
         setPendingTenantById((prev) => {
           const next = { ...prev };
           delete next[row.tenantId!];
+          return next;
+        });
+      }
+    });
+  }
+
+  function onToggleTenantThemes(row: UserTenantRow) {
+    if (!row.tenantId) return;
+
+    const nextEnabled = !row.tenantMenuThemesEnabled;
+    setRows((current) =>
+      current.map((item) =>
+        item.tenantId === row.tenantId ? { ...item, tenantMenuThemesEnabled: nextEnabled } : item,
+      ),
+    );
+    setPendingTenantById((prev) => ({ ...prev, [`themes-${row.tenantId}`]: true }));
+
+    startTransition(async () => {
+      try {
+        await updateTenantMenuThemesEnabledAction(row.tenantId!, nextEnabled);
+      } catch (err: unknown) {
+        setRows((current) =>
+          current.map((item) =>
+            item.tenantId === row.tenantId
+              ? { ...item, tenantMenuThemesEnabled: row.tenantMenuThemesEnabled }
+              : item,
+          ),
+        );
+        const message = err instanceof Error ? err.message : "Error actualizando themes";
+        alert(message);
+      } finally {
+        setPendingTenantById((prev) => {
+          const next = { ...prev };
+          delete next[`themes-${row.tenantId}`];
           return next;
         });
       }
@@ -180,6 +217,21 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
                               className="dashboard-status-thumb"
                             />
                           </span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onToggleTenantThemes(row)}
+                          className={`inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                            row.tenantMenuThemesEnabled
+                              ? "bg-[var(--color-bg-selected)] text-[var(--color-txt-selected)] hover:border-[var(--color-button-send)]"
+                              : "text-[var(--color-light)] hover:bg-[var(--color-cancel)] hover:text-[var(--color-light-hover)]"
+                          }`}
+                          disabled={!row.tenantId || Boolean(row.tenantId && pendingTenantById[`themes-${row.tenantId}`])}
+                          title={row.tenantMenuThemesEnabled ? "Deshabilitar themes" : "Habilitar themes"}
+                          aria-pressed={row.tenantMenuThemesEnabled}
+                        >
+                          <Palette size={16} />
+                          <span>{row.tenantMenuThemesEnabled ? "Themes on" : "Themes"}</span>
                         </button>
                         <button
                           type="button"

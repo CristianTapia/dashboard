@@ -52,6 +52,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ tenant: 
           latitude: tenant.latitude,
           longitude: tenant.longitude,
           maps_url: tenant.maps_url,
+          menu_themes_enabled: tenant.menu_themes_enabled ?? false,
+          menu_theme: tenant.menu_theme ?? "default",
         },
         products: items,
       },

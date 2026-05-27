@@ -39,6 +39,8 @@ export async function updateUserAction(
     tenantDomain?: string;
     tenantAddress?: string;
     tenantMapsUrl?: string;
+    tenantMenuThemesEnabled?: boolean;
+    tenantMenuTheme?: "default" | "summer" | "winter" | "halloween" | "christmas";
     loginName?: string;
     password?: string;
     role?: "admin" | "member";

@@ -132,6 +132,44 @@ export default function EditUsers({
           </p>
         </div>
 
+        <div className="hidden rounded-xl border border-[var(--color-border-box)] bg-[var(--color-background)] p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold">Temas personalizables del menú</p>
+              <p className="mt-1 text-xs leading-5 text-[var(--color-txt-secondary)]">
+                Permite que este tenant use themes estacionales como verano, invierno, Halloween o Navidad.
+              </p>
+            </div>
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => undefined}
+              className="dashboard-status-toggle shrink-0 is-off"
+              aria-pressed={false}
+            >
+              <span className="truncate">Deshabilitado</span>
+              <span className="dashboard-status-track" aria-hidden="true">
+                <span className="dashboard-status-thumb" />
+              </span>
+            </button>
+          </div>
+
+          <div className="mt-4 flex flex-col">
+            <label className="pb-2 text-sm font-semibold">Tema activo</label>
+            <select
+              className="form-select cursor-pointer rounded-lg border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-3 text-sm focus:border-[var(--color-button-send)] focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-60"
+              value="default"
+              onChange={() => undefined}
+              disabled
+            >
+              <option value="default">Predeterminado</option>
+            </select>
+            <p className="mt-2 text-xs text-[var(--color-txt-secondary)]">
+              La app menú puede leer esta configuración desde la API pública del tenant.
+            </p>
+          </div>
+        </div>
+
         <div className="flex flex-col">
           <label className="text-sm pb-2 font-semibold">Nombre de acceso *</label>
           <input

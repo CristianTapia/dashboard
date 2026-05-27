@@ -1,16 +1,31 @@
 import DashboardNavButton from "../ui/DashboardNavButton";
 import LogoutButton from "../ui/LogoutButton";
-import { BadgePercent, ConciergeBell, ChartNoAxesColumn, UtensilsCrossed, Shapes, Settings, Users } from "lucide-react";
+import {
+  BadgePercent,
+  ChartNoAxesColumn,
+  ConciergeBell,
+  Palette,
+  Settings,
+  Shapes,
+  Users,
+  UtensilsCrossed,
+} from "lucide-react";
 import { requireUserRedirect } from "@/app/lib/auth";
+import { getTenantMenuThemeSettings } from "@/app/lib/data/menu-themes";
 import { getTenantAccessContext } from "@/app/lib/tenant";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   await requireUserRedirect("/dashboard");
   let isAdmin = false;
+  let tenantThemesEnabled = false;
 
   try {
     const tenantCtx = await getTenantAccessContext();
     isAdmin = tenantCtx.isAdmin;
+    if (!tenantCtx.isAdmin) {
+      const themeSettings = await getTenantMenuThemeSettings(tenantCtx.activeTenantId);
+      tenantThemesEnabled = themeSettings.menuThemesEnabled;
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : "";
     if (message === "El usuario no tiene tenants activos asignados") {
@@ -29,8 +44,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { icon: <UtensilsCrossed size={iconSize} />, name: "Productos", href: "/dashboard/productos" },
     { icon: <Shapes size={iconSize} />, name: "Categorias", href: "/dashboard/categorias" },
     { icon: <ConciergeBell size={iconSize} />, name: "Mesas", href: "/dashboard/mesas" },
+    ...(!isAdmin && tenantThemesEnabled
+      ? [{ icon: <Palette size={iconSize} />, name: "Themes", href: "/dashboard/themes" }]
+      : []),
     ...(isAdmin
       ? [
+          { icon: <Palette size={iconSize} />, name: "Themes", href: "/dashboard/themes" },
           { icon: <Settings size={iconSize} />, name: "Configuracion", href: "/dashboard/configuracion" },
           { icon: <Users size={iconSize} />, name: "Usuarios", href: "/dashboard/usuarios" },
         ]

@@ -14,11 +14,15 @@ const LoginNameSchema = z
   .max(60, "El nombre de acceso es demasiado largo")
   .regex(/^[\p{L}\p{N}._-]+$/u, "El nombre de acceso solo permite letras, numeros, puntos, guiones y guion bajo");
 
+export const MenuThemeSchema = z.enum(["default", "summer", "winter", "halloween", "christmas"]);
+
 export const CreateUserSchema = z.object({
   tenantName: z.string().min(1, "El nombre del local es obligatorio"),
   tenantDomain: TenantDomainSchema.optional(),
   tenantAddress: z.string().trim().max(240, "La direccion es demasiado larga").optional(),
   tenantMapsUrl: z.string().trim().url("El link de Maps no es valido").optional(),
+  tenantMenuThemesEnabled: z.boolean().optional(),
+  tenantMenuTheme: MenuThemeSchema.optional(),
   loginName: LoginNameSchema,
   email: z.string().email("Correo invalido"),
   password: z.string().min(6, "La contrasena debe tener al menos 6 caracteres"),
@@ -32,6 +36,8 @@ export const UpdateUserSchema = z.object({
   tenantDomain: TenantDomainSchema.optional(),
   tenantAddress: z.string().trim().max(240, "La direccion es demasiado larga").optional(),
   tenantMapsUrl: z.string().trim().url("El link de Maps no es valido").optional(),
+  tenantMenuThemesEnabled: z.boolean().optional(),
+  tenantMenuTheme: MenuThemeSchema.optional(),
   loginName: LoginNameSchema.optional(),
   password: z.string().min(6, "La contrasena debe tener al menos 6 caracteres").optional(),
   role: z.enum(["admin", "member"]).optional(),

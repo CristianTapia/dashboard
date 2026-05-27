@@ -10,6 +10,8 @@ type TenantRow = {
   latitude?: number | null;
   longitude?: number | null;
   maps_url?: string | null;
+  menu_themes_enabled?: boolean | null;
+  menu_theme?: string | null;
 };
 
 type CategoryShape = { id: number; name: string };
@@ -27,10 +29,12 @@ type ProductRow = {
 export async function resolveTenantByPublicKey(tenantKey: string) {
   const admin = createAdmin();
 
-  const tenantSelect = "id,name,domain,address,latitude,longitude,maps_url";
+  const tenantSelect = "id,name,domain,address,latitude,longitude,maps_url,menu_themes_enabled,menu_theme";
   const fallbackSelect = "id,name,domain";
   const isMissingLocationColumn = (message: string) =>
-    ["address", "latitude", "longitude", "maps_url"].some((column) => message.includes(column));
+    ["address", "latitude", "longitude", "maps_url", "menu_themes_enabled", "menu_theme"].some((column) =>
+      message.includes(column),
+    );
 
   const selectTenant = async (column: "domain" | "id", value: string) => {
     const { data, error } = await admin
