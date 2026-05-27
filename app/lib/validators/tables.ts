@@ -16,6 +16,7 @@ const OptionalTableNumber = z
 export const CreateRestaurantTableSchema = z.object({
   name: OptionalTrimmedText,
   number: OptionalTableNumber,
+  salon: OptionalTrimmedText,
   active: z.boolean().optional(),
   tenant_id: z.string().min(1).optional(),
 });
@@ -26,9 +27,10 @@ export const UpdateRestaurantTableSchema = z
   .object({
     name: OptionalTrimmedText,
     number: OptionalTableNumber,
+    salon: OptionalTrimmedText,
   })
-  .refine((data) => Boolean(data.name || data.number), {
-    message: "Debes indicar un nombre o numero de mesa",
+  .refine((data) => Boolean(data.name || data.number || data.salon), {
+    message: "Debes indicar un nombre, numero o salon de mesa",
   });
 
 export type UpdateRestaurantTableInput = z.infer<typeof UpdateRestaurantTableSchema>;

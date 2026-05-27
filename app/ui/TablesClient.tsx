@@ -64,11 +64,35 @@ export default function TablesClient({
         !term ||
         table.label.toLowerCase().includes(term) ||
         table.public_token.toLowerCase().includes(term) ||
+        (table.salon ?? "").toLowerCase().includes(term) ||
         (table.number ?? "").toLowerCase().includes(term) ||
         (table.name ?? "").toLowerCase().includes(term);
       return byTenant && bySearch;
     });
   }, [activeTenantId, isAdmin, searchTerm, tables, tenantFilter]);
+
+  const groupedTables = useMemo(() => {
+    const groups = new Map<string, RestaurantTable[]>();
+
+    for (const table of filteredTables) {
+      const salon = table.salon?.trim() || "Salon 1";
+      groups.set(salon, [...(groups.get(salon) ?? []), table]);
+    }
+
+    return Array.from(groups.entries())
+      .map(([salon, salonTables]) => ({
+        salon,
+        tables: salonTables.sort((a, b) => {
+          const numberA = Number(a.number);
+          const numberB = Number(b.number);
+          if (Number.isInteger(numberA) && Number.isInteger(numberB) && numberA !== numberB) {
+            return numberA - numberB;
+          }
+          return a.label.localeCompare(b.label);
+        }),
+      }))
+      .sort((a, b) => a.salon.localeCompare(b.salon));
+  }, [filteredTables]);
 
   function copyToClipboard(value: string) {
     startTransition(async () => {
@@ -177,11 +201,22 @@ export default function TablesClient({
         </div>
       </div>
 
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,420px))] justify-center gap-4 sm:gap-6">
-        {filteredTables.map((table) => {
-          const active = getTableActive(table);
+      <div className="space-y-6">
+        {groupedTables.map((group) => (
+          <section key={group.salon} className="rounded-xl border border-[var(--color-border-box)] p-3 sm:p-4">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 className="text-base font-semibold">{group.salon}</h2>
+                <p className="text-xs text-[var(--color-txt-secondary)]">
+                  {group.tables.length} {group.tables.length === 1 ? "mesa" : "mesas"}
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,420px))] justify-center gap-4 sm:gap-6">
+              {group.tables.map((table) => {
+                const active = getTableActive(table);
 
-          return (
+                return (
             <div
               key={table.id}
               className="min-w-0 rounded-xl border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-4 shadow-sm transition-shadow hover:shadow-card sm:p-5"
@@ -274,8 +309,11 @@ export default function TablesClient({
                 </div>
               </div>
             </div>
-          );
-        })}
+                );
+              })}
+            </div>
+          </section>
+        ))}
       </div>
 
       {filteredTables.length === 0 ? (

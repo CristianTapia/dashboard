@@ -14,6 +14,7 @@ type PublicTableRow = {
   public_token: string;
   name: string | null;
   number: string | null;
+  salon: string | null;
   active: boolean;
   tenant: TenantRow | TenantRow[] | null;
 };
@@ -34,7 +35,7 @@ export async function resolvePublicTableByToken(tableToken: string) {
 
   const { data, error } = await admin
     .from("restaurant_tables")
-    .select("id,tenant_id,public_token,name,number,active,tenant:tenants(id,name,domain)")
+    .select("id,tenant_id,public_token,name,number,salon,active,tenant:tenants(id,name,domain)")
     .eq("public_token", tableToken)
     .maybeSingle<PublicTableRow>();
 
@@ -54,6 +55,7 @@ export async function resolvePublicTableByToken(tableToken: string) {
       tenant_id: data.tenant_id,
       public_token: data.public_token,
       label: buildLabel(data),
+      salon: data.salon ?? "Salon 1",
       active: data.active,
     },
     tenant: {

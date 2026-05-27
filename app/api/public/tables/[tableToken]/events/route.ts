@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { createPublicTableEvent, resolvePublicTableByToken } from "@/app/lib/data/public-tables";
 import { limitByKey } from "@/app/lib/rate-limit";
+import { broadcastTableAttentionUpdated } from "@/app/lib/realtime/menu";
 import { CreatePublicTableEventSchema, PublicTableTokenSchema } from "@/app/lib/validators/public-tables";
 
 const corsHeaders = {
@@ -54,6 +55,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ tableTo
         source: parsed.source ?? null,
         route: parsed.route ?? null,
       },
+    });
+
+    await broadcastTableAttentionUpdated({
+      tableId: table.table.id,
+      tableToken: table.table.public_token,
+      tenantId: table.table.tenant_id,
+      action: "created",
+      eventType: parsed.event_type,
     });
 
     return NextResponse.json({ ok: true }, { status: 201, headers: corsHeaders });

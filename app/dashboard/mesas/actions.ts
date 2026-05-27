@@ -25,6 +25,7 @@ export async function createRestaurantTableAction(payload: unknown) {
     {
       name: parsed.data.name,
       number: parsed.data.number,
+      salon: parsed.data.salon,
       active: parsed.data.active,
     },
     parsed.data.tenant_id,

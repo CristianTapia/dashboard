@@ -2,6 +2,7 @@ import DashboardNavButton from "../ui/DashboardNavButton";
 import LogoutButton from "../ui/LogoutButton";
 import {
   BadgePercent,
+  BellRing,
   ChartNoAxesColumn,
   ConciergeBell,
   Palette,
@@ -44,6 +45,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { icon: <UtensilsCrossed size={iconSize} />, name: "Productos", href: "/dashboard/productos" },
     { icon: <Shapes size={iconSize} />, name: "Categorias", href: "/dashboard/categorias" },
     { icon: <ConciergeBell size={iconSize} />, name: "Mesas", href: "/dashboard/mesas" },
+    ...(!isAdmin ? [{ icon: <BellRing size={iconSize} />, name: "Atencion", href: "/dashboard/atencion" }] : []),
     ...(!isAdmin && tenantThemesEnabled
       ? [{ icon: <Palette size={iconSize} />, name: "Themes", href: "/dashboard/themes" }]
       : []),

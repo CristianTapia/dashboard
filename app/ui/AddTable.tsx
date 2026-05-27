@@ -19,6 +19,7 @@ export default function AddTable({
   activeTenantId: string;
 }) {
   const [name, setName] = useState("");
+  const [salon, setSalon] = useState("Salon 1");
   const [tenantId, setTenantId] = useState(activeTenantId);
   const [pending, startTransition] = useTransition();
 
@@ -34,6 +35,7 @@ export default function AddTable({
       try {
         const res = await createRestaurantTableAction({
           name: name.trim() || undefined,
+          salon: salon.trim() || undefined,
           tenant_id: isAdmin ? tenantId : undefined,
           active: true,
         });
@@ -41,6 +43,7 @@ export default function AddTable({
         if (res?.ok) {
           alert(`Mesa ${res.created.number} creada`);
           setName("");
+          setSalon("Salon 1");
           setTenantId(activeTenantId);
           onSuccess?.();
         }
@@ -76,23 +79,38 @@ export default function AddTable({
           </div>
         )}
 
-        <div className="flex flex-col">
-          <label className="text-sm pb-2 font-semibold">Nombre de mesa</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Ej: Terraza norte"
-            disabled={pending}
-            className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm text-sm"
-          />
-          <p className="mt-2 text-xs text-[var(--color-txt-secondary)]">
-            El numero visible se asignara automaticamente usando el menor numero disponible del tenant.
-          </p>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="flex flex-col">
+            <label className="text-sm pb-2 font-semibold">Salon</label>
+            <input
+              type="text"
+              value={salon}
+              onChange={(e) => setSalon(e.target.value)}
+              placeholder="Ej: Salon 1"
+              disabled={pending}
+              className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm text-sm"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-sm pb-2 font-semibold">Nombre de mesa</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Ej: Terraza norte"
+              disabled={pending}
+              className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm text-sm"
+            />
+          </div>
         </div>
 
         <p className="text-sm text-[var(--color-txt-secondary)]">
-          Si no indicas un nombre, la mesa se mostrara como Mesa 1, Mesa 2, y asi sucesivamente.
+          El numero visible se asignara automaticamente usando el menor numero disponible del salon.
+        </p>
+
+        <p className="text-sm text-[var(--color-txt-secondary)]">
+          Si no indicas un nombre, la mesa se mostrara como Mesa 1, Mesa 2, y asi sucesivamente dentro de ese salon.
         </p>
 
         <p className="text-sm text-[var(--color-txt-secondary)]">

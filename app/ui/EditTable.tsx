@@ -16,17 +16,19 @@ export default function EditTable({
 }) {
   const [name, setName] = useState(table.name ?? "");
   const [number, setNumber] = useState(table.number ?? "");
+  const [salon, setSalon] = useState(table.salon ?? "Salon 1");
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
     setName(table.name ?? "");
     setNumber(table.number ?? "");
+    setSalon(table.salon ?? "Salon 1");
   }, [table]);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (!name.trim() && !number.trim()) {
+    if (!name.trim() && !number.trim() && !salon.trim()) {
       alert("Ingresa un nombre o número de mesa");
       return;
     }
@@ -41,6 +43,7 @@ export default function EditTable({
         const res = await updateRestaurantTableAction(table.id, {
           name: name.trim() || undefined,
           number: number.trim() || undefined,
+          salon: salon.trim() || undefined,
         });
 
         if (res?.ok) {
@@ -57,7 +60,19 @@ export default function EditTable({
   return (
     <div className="mx-auto flex max-w-3xl flex-col">
       <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-6">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="flex flex-col">
+            <label className="pb-2 text-sm font-semibold">Salon</label>
+            <input
+              type="text"
+              value={salon}
+              onChange={(e) => setSalon(e.target.value)}
+              placeholder="Ej: Salon 1"
+              disabled={pending}
+              className="rounded-lg border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-3 text-sm placeholder:text-sm focus:border-[var(--color-button-send)] focus:outline-none focus:ring-0"
+            />
+          </div>
+
           <div className="flex flex-col">
             <label className="pb-2 text-sm font-semibold">Número de mesa</label>
             <input

@@ -18,6 +18,7 @@ type RestaurantTableRow = {
   public_token: string;
   name: string | null;
   number: string | null;
+  salon: string | null;
   active: boolean;
   created_at: string;
 };
@@ -55,8 +56,13 @@ function buildPublicToken() {
 async function getNextAvailableTableNumber(
   db: ReturnType<typeof createAdmin> | Awaited<ReturnType<typeof createServer>>,
   tenantId: string,
+  salon: string,
 ) {
-  const { data, error } = await db.from("restaurant_tables").select("number").eq("tenant_id", tenantId);
+  const { data, error } = await db
+    .from("restaurant_tables")
+    .select("number")
+    .eq("tenant_id", tenantId)
+    .eq("salon", salon);
   if (error) throw new Error(error.message);
 
   const usedNumbers = new Set<number>();
@@ -98,6 +104,7 @@ function mapTable(row: RestaurantTableRow, tenant: TenantRow | null): Restaurant
     public_token: row.public_token,
     name: row.name,
     number: row.number,
+    salon: row.salon ?? "Salon 1",
     active: row.active,
     created_at: row.created_at,
     label: buildLabel(row),
@@ -120,7 +127,7 @@ export async function listRestaurantTables() {
 
   let query = db
     .from("restaurant_tables")
-    .select("id,tenant_id,public_token,name,number,active,created_at")
+    .select("id,tenant_id,public_token,name,number,salon,active,created_at")
     .order("created_at", { ascending: false });
 
   if (!adminUser) {
@@ -145,6 +152,7 @@ export async function createRestaurantTable(
   input: {
     name?: string | null;
     number?: string | null;
+    salon?: string | null;
     active?: boolean;
   },
   requestedTenantId?: string,
@@ -154,7 +162,8 @@ export async function createRestaurantTable(
   const db = adminUser ? createAdmin() : await createServer();
 
   const name = normalizeOptionalText(input.name);
-  const number = await getNextAvailableTableNumber(db, tenantId);
+  const salon = normalizeOptionalText(input.salon) ?? "Salon 1";
+  const number = await getNextAvailableTableNumber(db, tenantId, salon);
 
   if (!number) {
     throw new Error("Debes indicar un nombre o número de mesa");
@@ -164,6 +173,7 @@ export async function createRestaurantTable(
     tenant_id: tenantId,
     name,
     number,
+    salon,
     active: input.active ?? true,
     public_token: buildPublicToken(),
   };
@@ -171,7 +181,7 @@ export async function createRestaurantTable(
   const { data, error } = await db
     .from("restaurant_tables")
     .insert(insertPayload)
-    .select("id,tenant_id,public_token,name,number,active,created_at")
+    .select("id,tenant_id,public_token,name,number,salon,active,created_at")
     .single<RestaurantTableRow>();
 
   if (error) {
@@ -197,7 +207,7 @@ export async function updateRestaurantTableActive(id: string, active: boolean) {
   }
 
   const { data, error } = await query
-    .select("id,tenant_id,public_token,name,number,active,created_at")
+    .select("id,tenant_id,public_token,name,number,salon,active,created_at")
     .single<RestaurantTableRow>();
 
   if (error) {
@@ -216,6 +226,7 @@ export async function updateRestaurantTable(
   input: {
     name?: string | null;
     number?: string | null;
+    salon?: string | null;
   },
 ) {
   const adminUser = await isCurrentUserAdmin();
@@ -224,14 +235,30 @@ export async function updateRestaurantTable(
 
   const name = normalizeOptionalText(input.name);
   const number = normalizeOptionalText(input.number);
+  const salon = normalizeOptionalText(input.salon);
 
-  if (!name && !number) {
+  if (!name && !number && !salon) {
     throw new Error("Debes indicar un nombre o número de mesa");
+  }
+
+  const updatePayload: {
+    name: string | null;
+    number: string | null;
+    salon?: string;
+    updated_at: string;
+  } = {
+    name,
+    number,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (salon) {
+    updatePayload.salon = salon;
   }
 
   let query = db
     .from("restaurant_tables")
-    .update({ name, number, updated_at: new Date().toISOString() })
+    .update(updatePayload)
     .eq("id", id);
 
   if (!adminUser) {
@@ -239,7 +266,7 @@ export async function updateRestaurantTable(
   }
 
   const { data, error } = await query
-    .select("id,tenant_id,public_token,name,number,active,created_at")
+    .select("id,tenant_id,public_token,name,number,salon,active,created_at")
     .single<RestaurantTableRow>();
 
   if (error) {
@@ -265,7 +292,7 @@ export async function deleteRestaurantTable(id: string) {
   }
 
   const { data, error } = await query
-    .select("id,tenant_id,public_token,name,number,active,created_at")
+    .select("id,tenant_id,public_token,name,number,salon,active,created_at")
     .single<RestaurantTableRow>();
 
   if (error) {

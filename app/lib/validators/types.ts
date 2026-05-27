@@ -56,6 +56,7 @@ export type RestaurantTable = {
   public_token: string;
   name?: string | null;
   number?: string | null;
+  salon?: string | null;
   active: boolean;
   created_at: string;
   label: string;
