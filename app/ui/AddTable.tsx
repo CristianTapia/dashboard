@@ -19,22 +19,11 @@ export default function AddTable({
   activeTenantId: string;
 }) {
   const [name, setName] = useState("");
-  const [number, setNumber] = useState("");
   const [tenantId, setTenantId] = useState(activeTenantId);
   const [pending, startTransition] = useTransition();
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
-    if (!name.trim() && !number.trim()) {
-      alert("Ingresa un nombre o número de mesa");
-      return;
-    }
-
-    if (number.trim() && !/^\d+$/.test(number.trim())) {
-      alert("El número de mesa sólo puede contener números");
-      return;
-    }
 
     if (isAdmin && !tenantId) {
       alert("Selecciona un tenant");
@@ -45,15 +34,13 @@ export default function AddTable({
       try {
         const res = await createRestaurantTableAction({
           name: name.trim() || undefined,
-          number: number.trim() || undefined,
           tenant_id: isAdmin ? tenantId : undefined,
           active: true,
         });
 
         if (res?.ok) {
-          alert("Mesa creada");
+          alert(`Mesa ${res.created.number} creada`);
           setName("");
-          setNumber("");
           setTenantId(activeTenantId);
           onSuccess?.();
         }
@@ -89,37 +76,28 @@ export default function AddTable({
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex flex-col">
-            <label className="text-sm pb-2 font-semibold">Número de mesa</label>
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={number}
-              onChange={(e) => setNumber(e.target.value.replace(/\D/g, ""))}
-              placeholder="Ej: 12"
-              disabled={pending}
-              className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm text-sm"
-            />
-          </div>
-
-          <div className="flex flex-col">
-            <label className="text-sm pb-2 font-semibold">Nombre de mesa</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Ej: Terraza norte"
-              disabled={pending}
-              className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm text-sm"
-            />
-          </div>
+        <div className="flex flex-col">
+          <label className="text-sm pb-2 font-semibold">Nombre de mesa</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Ej: Terraza norte"
+            disabled={pending}
+            className="bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3 placeholder:text-sm text-sm"
+          />
+          <p className="mt-2 text-xs text-[var(--color-txt-secondary)]">
+            El numero visible se asignara automaticamente usando el menor numero disponible del tenant.
+          </p>
         </div>
 
         <p className="text-sm text-[var(--color-txt-secondary)]">
-          El sistema generará automáticamente un identificador público único para la mesa. Ese valor será la parte
-          técnica del link y del QR.
+          Si no indicas un nombre, la mesa se mostrara como Mesa 1, Mesa 2, y asi sucesivamente.
+        </p>
+
+        <p className="text-sm text-[var(--color-txt-secondary)]">
+          El sistema generara automaticamente un identificador publico unico para la mesa. Ese valor sera la parte
+          tecnica del link y del QR.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 px-0 sm:px-4 text-sm font-bold justify-center">

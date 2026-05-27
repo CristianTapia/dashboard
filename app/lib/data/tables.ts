@@ -52,6 +52,29 @@ function buildPublicToken() {
   return `t-${randomToken}`;
 }
 
+async function getNextAvailableTableNumber(
+  db: ReturnType<typeof createAdmin> | Awaited<ReturnType<typeof createServer>>,
+  tenantId: string,
+) {
+  const { data, error } = await db.from("restaurant_tables").select("number").eq("tenant_id", tenantId);
+  if (error) throw new Error(error.message);
+
+  const usedNumbers = new Set<number>();
+  for (const row of (data ?? []) as Array<{ number: string | null }>) {
+    const parsed = Number(row.number);
+    if (Number.isInteger(parsed) && parsed > 0) {
+      usedNumbers.add(parsed);
+    }
+  }
+
+  let candidate = 1;
+  while (usedNumbers.has(candidate)) {
+    candidate += 1;
+  }
+
+  return String(candidate);
+}
+
 async function loadTenantsMap(
   db: ReturnType<typeof createAdmin> | Awaited<ReturnType<typeof createServer>>,
   tenantIds: string[],
@@ -131,9 +154,9 @@ export async function createRestaurantTable(
   const db = adminUser ? createAdmin() : await createServer();
 
   const name = normalizeOptionalText(input.name);
-  const number = normalizeOptionalText(input.number);
+  const number = await getNextAvailableTableNumber(db, tenantId);
 
-  if (!name && !number) {
+  if (!number) {
     throw new Error("Debes indicar un nombre o número de mesa");
   }
 
