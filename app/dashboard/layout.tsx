@@ -1,6 +1,6 @@
 import DashboardNavButton from "../ui/DashboardNavButton";
 import LogoutButton from "../ui/LogoutButton";
-import { ChartNoAxesColumn, BadgeDollarSign, UtensilsCrossed, Shapes, Settings, Users, Table2 } from "lucide-react";
+import { BadgePercent, ConciergeBell, ChartNoAxesColumn, UtensilsCrossed, Shapes, Settings, Users } from "lucide-react";
 import { requireUserRedirect } from "@/app/lib/auth";
 import { getTenantAccessContext } from "@/app/lib/tenant";
 
@@ -25,10 +25,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
     ...(isAdmin
       ? [{ icon: <ChartNoAxesColumn size={iconSize} />, name: "Resumen", href: "/dashboard/resumen" }]
       : []),
-    { icon: <BadgeDollarSign size={iconSize} />, name: "Destacados", href: "/dashboard/destacados" },
+    { icon: <BadgePercent size={iconSize} />, name: "Destacados", href: "/dashboard/destacados" },
     { icon: <UtensilsCrossed size={iconSize} />, name: "Productos", href: "/dashboard/productos" },
     { icon: <Shapes size={iconSize} />, name: "Categorias", href: "/dashboard/categorias" },
-    { icon: <Table2 size={iconSize} />, name: "Mesas", href: "/dashboard/mesas" },
+    { icon: <ConciergeBell size={iconSize} />, name: "Mesas", href: "/dashboard/mesas" },
     ...(isAdmin
       ? [
           { icon: <Settings size={iconSize} />, name: "Configuracion", href: "/dashboard/configuracion" },

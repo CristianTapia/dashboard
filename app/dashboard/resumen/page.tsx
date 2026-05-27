@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Building2, Layers3, Megaphone, Package, Table2 } from "lucide-react";
+import { BadgePercent, Building2, ConciergeBell, Layers3, Package } from "lucide-react";
 
 import { requireAdmin } from "@/app/lib/auth";
 import { getAdminSummary } from "@/app/lib/data/admin-summary";
@@ -67,13 +67,13 @@ export default async function Overview() {
           title="Destacados"
           value={summary.highlights}
           detail={`${summary.activeHighlights} activos · ${summary.inactiveHighlights} inactivos`}
-          icon={<Megaphone size={20} />}
+          icon={<BadgePercent size={20} />}
         />
         <StatCard
           title="Mesas"
           value={summary.tables}
           detail="Links públicos y QR configurados"
-          icon={<Table2 size={20} />}
+          icon={<ConciergeBell size={20} />}
         />
       </div>
     </div>

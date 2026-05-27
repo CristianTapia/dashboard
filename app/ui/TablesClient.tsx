@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CirclePlus, Copy, ExternalLink, Pencil, Search, Table2, Trash, TriangleAlert, Upload } from "lucide-react";
+import { CirclePlus, ConciergeBell, Copy, ExternalLink, Pencil, Search, Trash, TriangleAlert, Upload } from "lucide-react";
 
 import AddTable from "@/app/ui/AddTable";
 import EditTable from "@/app/ui/EditTable";
@@ -190,7 +190,7 @@ export default function TablesClient({
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--color-bg-selected)] text-[var(--color-button-send)]">
-                      <Table2 size={18} />
+                      <ConciergeBell size={18} />
                     </span>
                     <div className="min-w-0">
                       <h2 className="truncate text-lg font-semibold">{table.label}</h2>
