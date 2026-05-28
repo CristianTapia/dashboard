@@ -20,7 +20,7 @@ type TableAttentionUpdatedPayload = {
   tableId: string;
   tableToken?: string;
   tenantId: string;
-  action: "created" | "handled";
+  action: "created" | "handled" | "reopened";
   eventType?: string;
   updatedAt: string;
 };

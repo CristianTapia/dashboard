@@ -348,30 +348,23 @@ export default function TenantTeamClient({
         </button>
       </div>
 
-      <section className="mt-6">
-        <div>
-          <h2 className="text-base font-semibold">Usuarios del tenant</h2>
-          <p className="text-xs text-[var(--color-txt-secondary)]">
-            {team.length} {team.length === 1 ? "usuario" : "usuarios"} con acceso a este tenant.
-          </p>
+      {team.length === 0 ? (
+        <div className="mt-6 rounded-xl border border-dashed border-[var(--color-border-box)] p-8 text-center text-sm text-[var(--color-txt-secondary)]">
+          Aun no hay usuarios operativos.
         </div>
+      ) : (
+        <div className="mt-6 grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-4 sm:gap-6">
+          {team.map((user) => {
+            const userRole = normalizeRole(user.role);
 
-        {team.length === 0 ? (
-          <div className="mt-4 rounded-xl border border-dashed border-[var(--color-border-box)] p-8 text-center text-sm text-[var(--color-txt-secondary)]">
-            Aun no hay usuarios operativos.
-          </div>
-        ) : (
-          <div className="mt-4 grid grid-cols-[repeat(auto-fit,minmax(280px,420px))] justify-center gap-4 sm:gap-6">
-            {team.map((user) => {
-              const userRole = normalizeRole(user.role);
-
-              return (
-                <article
-                  key={user.userId}
-                  className="min-w-0 rounded-xl border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-4 shadow-sm transition-shadow hover:shadow-card sm:p-5"
-                >
+            return (
+              <article
+                key={user.userId}
+                className="dark:bg-surface-dark flex min-w-0 flex-col overflow-hidden rounded-xl bg-[var(--color-foreground)] shadow-card"
+              >
+                <div className="flex flex-grow flex-col p-4">
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex min-w-0 items-center gap-2">
+                    <div className="flex min-w-0 items-center gap-2 pr-2">
                       <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--color-bg-selected)] text-[var(--color-button-send)]">
                         <UserRound size={18} />
                       </span>
@@ -385,31 +378,9 @@ export default function TenantTeamClient({
                         ) : null}
                       </div>
                     </div>
-                    <div className="flex shrink-0 items-center gap-1">
-                      <button
-                        type="button"
-                        disabled={pending}
-                        onClick={() => openEditModal(user)}
-                        className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-[var(--color-light)] transition-colors hover:bg-[var(--color-cancel)] hover:text-[var(--color-light-hover)] disabled:opacity-60"
-                        title="Editar asignaciones"
-                      >
-                        <Pencil size={17} />
-                      </button>
-                      {userRole === "staff" ? (
-                        <button
-                          type="button"
-                          disabled={pendingUserId === user.userId}
-                          onClick={() => onDeleteStaffUser(user)}
-                          className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-[var(--color-delete)] transition-colors hover:bg-red-50 hover:text-[var(--color-delete-hover)] disabled:opacity-60 dark:hover:bg-red-900/20"
-                          title="Eliminar garzon"
-                        >
-                          <Trash2 size={17} />
-                        </button>
-                      ) : null}
-                    </div>
                   </div>
 
-                  <div className="mt-4 space-y-3">
+                  <div className="mt-4 flex-grow space-y-3">
                     <div className="rounded-lg bg-[var(--color-bg-selected)] p-3">
                       <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-txt-secondary)]">
                         Salones asignados
@@ -444,12 +415,35 @@ export default function TenantTeamClient({
                       )}
                     </div>
                   </div>
-                </article>
-              );
-            })}
-          </div>
-        )}
-      </section>
+
+                  <div className="mt-4 flex items-center justify-end gap-1.5 border-t border-[var(--color-border-box)] pt-4 dark:border-border-dark">
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={() => openEditModal(user)}
+                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-[var(--color-light)] transition-colors hover:bg-[var(--color-cancel)] hover:text-[var(--color-light-hover)] disabled:opacity-60"
+                      title="Editar asignaciones"
+                    >
+                      <Pencil size={17} />
+                    </button>
+                    {userRole === "staff" ? (
+                      <button
+                        type="button"
+                        disabled={pendingUserId === user.userId}
+                        onClick={() => onDeleteStaffUser(user)}
+                        className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-[var(--color-delete)] transition-colors hover:bg-red-50 hover:text-[var(--color-delete-hover)] disabled:opacity-60 dark:hover:bg-red-900/20"
+                        title="Eliminar garzon"
+                      >
+                        <Trash2 size={17} />
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
 
       <Modal
         isOpen={activeModal === "addUser"}

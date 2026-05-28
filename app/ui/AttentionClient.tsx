@@ -5,16 +5,27 @@ import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from
 import { useRouter } from "next/navigation";
 import { BellRing, CheckCircle2, ClipboardList, ConciergeBell, QrCode, ReceiptText, Search } from "lucide-react";
 
-import { AttentionSalonGroup, AttentionTableCard } from "@/app/lib/data/attention";
+import { AttentionSalonGroup, AttentionTableCard, RecentlyHandledAttention } from "@/app/lib/data/attention";
 import { supabaseClient } from "@/app/lib/supabase/client";
 import TableQrCode from "@/app/ui/TableQrCode";
 
-export default function AttentionClient({ salonGroups, tenantId }: { salonGroups: AttentionSalonGroup[]; tenantId: string }) {
+export default function AttentionClient({
+  salonGroups,
+  tenantId,
+  recentlyHandled,
+}: {
+  salonGroups: AttentionSalonGroup[];
+  tenantId: string;
+  recentlyHandled: RecentlyHandledAttention[];
+}) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [recentItems, setRecentItems] = useState(recentlyHandled);
   const [handledTableIds, setHandledTableIds] = useState<Record<string, number>>({});
   const [pendingTableIds, setPendingTableIds] = useState<Record<string, boolean>>({});
+  const [reopeningTableIds, setReopeningTableIds] = useState<Record<string, boolean>>({});
   const [expandedQrTableId, setExpandedQrTableId] = useState<string | null>(null);
+  const [undoNotice, setUndoNotice] = useState<{ tableId: string; label: string } | null>(null);
   const [, startRefreshTransition] = useTransition();
   const refreshTimerRef = useRef<number | null>(null);
   const realtimeConnectedRef = useRef(false);
@@ -30,6 +41,10 @@ export default function AttentionClient({ salonGroups, tenantId }: { salonGroups
       });
     }, 100);
   }, [router, startRefreshTransition]);
+
+  useEffect(() => {
+    setRecentItems(recentlyHandled);
+  }, [recentlyHandled]);
 
   useEffect(() => {
     const channel = supabaseClient
@@ -143,9 +158,17 @@ export default function AttentionClient({ salonGroups, tenantId }: { salonGroups
   );
 
   function onMarkHandled(tableId: string) {
+    const tableLabel =
+      salonGroups.flatMap((group) => group.tables).find((table) => table.tableId === tableId)?.label ?? "Mesa";
+
     setHandledTableIds((prev) => ({ ...prev, [tableId]: Date.now() }));
     setPendingTableIds((prev) => ({ ...prev, [tableId]: true }));
+    setUndoNotice({ tableId, label: tableLabel });
     locallyHandledTableIdsRef.current[tableId] = Date.now() + 10_000;
+
+    window.setTimeout(() => {
+      setUndoNotice((current) => (current?.tableId === tableId ? null : current));
+    }, 12_000);
 
     void (async () => {
       try {
@@ -160,6 +183,7 @@ export default function AttentionClient({ salonGroups, tenantId }: { salonGroups
         }
       } catch (error: unknown) {
         delete locallyHandledTableIdsRef.current[tableId];
+        setUndoNotice((current) => (current?.tableId === tableId ? null : current));
         setHandledTableIds((prev) => {
           const next = { ...prev };
           delete next[tableId];
@@ -169,6 +193,85 @@ export default function AttentionClient({ salonGroups, tenantId }: { salonGroups
         alert(message);
       } finally {
         setPendingTableIds((prev) => {
+          const next = { ...prev };
+          delete next[tableId];
+          return next;
+        });
+      }
+    })();
+  }
+
+  function onUndoHandled(tableId: string) {
+    setUndoNotice(null);
+    setPendingTableIds((prev) => ({ ...prev, [tableId]: true }));
+    const previousHandledAt = handledTableIds[tableId] ?? Date.now();
+
+    delete locallyHandledTableIdsRef.current[tableId];
+    setHandledTableIds((prev) => {
+      const next = { ...prev };
+      delete next[tableId];
+      return next;
+    });
+
+    void (async () => {
+      try {
+        const response = await fetch(`/api/dashboard/attention/tables/${encodeURIComponent(tableId)}/reopen`, {
+          method: "POST",
+          keepalive: true,
+        });
+
+        if (!response.ok) {
+          const body = (await response.json().catch(() => null)) as { error?: string } | null;
+          throw new Error(body?.error ?? "Error reabriendo la mesa");
+        }
+
+        refreshAttention();
+      } catch (error: unknown) {
+        setHandledTableIds((prev) => ({ ...prev, [tableId]: previousHandledAt }));
+        locallyHandledTableIdsRef.current[tableId] = Date.now() + 10_000;
+        const message = error instanceof Error ? error.message : "Error reabriendo la mesa";
+        alert(message);
+      } finally {
+        setPendingTableIds((prev) => {
+          const next = { ...prev };
+          delete next[tableId];
+          return next;
+        });
+      }
+    })();
+  }
+
+  function onReopenRecent(tableId: string) {
+    const previousItems = recentItems;
+
+    setRecentItems((current) => current.filter((item) => item.tableId !== tableId));
+    setReopeningTableIds((prev) => ({ ...prev, [tableId]: true }));
+    delete locallyHandledTableIdsRef.current[tableId];
+    setHandledTableIds((prev) => {
+      const next = { ...prev };
+      delete next[tableId];
+      return next;
+    });
+
+    void (async () => {
+      try {
+        const response = await fetch(`/api/dashboard/attention/tables/${encodeURIComponent(tableId)}/reopen`, {
+          method: "POST",
+          keepalive: true,
+        });
+
+        if (!response.ok) {
+          const body = (await response.json().catch(() => null)) as { error?: string } | null;
+          throw new Error(body?.error ?? "Error reabriendo la mesa");
+        }
+
+        refreshAttention();
+      } catch (error: unknown) {
+        setRecentItems(previousItems);
+        const message = error instanceof Error ? error.message : "Error reabriendo la mesa";
+        alert(message);
+      } finally {
+        setReopeningTableIds((prev) => {
           const next = { ...prev };
           delete next[tableId];
           return next;
@@ -267,10 +370,50 @@ export default function AttentionClient({ salonGroups, tenantId }: { salonGroups
                 <ClipboardList size={17} />
               </span>
               <div className="min-w-0">
-                <p className="text-sm font-semibold">Comanda pendiente</p>
-                <p className="mt-1 text-xs leading-5 text-[var(--color-txt-secondary)]">
-                  {table.orderSummary ?? "Comanda recibida desde el menu"}
+                <p className="text-sm font-semibold">
+                  {table.orderRequests.length > 1
+                    ? `${table.orderRequests.length} comandas pendientes`
+                    : "Comanda pendiente"}
                 </p>
+                {table.orderItemSummary.length > 0 ? (
+                  <div className="mt-2 rounded-lg border border-[var(--color-border-box)] bg-[var(--color-bg-selected)] px-2.5 py-2">
+                    <p className="text-xs font-semibold text-[var(--color-txt-selected)]">Resumen total</p>
+                    <div className="mt-1.5 flex flex-wrap gap-1.5">
+                      {table.orderItemSummary.map((item) => (
+                        <span
+                          key={item.name}
+                          className="rounded-md bg-[var(--color-foreground)] px-2 py-1 text-xs text-[var(--color-txt-secondary)]"
+                        >
+                          {item.quantity}x {item.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+                <details className="mt-2 group">
+                  <summary className="cursor-pointer rounded-lg border border-[var(--color-border-box)] bg-[var(--color-bg-selected)] px-2.5 py-2 text-xs font-semibold text-[var(--color-txt-selected)] marker:text-[var(--color-txt-secondary)]">
+                    Ver detalle de comandas
+                  </summary>
+                  <div className="mt-2 space-y-2">
+                    {(table.orderRequests.length > 0
+                      ? table.orderRequests
+                      : [{ id: 0, summary: table.orderSummary ?? "Comanda recibida desde el menu", receivedAt: "" }]
+                    ).map((order, index) => (
+                      <div
+                        key={`${table.tableId}-${order.id}-${index}`}
+                        className="rounded-lg border border-[var(--color-border-box)] bg-[var(--color-bg-selected)] px-2.5 py-2"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs font-semibold text-[var(--color-txt-selected)]">Comanda {index + 1}</span>
+                          {order.receivedAt ? (
+                            <span className="text-[11px] text-[var(--color-txt-secondary)]">{formatTimeLabel(order.receivedAt)}</span>
+                          ) : null}
+                        </div>
+                        <p className="mt-1 text-xs leading-5 text-[var(--color-txt-secondary)]">{order.summary}</p>
+                      </div>
+                    ))}
+                  </div>
+                </details>
               </div>
             </div>
           </div>
@@ -358,6 +501,39 @@ export default function AttentionClient({ salonGroups, tenantId }: { salonGroups
         </section>
       ) : null}
 
+      {recentItems.length > 0 ? (
+        <details className="mb-5 rounded-xl border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-3 shadow-sm sm:mb-6 sm:p-4">
+          <summary className="cursor-pointer select-none text-sm font-semibold text-[var(--color-txt-selected)]">
+            Atendidas recientemente ({recentItems.length})
+          </summary>
+          <div className="mt-3 grid grid-cols-1 gap-2 lg:grid-cols-2">
+            {recentItems.map((item) => (
+              <div
+                key={`${item.tableId}-${item.handledAt}`}
+                className="flex min-w-0 flex-col gap-3 rounded-lg border border-[var(--color-border-box)] bg-[var(--color-bg-selected)] p-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold">{item.label}</p>
+                  <p className="truncate text-xs text-[var(--color-txt-secondary)]">
+                    {item.salon} · {formatTimeLabel(item.handledAt)} · {item.pendingCount}{" "}
+                    {item.pendingCount === 1 ? "evento" : "eventos"}
+                  </p>
+                  <p className="mt-1 truncate text-xs text-[var(--color-txt-secondary)]">{item.summary}</p>
+                </div>
+                <button
+                  type="button"
+                  disabled={Boolean(reopeningTableIds[item.tableId])}
+                  onClick={() => onReopenRecent(item.tableId)}
+                  className="inline-flex h-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-[var(--color-button-send)] bg-[var(--color-foreground)] px-3 text-xs font-semibold text-[var(--color-txt-selected)] transition hover:bg-[var(--color-bg-hover)] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {reopeningTableIds[item.tableId] ? "Reabriendo..." : "Reabrir"}
+                </button>
+              </div>
+            ))}
+          </div>
+        </details>
+      ) : null}
+
       <div className="space-y-4 sm:space-y-6">
         {filteredGroups.map((group) => (
           <section key={group.salon} className="rounded-xl border border-[var(--color-border-box)] p-2.5 sm:p-4">
@@ -380,6 +556,22 @@ export default function AttentionClient({ salonGroups, tenantId }: { salonGroups
       {filteredGroups.length === 0 && urgentTables.length === 0 ? (
         <div className="mt-6 rounded-xl border border-dashed border-[var(--color-border-box)] p-10 text-center text-sm text-[var(--color-txt-secondary)]">
           No hay mesas para los filtros seleccionados.
+        </div>
+      ) : null}
+
+      {undoNotice ? (
+        <div className="fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] z-50 mx-auto flex max-w-md items-center justify-between gap-3 rounded-xl border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-3 text-sm shadow-card md:bottom-4">
+          <div className="min-w-0">
+            <p className="font-semibold">Mesa atendida</p>
+            <p className="truncate text-xs text-[var(--color-txt-secondary)]">{undoNotice.label}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => onUndoHandled(undoNotice.tableId)}
+            className="shrink-0 cursor-pointer rounded-lg border border-[var(--color-button-send)] bg-[var(--color-bg-selected)] px-3 py-2 text-xs font-semibold text-[var(--color-txt-selected)]"
+          >
+            Deshacer
+          </button>
         </div>
       ) : null}
     </div>
