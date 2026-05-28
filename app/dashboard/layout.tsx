@@ -13,16 +13,35 @@ import {
 } from "lucide-react";
 import { requireUserRedirect } from "@/app/lib/auth";
 import { getTenantMenuThemeSettings } from "@/app/lib/data/menu-themes";
-import { getTenantAccessContext } from "@/app/lib/tenant";
+import { getCurrentUser, getTenantAccessContext } from "@/app/lib/tenant";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   await requireUserRedirect("/dashboard");
   let isAdmin = false;
+  let isTenantAdmin = false;
   let tenantThemesEnabled = false;
+  let dashboardTitle = "Dashboard";
+  let dashboardSubtitle = "Panel de gestion";
 
   try {
-    const tenantCtx = await getTenantAccessContext();
+    const [tenantCtx, user] = await Promise.all([getTenantAccessContext(), getCurrentUser()]);
     isAdmin = tenantCtx.isAdmin;
+    isTenantAdmin = tenantCtx.isTenantAdmin;
+
+    const activeTenant = tenantCtx.memberships.find((membership) => membership.tenant_id === tenantCtx.activeTenantId)?.tenant;
+    const metadata = user.user_metadata ?? {};
+    const userName =
+      typeof metadata.display_name === "string"
+        ? metadata.display_name
+        : typeof metadata.name === "string"
+          ? metadata.name
+          : typeof metadata.login_name === "string"
+            ? metadata.login_name
+            : user.email ?? "Usuario";
+
+    dashboardTitle = tenantCtx.isAdmin ? "Dashboard" : activeTenant?.name ?? "Dashboard";
+    dashboardSubtitle = tenantCtx.isAdmin ? "Administracion global" : userName;
+
     if (!tenantCtx.isAdmin) {
       const themeSettings = await getTenantMenuThemeSettings(tenantCtx.activeTenantId);
       tenantThemesEnabled = themeSettings.menuThemesEnabled;
@@ -37,26 +56,32 @@ export default async function DashboardLayout({ children }: { children: React.Re
   }
 
   const iconSize = 20;
-  const navItems = [
-    ...(isAdmin
-      ? [{ icon: <ChartNoAxesColumn size={iconSize} />, name: "Resumen", href: "/dashboard/resumen" }]
-      : []),
+  const tenantAdminItems = [
     { icon: <BadgePercent size={iconSize} />, name: "Destacados", href: "/dashboard/destacados" },
     { icon: <UtensilsCrossed size={iconSize} />, name: "Productos", href: "/dashboard/productos" },
     { icon: <Shapes size={iconSize} />, name: "Categorias", href: "/dashboard/categorias" },
     { icon: <ConciergeBell size={iconSize} />, name: "Mesas", href: "/dashboard/mesas" },
-    ...(!isAdmin ? [{ icon: <BellRing size={iconSize} />, name: "Atencion", href: "/dashboard/atencion" }] : []),
-    ...(!isAdmin && tenantThemesEnabled
-      ? [{ icon: <Palette size={iconSize} />, name: "Themes", href: "/dashboard/themes" }]
-      : []),
-    ...(isAdmin
-      ? [
-          { icon: <Palette size={iconSize} />, name: "Themes", href: "/dashboard/themes" },
-          { icon: <Settings size={iconSize} />, name: "Configuracion", href: "/dashboard/configuracion" },
-          { icon: <Users size={iconSize} />, name: "Usuarios", href: "/dashboard/usuarios" },
-        ]
-      : []),
+    { icon: <BellRing size={iconSize} />, name: "Atencion", href: "/dashboard/atencion" },
+    { icon: <Users size={iconSize} />, name: "Equipo", href: "/dashboard/usuarios" },
+    ...(tenantThemesEnabled ? [{ icon: <Palette size={iconSize} />, name: "Themes", href: "/dashboard/themes" }] : []),
   ];
+
+  const staffItems = [{ icon: <BellRing size={iconSize} />, name: "Atencion", href: "/dashboard/atencion" }];
+
+  const navItems = isAdmin
+    ? [
+        { icon: <ChartNoAxesColumn size={iconSize} />, name: "Resumen", href: "/dashboard/resumen" },
+        { icon: <BadgePercent size={iconSize} />, name: "Destacados", href: "/dashboard/destacados" },
+        { icon: <UtensilsCrossed size={iconSize} />, name: "Productos", href: "/dashboard/productos" },
+        { icon: <Shapes size={iconSize} />, name: "Categorias", href: "/dashboard/categorias" },
+        { icon: <ConciergeBell size={iconSize} />, name: "Mesas", href: "/dashboard/mesas" },
+        { icon: <Palette size={iconSize} />, name: "Themes", href: "/dashboard/themes" },
+        { icon: <Settings size={iconSize} />, name: "Configuracion", href: "/dashboard/configuracion" },
+        { icon: <Users size={iconSize} />, name: "Usuarios", href: "/dashboard/usuarios" },
+      ]
+    : isTenantAdmin
+      ? tenantAdminItems
+      : staffItems;
 
   return (
     <div className="min-h-[100dvh] bg-[var(--color-background)] md:flex">
@@ -67,10 +92,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
               D
             </div>
             <div className="min-w-0">
-              <h1 className="text-base font-bold leading-tight">Dashboard</h1>
-              <p className="truncate text-xs text-[var(--color-txt-secondary)]">
-                {isAdmin ? "Administración global" : "Panel de gestión"}
-              </p>
+              <h1 className="truncate text-base font-bold leading-tight">{dashboardTitle}</h1>
+              <p className="truncate text-xs text-[var(--color-txt-secondary)]">{dashboardSubtitle}</p>
             </div>
           </div>
         </div>
@@ -94,9 +117,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--color-bg-selected)] text-sm font-bold text-[var(--color-txt-selected)]">
             D
           </div>
-          <div>
-            <p className="text-sm font-bold leading-tight">Dashboard</p>
-            <p className="text-xs text-[var(--color-txt-secondary)]">{isAdmin ? "Admin" : "Gestión"}</p>
+          <div className="min-w-0">
+            <p className="max-w-[13rem] truncate text-sm font-bold leading-tight">{dashboardTitle}</p>
+            <p className="max-w-[13rem] truncate text-xs text-[var(--color-txt-secondary)]">{dashboardSubtitle}</p>
           </div>
         </div>
       </header>
@@ -105,12 +128,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <div className="mx-auto w-full max-w-screen-2xl">{children}</div>
       </main>
 
-      <nav className="md:hidden fixed inset-x-0 bottom-0 z-40 border-t border-[var(--color-line-limit)] bg-[var(--color-foreground)]/95 backdrop-blur">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--color-line-limit)] bg-[var(--color-foreground)]/95 backdrop-blur md:hidden">
         <ul className="flex gap-1 overflow-x-auto px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2">
           {navItems.map((item) => (
             <DashboardNavButton key={item.href} icon={item.icon} name={item.name} href={item.href} compact />
           ))}
-          <li className="shrink-0 min-w-[72px]">
+          <li className="min-w-[72px] shrink-0">
             <LogoutButton compact />
           </li>
         </ul>

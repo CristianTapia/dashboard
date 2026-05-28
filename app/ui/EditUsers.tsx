@@ -32,7 +32,9 @@ export default function EditUsers({
   const [mapsUrl, setMapsUrl] = useState(tenantMapsUrl ?? "");
   const [accessName, setAccessName] = useState(loginName ?? "");
   const [password, setPassword] = useState("");
-  const [selectedRole, setSelectedRole] = useState<"admin" | "member">(role === "admin" ? "admin" : "member");
+  const [selectedRole, setSelectedRole] = useState<"admin" | "tenant_admin" | "staff" | "member">(
+    role === "admin" || role === "tenant_admin" || role === "staff" || role === "member" ? role : "tenant_admin",
+  );
   const [pending, startTransition] = useTransition();
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -207,11 +209,13 @@ export default function EditUsers({
           <select
             className="form-select text-sm cursor-pointer bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
             value={selectedRole}
-            onChange={(event) => setSelectedRole(event.target.value as "admin" | "member")}
+            onChange={(event) => setSelectedRole(event.target.value as "admin" | "tenant_admin" | "staff" | "member")}
             disabled={pending}
           >
-            <option value="admin">Admin</option>
-            <option value="member">Usuario</option>
+            {role === "admin" ? <option value="admin">Global admin</option> : null}
+            <option value="tenant_admin">Tenant admin</option>
+            <option value="staff">Staff / garzon</option>
+            <option value="member">Member</option>
           </select>
         </div>
 

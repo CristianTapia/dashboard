@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { CirclePlus, Palette, Pencil, Search, Trash, TriangleAlert, Upload } from "lucide-react";
+import { CirclePlus, Pencil, Search, Trash, TriangleAlert, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Modal from "@/app/ui/Modals/Modal";
 import AddUsers from "@/app/ui/AddUsers";
@@ -23,6 +23,14 @@ type UserTenantRow = {
   tenantMenuThemesEnabled: boolean;
   tenantMenuTheme: string;
 };
+
+function getRoleLabel(role: string | null) {
+  if (role === "admin") return "Global admin";
+  if (role === "tenant_admin") return "Tenant admin";
+  if (role === "staff") return "Staff";
+  if (role === "member") return "Member";
+  return "Sin rol";
+}
 
 export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenantRow[] }) {
   const [search, setSearch] = useState({ term: "" });
@@ -128,6 +136,10 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
     });
   }
 
+  function isGlobalAdmin(row: UserTenantRow) {
+    return row.role === "admin";
+  }
+
   return (
     <div className="w-full max-w-full p-2 sm:p-4 flex flex-col">
       <div className="flex flex-col items-start gap-1.5">
@@ -162,49 +174,59 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
       </div>
 
       <section className="bg-[var(--color-foreground)] border border-[var(--color-line-limit)] rounded-xl p-3 sm:p-6">
-        <h2 className="text-lg font-semibold mb-2">Usuarios del tenant</h2>
+        <h2 className="text-lg font-semibold mb-2">Usuarios y tenants</h2>
         {filteredRows.length === 0 ? (
           <p className="text-sm text-[var(--color-txt-secondary)]">Aun no hay usuarios.</p>
         ) : (
           <div className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[980px] text-sm">
               <thead>
-                <tr className="text-left border-b border-[var(--color-line-limit)]">
-                  <th className="py-2">Email</th>
-                  <th className="py-2">Acceso</th>
-                  <th className="py-2">Tenant</th>
-                  <th className="py-2">Clave publica</th>
-                  <th className="py-2">Rol</th>
-                  <th className="py-2">Estado</th>
-                  <th className="py-2 text-right">Acciones</th>
+                <tr className="border-b border-[var(--color-line-limit)] text-left text-xs font-semibold uppercase tracking-wide text-[var(--color-txt-secondary)]">
+                  <th className="px-3 py-3">Usuario</th>
+                  <th className="px-3 py-3">Tenant</th>
+                  <th className="px-3 py-3">Rol</th>
+                  <th className="px-3 py-3">Tenant activo</th>
+                  <th className="px-3 py-3">Themes</th>
+                  <th className="px-3 py-3 text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredRows.map((row) => (
-                  <tr key={`${row.userId}-${row.tenantId}`} className="border-b border-[var(--color-line-limit)]">
-                    <td className="py-2">{row.email ?? "Sin email"}</td>
-                    <td className="py-2 font-mono text-xs">{row.loginName ?? "Sin acceso"}</td>
-                    <td className="py-2">{row.tenantName}</td>
-                    <td className="py-2 font-mono text-xs">{row.tenantDomain ?? row.tenantId ?? "Sin clave"}</td>
-                    <td className="py-2">{row.role ?? "Sin rol"}</td>
-                    <td className="py-2">
+                  <tr key={`${row.userId}-${row.tenantId}`} className="border-b border-[var(--color-line-limit)] align-middle last:border-b-0">
+                    <td className="px-3 py-3">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm font-medium">{row.email ?? "Sin email"}</span>
+                        <span className="font-mono text-xs text-[var(--color-txt-secondary)]">{row.loginName ?? "Sin acceso"}</span>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm font-medium">{row.tenantName}</span>
+                        <span className="font-mono text-xs text-[var(--color-txt-secondary)]">
+                          {row.tenantDomain ?? row.tenantId ?? "Sin clave"}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3">
                       <span
                         className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
-                          row.tenantActive
-                            ? "bg-sky-100 text-sky-800 dark:bg-cyan-400/12 dark:text-cyan-100"
-                            : "bg-slate-200 text-slate-700 dark:bg-slate-700/70 dark:text-slate-300"
+                          row.role === "admin"
+                            ? "bg-slate-900 text-white dark:bg-white dark:text-slate-950"
+                            : "bg-[var(--color-bg-selected)] text-[var(--color-txt-selected)]"
                         }`}
                       >
-                        {row.tenantActive ? "Activo" : "Inactivo"}
+                        {getRoleLabel(row.role)}
                       </span>
                     </td>
-                    <td className="py-2">
-                      <div className="flex items-center justify-end gap-2">
+                    <td className="px-3 py-3">
+                      {isGlobalAdmin(row) ? (
+                        <span className="text-xs text-[var(--color-txt-secondary)]">No aplica</span>
+                      ) : (
                         <button
                           type="button"
                           disabled={!row.tenantId || Boolean(row.tenantId && pendingTenantById[row.tenantId])}
                           onClick={() => onToggleTenantActive(row)}
-                          className={`dashboard-status-toggle min-w-[8.75rem] ${row.tenantActive ? "is-on" : "is-off"}`}
+                          className={`dashboard-status-toggle min-w-[8.75rem] max-w-[8.75rem] ${row.tenantActive ? "is-on" : "is-off"}`}
                           title={row.tenantActive ? "Desactivar tenant" : "Activar tenant"}
                           aria-pressed={row.tenantActive}
                         >
@@ -218,21 +240,29 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
                             />
                           </span>
                         </button>
+                      )}
+                    </td>
+                    <td className="px-3 py-3">
+                      {isGlobalAdmin(row) ? (
+                        <span className="text-xs text-[var(--color-txt-secondary)]">No aplica</span>
+                      ) : (
                         <button
                           type="button"
                           onClick={() => onToggleTenantThemes(row)}
-                          className={`inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-                            row.tenantMenuThemesEnabled
-                              ? "bg-[var(--color-bg-selected)] text-[var(--color-txt-selected)] hover:border-[var(--color-button-send)]"
-                              : "text-[var(--color-light)] hover:bg-[var(--color-cancel)] hover:text-[var(--color-light-hover)]"
-                          }`}
+                          className={`dashboard-status-toggle min-w-[8.75rem] max-w-[8.75rem] ${row.tenantMenuThemesEnabled ? "is-on" : "is-off"}`}
                           disabled={!row.tenantId || Boolean(row.tenantId && pendingTenantById[`themes-${row.tenantId}`])}
                           title={row.tenantMenuThemesEnabled ? "Deshabilitar themes" : "Habilitar themes"}
                           aria-pressed={row.tenantMenuThemesEnabled}
                         >
-                          <Palette size={16} />
-                          <span>{row.tenantMenuThemesEnabled ? "Themes on" : "Themes"}</span>
+                          <span className="truncate">{row.tenantMenuThemesEnabled ? "Themes on" : "Themes off"}</span>
+                          <span className="dashboard-status-track" aria-hidden="true">
+                            <span className="dashboard-status-thumb" />
+                          </span>
                         </button>
+                      )}
+                    </td>
+                    <td className="px-3 py-3">
+                      <div className="flex items-center justify-end gap-2">
                         <button
                           type="button"
                           onClick={() => openModal("editUser", row)}
@@ -242,15 +272,17 @@ export default function UsuariosPage({ initialUsers }: { initialUsers: UserTenan
                         >
                           <Pencil size={18} />
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => openModal("confirmDelete", row)}
-                          className="cursor-pointer p-2 rounded-2xl text-[var(--color-delete)] hover:bg-red-50 hover:text-[var(--color-delete-hover)] transition-colors disabled:opacity-50"
-                          disabled={!row.tenantId}
-                          title="Eliminar tenant"
-                        >
-                          <Trash size={18} />
-                        </button>
+                        {!isGlobalAdmin(row) ? (
+                          <button
+                            type="button"
+                            onClick={() => openModal("confirmDelete", row)}
+                            className="cursor-pointer p-2 rounded-2xl text-[var(--color-delete)] hover:bg-red-50 hover:text-[var(--color-delete-hover)] transition-colors disabled:opacity-50"
+                            disabled={!row.tenantId}
+                            title="Eliminar tenant"
+                          >
+                            <Trash size={18} />
+                          </button>
+                        ) : null}
                       </div>
                     </td>
                   </tr>

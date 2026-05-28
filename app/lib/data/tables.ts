@@ -3,7 +3,7 @@ import "server-only";
 import { randomBytes } from "crypto";
 
 import { createAdmin, createServer } from "@/app/lib/supabase";
-import { getCurrentTenantId, isCurrentUserAdmin, resolveWritableTenantId } from "@/app/lib/tenant";
+import { getCurrentTenantId, getCurrentUser, getTenantAccessContext, isCurrentUserAdmin, resolveWritableTenantId } from "@/app/lib/tenant";
 import { RestaurantTable } from "@/app/lib/validators/types";
 
 type TenantRow = {
@@ -21,6 +21,11 @@ type RestaurantTableRow = {
   salon: string | null;
   active: boolean;
   created_at: string;
+};
+
+type StaffAssignmentRow = {
+  salon: string | null;
+  table_id: string | null;
 };
 
 function isMissingTablesRelation(error: { code?: string; message?: string } | null) {
@@ -123,6 +128,7 @@ function mapTable(row: RestaurantTableRow, tenant: TenantRow | null): Restaurant
 export async function listRestaurantTables() {
   const adminUser = await isCurrentUserAdmin();
   const currentTenantId = await getCurrentTenantId();
+  const tenantCtx = await getTenantAccessContext();
   const db = createAdmin();
 
   let query = db
@@ -141,11 +147,34 @@ export async function listRestaurantTables() {
   }
 
   const rows = (data ?? []) as RestaurantTableRow[];
+  let visibleRows = rows;
+
+  if (!adminUser && !tenantCtx.isTenantAdmin) {
+    const user = await getCurrentUser();
+    const { data: assignmentsData, error: assignmentsError } = await db
+      .from("tenant_staff_assignments")
+      .select("salon,table_id")
+      .eq("tenant_id", currentTenantId)
+      .eq("user_id", user.id);
+    if (assignmentsError) throw new Error(assignmentsError.message);
+
+    const assignments = (assignmentsData ?? []) as StaffAssignmentRow[];
+    const assignedSalons = new Set(assignments.map((assignment) => assignment.salon).filter(Boolean) as string[]);
+    const assignedTableIds = new Set(assignments.map((assignment) => assignment.table_id).filter(Boolean) as string[]);
+
+    if (assignedSalons.size > 0 || assignedTableIds.size > 0) {
+      visibleRows = rows.filter((row) => {
+        const salon = row.salon?.trim() || "Salon 1";
+        return assignedTableIds.has(row.id) || assignedSalons.has(salon);
+      });
+    }
+  }
+
   const tenantsMap = await loadTenantsMap(
     db,
-    rows.map((row) => row.tenant_id),
+    visibleRows.map((row) => row.tenant_id),
   );
-  return rows.map((row) => mapTable(row, tenantsMap.get(row.tenant_id) ?? null));
+  return visibleRows.map((row) => mapTable(row, tenantsMap.get(row.tenant_id) ?? null));
 }
 
 export async function createRestaurantTable(

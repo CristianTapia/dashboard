@@ -2,7 +2,8 @@
 
 import { X } from "lucide-react";
 
-const baseClassNameButton = "flex justify-center px-4 p-3 gap-2 rounded-xl cursor-pointer";
+const baseClassNameButton =
+  "flex min-h-11 w-full sm:w-auto sm:min-w-40 items-center justify-center gap-2 rounded-xl px-4 py-3 cursor-pointer";
 
 export default function Modal({
   isOpen,
@@ -71,7 +72,7 @@ export default function Modal({
 
             {/* Modal footer buttons*/}
             {buttonAName || buttonBName ? (
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 px-2 sm:px-4 text-sm font-bold justify-center shrink-0">
+              <div className="flex flex-col gap-3 px-2 pb-2 pt-4 text-sm font-bold sm:flex-row sm:justify-end sm:gap-4 sm:px-4 shrink-0">
                 {buttonAName ? (
                   <button
                     onClick={onButtonAClickAction}

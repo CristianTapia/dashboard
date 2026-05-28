@@ -11,7 +11,7 @@ export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => voi
   const [loginName, setLoginName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"admin" | "member">("member");
+  const [role, setRole] = useState<"tenant_admin" | "staff" | "member">("tenant_admin");
   const [pending, startTransition] = useTransition();
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -41,7 +41,7 @@ export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => voi
           setLoginName("");
           setEmail("");
           setPassword("");
-          setRole("member");
+          setRole("tenant_admin");
           onSuccess?.();
         }
       } catch (err: unknown) {
@@ -162,10 +162,11 @@ export default function AddUsers({ onCancel, onSuccess }: { onCancel?: () => voi
           <select
             className="form-select text-sm cursor-pointer bg-[var(--color-foreground)] rounded-lg border border-[var(--color-border-box)] focus:outline-none focus:ring-0 focus:border-[var(--color-button-send)] p-3"
             value={role}
-            onChange={(event) => setRole(event.target.value as "admin" | "member")}
+            onChange={(event) => setRole(event.target.value as "tenant_admin" | "staff" | "member")}
           >
-            <option value="admin">Admin</option>
-            <option value="member">Usuario</option>
+            <option value="tenant_admin">Tenant admin</option>
+            <option value="staff">Staff / garzon</option>
+            <option value="member">Member</option>
           </select>
         </div>
 

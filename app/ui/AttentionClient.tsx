@@ -3,16 +3,18 @@
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { BellRing, CheckCircle2, ConciergeBell, ReceiptText, Search } from "lucide-react";
+import { BellRing, CheckCircle2, ClipboardList, ConciergeBell, QrCode, ReceiptText, Search } from "lucide-react";
 
 import { AttentionSalonGroup, AttentionTableCard } from "@/app/lib/data/attention";
 import { supabaseClient } from "@/app/lib/supabase/client";
+import TableQrCode from "@/app/ui/TableQrCode";
 
 export default function AttentionClient({ salonGroups, tenantId }: { salonGroups: AttentionSalonGroup[]; tenantId: string }) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [handledTableIds, setHandledTableIds] = useState<Record<string, number>>({});
   const [pendingTableIds, setPendingTableIds] = useState<Record<string, boolean>>({});
+  const [expandedQrTableId, setExpandedQrTableId] = useState<string | null>(null);
   const [, startRefreshTransition] = useTransition();
   const refreshTimerRef = useRef<number | null>(null);
   const realtimeConnectedRef = useRef(false);
@@ -99,21 +101,19 @@ export default function AttentionClient({ salonGroups, tenantId }: { salonGroups
       .map((group) => {
         const tables = group.tables
           .filter((table) => {
-          if (!term) return true;
-          return (
-            table.label.toLowerCase().includes(term) ||
-            table.salon.toLowerCase().includes(term) ||
-            table.tableToken.toLowerCase().includes(term)
-          );
-        })
+            if (!term) return true;
+            return (
+              table.label.toLowerCase().includes(term) ||
+              table.salon.toLowerCase().includes(term) ||
+              table.tableToken.toLowerCase().includes(term)
+            );
+          })
           .filter((table) => {
             const needsAttention = tableNeedsAttention(table);
             if (needsAttention) urgent.push(table);
             return !needsAttention;
           })
-          .sort((a, b) => {
-            return a.label.localeCompare(b.label, undefined, { numeric: true });
-          });
+          .sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }));
 
         return {
           ...group,
@@ -177,67 +177,146 @@ export default function AttentionClient({ salonGroups, tenantId }: { salonGroups
     })();
   }
 
-  function renderTableCard(table: (typeof salonGroups)[number]["tables"][number]) {
+  function renderTableCard(table: AttentionTableCard) {
     const needsAttention = tableNeedsAttention(table);
+    const requestedAtLabel = table.latestRequestedAt ? formatTimeLabel(table.latestRequestedAt) : null;
+    const requests = [
+      {
+        active: needsAttention && table.serviceRequested,
+        icon: <ConciergeBell size={16} />,
+        label: "Servicio",
+        description: "El cliente llama al garzon",
+      },
+      {
+        active: needsAttention && table.billRequested,
+        icon: <ReceiptText size={16} />,
+        label: "Cuenta",
+        description: "El cliente pide pagar",
+      },
+      {
+        active: needsAttention && table.orderRequested,
+        icon: <ClipboardList size={16} />,
+        label: "Pedido",
+        description: "El cliente quiere ordenar",
+      },
+    ];
+    const activeRequests = requests.filter((request) => request.active);
 
     return (
       <article
         key={table.tableId}
-        className={`min-w-0 rounded-xl border bg-[var(--color-foreground)] p-4 shadow-sm transition ${
+        className={`group relative flex min-w-0 flex-col overflow-hidden rounded-xl border bg-[var(--color-foreground)] p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-card sm:p-4 ${
           needsAttention
-            ? "border-[var(--color-delete)] shadow-card ring-2 ring-red-500/10"
+            ? "border-[var(--color-button-send)] shadow-card ring-2 ring-sky-400/10"
             : "border-[var(--color-border-box)]"
         }`}
       >
+        {needsAttention ? <div className="absolute inset-x-0 top-0 h-1 bg-[var(--color-button-send)]" /> : null}
+
         <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <span
-                className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
-                  needsAttention
-                    ? "bg-red-50 text-[var(--color-delete)] dark:bg-red-900/20"
-                    : "bg-[var(--color-bg-selected)] text-[var(--color-button-send)]"
-                }`}
-              >
-                {needsAttention ? <BellRing size={18} /> : <ConciergeBell size={18} />}
+          <div className="flex min-w-0 items-center gap-2">
+            <span
+              className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition ${
+                needsAttention
+                  ? "bg-[var(--color-bg-selected)] text-[var(--color-button-send)] shadow-sm ring-1 ring-[var(--color-button-send)]/20"
+                  : "bg-[var(--color-bg-selected)] text-[var(--color-button-send)]"
+              }`}
+            >
+              {needsAttention ? <BellRing size={18} /> : <ConciergeBell size={18} />}
+            </span>
+            <div className="min-w-0">
+              <h3 className="truncate text-base font-semibold">{table.label}</h3>
+              <p className="truncate text-xs text-[var(--color-txt-secondary)]">{table.salon}</p>
+            </div>
+          </div>
+
+          <span
+            className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${
+              needsAttention
+                ? "bg-[var(--color-bg-selected)] text-[var(--color-txt-selected)] ring-1 ring-[var(--color-button-send)]/25"
+                : "bg-[var(--color-bg-selected)] text-[var(--color-txt-secondary)]"
+            }`}
+          >
+            {needsAttention ? <BellRing size={12} /> : <CheckCircle2 size={12} />}
+            {needsAttention ? `${table.pendingCount} pendiente${table.pendingCount === 1 ? "" : "s"}` : "Sin alertas"}
+          </span>
+        </div>
+
+        {needsAttention ? (
+          <div className="mt-4 rounded-xl border border-[var(--color-button-send)]/25 bg-[var(--color-bg-selected)] p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-txt-secondary)]">
+                Cliente solicita
+              </p>
+              {requestedAtLabel ? (
+                <span className="text-xs font-medium text-[var(--color-txt-secondary)]">Recibido {requestedAtLabel}</span>
+              ) : null}
+            </div>
+            <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2">
+              {activeRequests.length > 0
+                ? activeRequests.map((request) => <RequestActionCard key={request.label} {...request} />)
+                : requests.map((request) => <RequestActionCard key={request.label} {...request} active />)}
+            </div>
+          </div>
+        ) : null}
+
+        {needsAttention && table.orderRequested ? (
+          <div className="mt-3 rounded-xl border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-3">
+            <div className="flex items-start gap-2">
+              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-bg-selected)] text-[var(--color-button-send)]">
+                <ClipboardList size={17} />
               </span>
               <div className="min-w-0">
-                <h3 className="truncate text-base font-semibold">{table.label}</h3>
-                <p className="truncate text-xs text-[var(--color-txt-secondary)]">{table.salon}</p>
+                <p className="text-sm font-semibold">Comanda pendiente</p>
+                <p className="mt-1 text-xs leading-5 text-[var(--color-txt-secondary)]">
+                  {table.orderSummary ?? "Comanda recibida desde el menu"}
+                </p>
               </div>
             </div>
           </div>
+        ) : null}
+
+        <div className="mt-auto pt-3">
+          <button
+            type="button"
+            onClick={() => setExpandedQrTableId((current) => (current === table.tableId ? null : table.tableId))}
+            className="inline-flex h-9 w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[var(--color-border-box)] bg-[var(--color-bg-selected)] px-3 text-sm font-medium text-[var(--color-txt-selected)] transition hover:border-[var(--color-button-send)]"
+          >
+            <QrCode size={15} />
+            {expandedQrTableId === table.tableId ? "Ocultar codigo QR" : "Mostrar codigo QR"}
+          </button>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
-          <StatusPill active={needsAttention && table.serviceRequested} icon={<ConciergeBell size={14} />} label="Servicio" />
-          <StatusPill active={needsAttention && table.billRequested} icon={<ReceiptText size={14} />} label="Cuenta" />
-        </div>
+        {expandedQrTableId === table.tableId ? (
+          <div className="mt-3">
+            <TableQrCode value={table.publicUrl} label={table.label} number={table.number} name={table.name} />
+          </div>
+        ) : null}
 
         <button
           type="button"
           disabled={!needsAttention || Boolean(pendingTableIds[table.tableId])}
           onClick={() => onMarkHandled(table.tableId)}
-          className={`mt-4 inline-flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-lg px-3 text-sm font-medium transition disabled:cursor-not-allowed ${
+          className={`mt-3 inline-flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-lg px-3 text-sm font-medium transition disabled:cursor-not-allowed ${
             needsAttention
-              ? "bg-[var(--color-button-send)] text-white hover:bg-[var(--color-button-send-hover)] disabled:opacity-60"
+              ? "border border-[var(--color-button-send)] bg-[var(--color-button-send)] text-white shadow-sm hover:bg-[var(--color-button-send-hover)] disabled:opacity-60"
               : "border border-[var(--color-border-box)] bg-[var(--color-bg-selected)] text-[var(--color-txt-secondary)]"
           }`}
         >
           <CheckCircle2 size={16} />
-          {pendingTableIds[table.tableId] ? "Guardando..." : needsAttention ? "Mesa atendida" : "Sin alertas"}
+          {pendingTableIds[table.tableId] ? "Guardando..." : needsAttention ? "Marcar como atendida" : "Mesa atendida"}
         </button>
       </article>
     );
   }
 
   return (
-    <div className="flex w-full max-w-full flex-col p-2 sm:p-4">
+    <div className="flex w-full max-w-full flex-col p-1.5 sm:p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex flex-col items-start gap-1.5">
-          <h1 className="text-2xl font-semibold sm:text-[1.7rem]">Atencion</h1>
-          <p className="max-w-2xl text-sm leading-6 text-[var(--color-txt-secondary)]">
-            Solicitudes de servicio y cuenta enviadas desde el menu por cada mesa.
+          <h1 className="text-xl font-semibold sm:text-[1.7rem]">Atencion</h1>
+          <p className="max-w-2xl text-xs leading-5 text-[var(--color-txt-secondary)] sm:text-sm sm:leading-6">
+            Solicitudes de servicio, cuenta y pedido enviadas desde el menu por cada mesa.
           </p>
         </div>
         <div className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-border-box)] bg-[var(--color-foreground)] px-3 py-2 text-sm shadow-sm">
@@ -262,7 +341,7 @@ export default function AttentionClient({ salonGroups, tenantId }: { salonGroups
       </div>
 
       {urgentTables.length > 0 ? (
-        <section className="mb-6 rounded-xl border border-[var(--color-delete)] bg-red-50/50 p-3 ring-2 ring-red-500/10 dark:bg-red-900/10 sm:p-4">
+        <section className="mb-5 rounded-xl border border-[var(--color-button-send)]/30 bg-[var(--color-foreground)] p-2.5 ring-2 ring-sky-400/10 sm:mb-6 sm:p-4">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 className="text-base font-semibold">Atenciones pendientes</h2>
@@ -271,15 +350,17 @@ export default function AttentionClient({ salonGroups, tenantId }: { salonGroups
               </p>
             </div>
           </div>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(230px,360px))] justify-center gap-4">
-            {urgentTables.map((table) => renderTableCard(table))}
+          <div className="max-h-[min(65dvh,42rem)] overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-[repeat(auto-fit,minmax(230px,360px))] sm:justify-center sm:gap-4">
+              {urgentTables.map((table) => renderTableCard(table))}
+            </div>
           </div>
         </section>
       ) : null}
 
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {filteredGroups.map((group) => (
-          <section key={group.salon} className="rounded-xl border border-[var(--color-border-box)] p-3 sm:p-4">
+          <section key={group.salon} className="rounded-xl border border-[var(--color-border-box)] p-2.5 sm:p-4">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h2 className="text-base font-semibold">{group.salon}</h2>
@@ -289,14 +370,14 @@ export default function AttentionClient({ salonGroups, tenantId }: { salonGroups
               </div>
             </div>
 
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(230px,360px))] justify-center gap-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-[repeat(auto-fit,minmax(230px,360px))] sm:justify-center sm:gap-4">
               {group.tables.map((table) => renderTableCard(table))}
             </div>
           </section>
         ))}
       </div>
 
-      {filteredGroups.length === 0 ? (
+      {filteredGroups.length === 0 && urgentTables.length === 0 ? (
         <div className="mt-6 rounded-xl border border-dashed border-[var(--color-border-box)] p-10 text-center text-sm text-[var(--color-txt-secondary)]">
           No hay mesas para los filtros seleccionados.
         </div>
@@ -305,17 +386,41 @@ export default function AttentionClient({ salonGroups, tenantId }: { salonGroups
   );
 }
 
-function StatusPill({ active, icon, label }: { active: boolean; icon: ReactNode; label: string }) {
+function formatTimeLabel(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
+function RequestActionCard({
+  active,
+  icon,
+  label,
+  description,
+}: {
+  active: boolean;
+  icon: ReactNode;
+  label: string;
+  description: string;
+}) {
   return (
     <div
-      className={`inline-flex min-w-0 items-center justify-center gap-1.5 rounded-lg border px-2 py-2 ${
+      className={`flex min-w-0 items-start gap-2 rounded-lg border p-3 md:min-h-[5.75rem] ${
         active
-          ? "border-red-200 bg-red-50 text-[var(--color-delete)] dark:border-red-800/60 dark:bg-red-900/20"
-          : "border-[var(--color-border-box)] bg-[var(--color-bg-selected)] text-[var(--color-txt-secondary)]"
+          ? "animate-pulse border-[var(--color-button-send)]/30 bg-[var(--color-foreground)] text-[var(--color-txt-selected)] shadow-sm"
+          : "border-[var(--color-border-box)] bg-[var(--color-foreground)] text-[var(--color-txt-secondary)]"
       }`}
     >
-      {icon}
-      <span className="truncate">{label}</span>
+      <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-bg-selected)] text-[var(--color-button-send)]">
+        {icon}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-semibold leading-tight">{label}</span>
+        <span className="mt-1 block text-xs leading-5 text-[var(--color-txt-secondary)]">{description}</span>
+      </span>
     </div>
   );
 }

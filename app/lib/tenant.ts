@@ -59,12 +59,18 @@ const getTenantAccessContextCached = cache(async () => {
 
   const tenantIds = memberships.map((membership) => membership.tenant_id);
   const isAdmin = memberships.some((membership) => membership.role === "admin" || membership.role === "owner");
+  const activeMembership =
+    tenantIdFromCookie && tenantIds.includes(tenantIdFromCookie)
+      ? memberships.find((membership) => membership.tenant_id === tenantIdFromCookie) ?? memberships[0]
+      : memberships[0];
   const activeTenantId =
     tenantIdFromCookie && tenantIds.includes(tenantIdFromCookie) ? tenantIdFromCookie : memberships[0].tenant_id;
 
   return {
     isAdmin,
     activeTenantId,
+    activeRole: activeMembership.role,
+    isTenantAdmin: activeMembership.role === "tenant_admin" || activeMembership.role === "admin" || activeMembership.role === "owner",
     memberships,
   };
 });

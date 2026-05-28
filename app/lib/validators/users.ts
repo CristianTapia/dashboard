@@ -26,7 +26,7 @@ export const CreateUserSchema = z.object({
   loginName: LoginNameSchema,
   email: z.string().email("Correo invalido"),
   password: z.string().min(6, "La contrasena debe tener al menos 6 caracteres"),
-  role: z.enum(["admin", "member"]).optional(),
+  role: z.enum(["admin", "tenant_admin", "staff", "member"]).optional(),
 });
 
 export type CreateUserInput = z.infer<typeof CreateUserSchema>;
@@ -40,7 +40,7 @@ export const UpdateUserSchema = z.object({
   tenantMenuTheme: MenuThemeSchema.optional(),
   loginName: LoginNameSchema.optional(),
   password: z.string().min(6, "La contrasena debe tener al menos 6 caracteres").optional(),
-  role: z.enum(["admin", "member"]).optional(),
+  role: z.enum(["admin", "tenant_admin", "staff", "member"]).optional(),
   userId: z.string().min(1).optional(),
 });
 

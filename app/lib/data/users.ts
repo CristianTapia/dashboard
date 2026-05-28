@@ -2,6 +2,7 @@ import "server-only";
 import { createAdmin } from "@/app/lib/supabase/Admin";
 import { CreateUserInput, UpdateUserInput } from "@/app/lib/validators/users";
 import { unstable_cache } from "next/cache";
+import { getCurrentTenantId, getTenantAccessContext } from "@/app/lib/tenant";
 
 type TenantShape = {
   id: string;
@@ -24,6 +25,17 @@ type AuthUserSummary = {
   id: string;
   email: string | null;
   loginName: string | null;
+  displayName: string | null;
+};
+
+export type TenantTeamRow = {
+  userId: string;
+  name: string | null;
+  loginName: string | null;
+  email: string | null;
+  role: string | null;
+  salons: string[];
+  tableIds: string[];
 };
 
 function slugifyTenantDomain(value: string) {
@@ -85,6 +97,12 @@ async function listAuthUsers(supabase: ReturnType<typeof createAdmin>) {
         id: user.id,
         email: user.email ?? null,
         loginName: typeof user.user_metadata?.login_name === "string" ? user.user_metadata.login_name : null,
+        displayName:
+          typeof user.user_metadata?.display_name === "string"
+            ? user.user_metadata.display_name
+            : typeof user.user_metadata?.name === "string"
+              ? user.user_metadata.name
+              : null,
       })),
     );
 
@@ -187,6 +205,231 @@ const listUsersCached = unstable_cache(
 
 export async function listUsers() {
   return listUsersCached();
+}
+
+export async function listTenantTeam() {
+  const tenantId = await getCurrentTenantId();
+  const supabase = createAdmin();
+
+  const [{ data: memberships, error: membershipError }, { data: assignments, error: assignmentsError }] =
+    await Promise.all([
+      supabase.from("tenant_members").select("user_id, role").eq("tenant_id", tenantId).order("created_at", { ascending: false }),
+      supabase.from("tenant_staff_assignments").select("user_id,salon,table_id").eq("tenant_id", tenantId),
+    ]);
+
+  if (membershipError) throw new Error(membershipError.message);
+  if (assignmentsError) throw new Error(assignmentsError.message);
+
+  const rows = (memberships ?? []) as Array<{ user_id: string; role: string | null }>;
+  const usersById = new Map((await listAuthUsers(supabase)).map((user) => [user.id, user]));
+  const assignmentsByUser = new Map<string, { salons: string[]; tableIds: string[] }>();
+
+  for (const assignment of (assignments ?? []) as Array<{ user_id: string; salon: string | null; table_id: string | null }>) {
+    const current = assignmentsByUser.get(assignment.user_id) ?? { salons: [], tableIds: [] };
+    if (assignment.salon) current.salons.push(assignment.salon);
+    if (assignment.table_id) current.tableIds.push(assignment.table_id);
+    assignmentsByUser.set(assignment.user_id, current);
+  }
+
+  return rows.map((row): TenantTeamRow => {
+    const user = usersById.get(row.user_id);
+    const userAssignments = assignmentsByUser.get(row.user_id) ?? { salons: [], tableIds: [] };
+    return {
+      userId: row.user_id,
+      name: user?.displayName ?? null,
+      loginName: user?.loginName ?? null,
+      email: user?.email ?? null,
+      role: row.role,
+      salons: Array.from(new Set(userAssignments.salons)),
+      tableIds: Array.from(new Set(userAssignments.tableIds)),
+    };
+  });
+}
+
+export async function createTenantStaffUser(input: {
+  name: string;
+  loginName: string;
+  email?: string;
+  password: string;
+  role?: "tenant_admin" | "staff";
+  salons?: string[];
+  tableIds?: string[];
+}) {
+  const tenantCtx = await getTenantAccessContext();
+  if (!tenantCtx.isTenantAdmin || tenantCtx.isAdmin) throw new Error("Permisos insuficientes");
+
+  const supabase = createAdmin();
+  const tenantId = tenantCtx.activeTenantId;
+  const loginName = await ensureUniqueLoginName(supabase, input.loginName);
+  const displayName = input.name.trim();
+  const email = input.email?.trim() || `${loginName}@${tenantId}.staff.lab3c.local`;
+
+  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    email,
+    password: input.password,
+    email_confirm: true,
+    user_metadata: {
+      display_name: displayName,
+      name: displayName,
+      login_name: loginName,
+      contact_email: input.email ?? null,
+    },
+  });
+
+  if (authError || !authData?.user) throw new Error(authError?.message || "Error creando usuario");
+
+  const role = input.role === "tenant_admin" ? "tenant_admin" : "staff";
+  const { error: memberError } = await supabase.from("tenant_members").insert({
+    tenant_id: tenantId,
+    user_id: authData.user.id,
+    role,
+  });
+
+  if (memberError) {
+    await supabase.auth.admin.deleteUser(authData.user.id);
+    throw new Error(memberError.message);
+  }
+
+  await replaceTenantStaffAssignments(supabase, tenantId, authData.user.id, input.salons ?? [], input.tableIds ?? []);
+  return {
+    userId: authData.user.id,
+    name: displayName,
+    loginName,
+    email,
+    role,
+    salons: input.salons ?? [],
+    tableIds: input.tableIds ?? [],
+  } satisfies TenantTeamRow;
+}
+
+async function replaceTenantStaffAssignments(
+  supabase: ReturnType<typeof createAdmin>,
+  tenantId: string,
+  userId: string,
+  salons: string[],
+  tableIds: string[],
+) {
+  const normalizedSalons = Array.from(new Set(salons.map((salon) => salon.trim()).filter(Boolean)));
+  const normalizedTableIds = Array.from(new Set(tableIds.map((tableId) => tableId.trim()).filter(Boolean)));
+
+  const { error: deleteError } = await supabase
+    .from("tenant_staff_assignments")
+    .delete()
+    .eq("tenant_id", tenantId)
+    .eq("user_id", userId);
+  if (deleteError) throw new Error(deleteError.message);
+
+  const payload = [
+    ...normalizedSalons.map((salon) => ({ tenant_id: tenantId, user_id: userId, salon, table_id: null })),
+    ...normalizedTableIds.map((tableId) => ({ tenant_id: tenantId, user_id: userId, salon: null, table_id: tableId })),
+  ];
+
+  if (payload.length === 0) return;
+
+  const { error } = await supabase.from("tenant_staff_assignments").insert(payload);
+  if (error) throw new Error(error.message);
+}
+
+export async function updateTenantStaffAssignments(
+  userId: string,
+  input: {
+    name?: string;
+    loginName?: string;
+    password?: string;
+    salons?: string[];
+    tableIds?: string[];
+    role?: "tenant_admin" | "staff";
+  },
+) {
+  const tenantCtx = await getTenantAccessContext();
+  if (!tenantCtx.isTenantAdmin || tenantCtx.isAdmin) throw new Error("Permisos insuficientes");
+
+  const supabase = createAdmin();
+  const tenantId = tenantCtx.activeTenantId;
+
+  if (input.name !== undefined || input.loginName || input.password) {
+    const { data: currentUser, error: currentUserError } = await supabase.auth.admin.getUserById(userId);
+    if (currentUserError) throw new Error(currentUserError.message);
+
+    const userUpdate: {
+      password?: string;
+      user_metadata?: Record<string, unknown>;
+    } = {};
+
+    if (input.name !== undefined || input.loginName) {
+      const metadata = { ...(currentUser.user?.user_metadata ?? {}) };
+
+      if (input.name !== undefined) {
+        const displayName = input.name.trim();
+        if (!displayName) throw new Error("El nombre es obligatorio");
+        metadata.display_name = displayName;
+        metadata.name = displayName;
+      }
+
+      if (input.loginName) {
+        metadata.login_name = await ensureUniqueLoginName(supabase, input.loginName, userId);
+      }
+
+      userUpdate.user_metadata = metadata;
+    }
+
+    if (input.password) {
+      userUpdate.password = input.password;
+    }
+
+    const { error } = await supabase.auth.admin.updateUserById(userId, userUpdate);
+    if (error) throw new Error(error.message);
+  }
+
+  if (input.role) {
+    const { error } = await supabase
+      .from("tenant_members")
+      .update({ role: input.role })
+      .eq("tenant_id", tenantId)
+      .eq("user_id", userId);
+    if (error) throw new Error(error.message);
+  }
+
+  await replaceTenantStaffAssignments(supabase, tenantId, userId, input.salons ?? [], input.tableIds ?? []);
+  return { ok: true };
+}
+
+export async function deleteTenantStaffUser(userId: string) {
+  const tenantCtx = await getTenantAccessContext();
+  if (!tenantCtx.isTenantAdmin || tenantCtx.isAdmin) throw new Error("Permisos insuficientes");
+
+  const supabase = createAdmin();
+  const tenantId = tenantCtx.activeTenantId;
+
+  const { data: membership, error: membershipError } = await supabase
+    .from("tenant_members")
+    .select("role")
+    .eq("tenant_id", tenantId)
+    .eq("user_id", userId)
+    .maybeSingle<{ role: string | null }>();
+
+  if (membershipError) throw new Error(membershipError.message);
+  if (!membership) throw new Error("Usuario no encontrado");
+  if (membership.role !== "staff") throw new Error("Solo se pueden eliminar garzones");
+
+  const { error: assignmentsError } = await supabase
+    .from("tenant_staff_assignments")
+    .delete()
+    .eq("tenant_id", tenantId)
+    .eq("user_id", userId);
+  if (assignmentsError) throw new Error(assignmentsError.message);
+
+  const { error: memberError } = await supabase
+    .from("tenant_members")
+    .delete()
+    .eq("tenant_id", tenantId)
+    .eq("user_id", userId);
+  if (memberError) throw new Error(memberError.message);
+
+  const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+  if (authError) throw new Error(authError.message);
+
+  return { ok: true };
 }
 
 export async function createUser(input: CreateUserInput) {
