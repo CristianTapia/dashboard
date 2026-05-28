@@ -9,15 +9,17 @@ export default function TableQrCode({
   label,
   number,
   name,
+  salon,
 }: {
   value: string;
   label: string;
   number?: string | null;
   name?: string | null;
+  salon?: string | null;
 }) {
   const [printDataUrl, setPrintDataUrl] = useState("");
-  const tableTitle = number?.trim() ? `Mesa ${number.trim()}` : label;
-  const tableSubtitle = name?.trim() ?? "";
+  const tableTitle = label;
+  const tableSubtitle = salon?.trim() ?? "";
 
   useEffect(() => {
     let cancelled = false;

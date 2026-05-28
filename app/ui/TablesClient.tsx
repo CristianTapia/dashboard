@@ -281,6 +281,7 @@ export default function TablesClient({
                         label={table.label}
                         number={table.number}
                         name={table.name}
+                        salon={group.salon}
                       />
 
                       <div className="flex items-center justify-between gap-1.5 border-t border-[var(--color-border-box)] pt-3">
