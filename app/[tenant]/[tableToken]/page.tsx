@@ -29,12 +29,13 @@ export default async function PublicShortTableMenuPage({
   if (!validTenantKeys.includes(tenantKey)) notFound();
 
   const products = await listPublicProductsByTenant(tableData.tenant.id, { limit: 200 });
+  const tableTitle = `${tableData.table.room_name} - ${tableData.table.label}`;
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8">
       <PublicMenuRealtimeRefresh tenantId={tableData.tenant.id} />
       <h1 className="text-2xl font-bold mb-2">Menu de {tableData.tenant.name}</h1>
-      <p className="text-sm opacity-70 mb-6">{tableData.table.label}</p>
+      <p className="text-sm opacity-70 mb-6">{tableTitle}</p>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {products.map((product) => (

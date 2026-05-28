@@ -2,7 +2,17 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CirclePlus, ConciergeBell, Copy, ExternalLink, Pencil, Search, Trash, TriangleAlert, Upload } from "lucide-react";
+import {
+  CirclePlus,
+  ConciergeBell,
+  Copy,
+  ExternalLink,
+  Pencil,
+  Search,
+  Trash,
+  TriangleAlert,
+  Upload,
+} from "lucide-react";
 
 import AddTable from "@/app/ui/AddTable";
 import EditTable from "@/app/ui/EditTable";
@@ -217,28 +227,30 @@ export default function TablesClient({
                 const active = getTableActive(table);
 
                 return (
-            <div
-              key={table.id}
-              className="min-w-0 rounded-xl border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-4 shadow-sm transition-shadow hover:shadow-card sm:p-5"
-            >
-              <div className="flex items-center gap-2">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--color-bg-selected)] text-[var(--color-button-send)]">
-                      <ConciergeBell size={18} />
-                    </span>
-                    <div className="min-w-0">
-                      <h2 className="truncate text-lg font-semibold">{table.label}</h2>
-                      {isAdmin && table.tenant?.name ? (
-                        <p className="truncate text-xs text-[var(--color-txt-secondary)]">Tenant: {table.tenant.name}</p>
-                      ) : null}
+                  <div
+                    key={table.id}
+                    className="min-w-0 rounded-xl border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-4 shadow-sm transition-shadow hover:shadow-card sm:p-5"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--color-bg-selected)] text-[var(--color-button-send)]">
+                            <ConciergeBell size={18} />
+                          </span>
+                          <div className="min-w-0">
+                            <h2 className="truncate text-lg font-semibold">{table.label}</h2>
+                            {isAdmin && table.tenant?.name ? (
+                              <p className="truncate text-xs text-[var(--color-txt-secondary)]">
+                                Tenant: {table.tenant.name}
+                              </p>
+                            ) : null}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </div>
 
-              <div className="mt-4 space-y-3">
-                <div className="rounded-lg bg-[var(--color-bg-selected)] p-3">
+                    <div className="mt-4 space-y-3">
+                      {/* <div className="rounded-lg bg-[var(--color-bg-selected)] p-3">
                   <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-txt-secondary)]">
                     Link público
                   </p>
@@ -262,53 +274,53 @@ export default function TablesClient({
                       Abrir
                     </a>
                   </div>
-                </div>
+                </div> */}
 
-                <TableQrCode value={table.short_url} label={table.label} number={table.number} name={table.name} />
-
-                <div className="flex items-center justify-between gap-1.5 border-t border-[var(--color-border-box)] pt-3">
-                  <button
-                    type="button"
-                    disabled={Boolean(pendingActiveById[table.id])}
-                    onClick={() => onToggleActive(table)}
-                    className={`dashboard-status-toggle ${active ? "is-on" : "is-off"}`}
-                    title={active ? "Desactivar mesa" : "Activar mesa"}
-                    aria-pressed={active}
-                    aria-label={active ? "Mesa activa. Desactivar mesa" : "Mesa inactiva. Activar mesa"}
-                  >
-                    <span className="truncate">{active ? "Mesa activa" : "Mesa inactiva"}</span>
-                    <span
-                      className="dashboard-status-track"
-                      aria-hidden="true"
-                    >
-                      <span
-                        className="dashboard-status-thumb"
+                      <TableQrCode
+                        value={table.short_url}
+                        label={table.label}
+                        number={table.number}
+                        name={table.name}
                       />
-                    </span>
-                  </button>
-                  <div className="flex shrink-0 items-center justify-end gap-1.5">
-                    <button
-                      type="button"
-                      disabled={isPending}
-                      onClick={() => openEditModal(table)}
-                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-[var(--color-light)] transition-colors hover:bg-[var(--color-cancel)] hover:text-[var(--color-light-hover)] disabled:opacity-60"
-                      title="Editar mesa"
-                    >
-                      <Pencil size={17} />
-                    </button>
-                    <button
-                      type="button"
-                      disabled={isPending}
-                      onClick={() => openDeleteModal(table)}
-                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-[var(--color-delete)] transition-colors hover:bg-red-50 hover:text-[var(--color-delete-hover)] disabled:opacity-60 dark:hover:bg-red-900/20"
-                      title="Eliminar mesa"
-                    >
-                      <Trash size={17} />
-                    </button>
+
+                      <div className="flex items-center justify-between gap-1.5 border-t border-[var(--color-border-box)] pt-3">
+                        <button
+                          type="button"
+                          disabled={Boolean(pendingActiveById[table.id])}
+                          onClick={() => onToggleActive(table)}
+                          className={`dashboard-status-toggle ${active ? "is-on" : "is-off"}`}
+                          title={active ? "Desactivar mesa" : "Activar mesa"}
+                          aria-pressed={active}
+                          aria-label={active ? "Mesa activa. Desactivar mesa" : "Mesa inactiva. Activar mesa"}
+                        >
+                          <span className="truncate">{active ? "Mesa activa" : "Mesa inactiva"}</span>
+                          <span className="dashboard-status-track" aria-hidden="true">
+                            <span className="dashboard-status-thumb" />
+                          </span>
+                        </button>
+                        <div className="flex shrink-0 items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            disabled={isPending}
+                            onClick={() => openEditModal(table)}
+                            className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-[var(--color-light)] transition-colors hover:bg-[var(--color-cancel)] hover:text-[var(--color-light-hover)] disabled:opacity-60"
+                            title="Editar mesa"
+                          >
+                            <Pencil size={17} />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={isPending}
+                            onClick={() => openDeleteModal(table)}
+                            className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-[var(--color-delete)] transition-colors hover:bg-red-50 hover:text-[var(--color-delete-hover)] disabled:opacity-60 dark:hover:bg-red-900/20"
+                            title="Eliminar mesa"
+                          >
+                            <Trash size={17} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </div>
                 );
               })}
             </div>

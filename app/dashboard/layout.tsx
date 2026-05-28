@@ -28,7 +28,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
     isAdmin = tenantCtx.isAdmin;
     isTenantAdmin = tenantCtx.isTenantAdmin;
 
-    const activeTenant = tenantCtx.memberships.find((membership) => membership.tenant_id === tenantCtx.activeTenantId)?.tenant;
+    const activeTenant = tenantCtx.memberships.find(
+      (membership) => membership.tenant_id === tenantCtx.activeTenantId,
+    )?.tenant;
     const metadata = user.user_metadata ?? {};
     const userName =
       typeof metadata.display_name === "string"
@@ -37,9 +39,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
           ? metadata.name
           : typeof metadata.login_name === "string"
             ? metadata.login_name
-            : user.email ?? "Usuario";
+            : (user.email ?? "Usuario");
 
-    dashboardTitle = tenantCtx.isAdmin ? "Dashboard" : activeTenant?.name ?? "Dashboard";
+    dashboardTitle = tenantCtx.isAdmin ? "Dashboard" : (activeTenant?.name ?? "Dashboard");
     dashboardSubtitle = tenantCtx.isAdmin ? "Administracion global" : userName;
 
     if (!tenantCtx.isAdmin) {
@@ -57,16 +59,18 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const iconSize = 20;
   const tenantAdminItems = [
+    { icon: <ChartNoAxesColumn size={iconSize} />, name: "Resumen", href: "/dashboard/resumen" },
     { icon: <BadgePercent size={iconSize} />, name: "Destacados", href: "/dashboard/destacados" },
     { icon: <UtensilsCrossed size={iconSize} />, name: "Productos", href: "/dashboard/productos" },
     { icon: <Shapes size={iconSize} />, name: "Categorias", href: "/dashboard/categorias" },
     { icon: <ConciergeBell size={iconSize} />, name: "Mesas", href: "/dashboard/mesas" },
-    { icon: <BellRing size={iconSize} />, name: "Atencion", href: "/dashboard/atencion" },
     { icon: <Users size={iconSize} />, name: "Equipo", href: "/dashboard/usuarios" },
+    { icon: <BellRing size={iconSize} />, name: "Atención", href: "/dashboard/atencion" },
+
     ...(tenantThemesEnabled ? [{ icon: <Palette size={iconSize} />, name: "Themes", href: "/dashboard/themes" }] : []),
   ];
 
-  const staffItems = [{ icon: <BellRing size={iconSize} />, name: "Atencion", href: "/dashboard/atencion" }];
+  const staffItems = [{ icon: <BellRing size={iconSize} />, name: "Atención", href: "/dashboard/atencion" }];
 
   const navItems = isAdmin
     ? [

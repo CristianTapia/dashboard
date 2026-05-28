@@ -3,11 +3,29 @@
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { BellRing, CheckCircle2, ClipboardList, ConciergeBell, QrCode, ReceiptText, Search } from "lucide-react";
+import { BellRing, CheckCircle2, ClipboardList, ConciergeBell, QrCode, ReceiptText, Search, Volume2, VolumeX } from "lucide-react";
 
 import { AttentionSalonGroup, AttentionTableCard, RecentlyHandledAttention } from "@/app/lib/data/attention";
 import { supabaseClient } from "@/app/lib/supabase/client";
 import TableQrCode from "@/app/ui/TableQrCode";
+
+const ALERT_EVENT_TYPES = new Set([
+  "service",
+  "waiter",
+  "call_waiter",
+  "call_server",
+  "waiter_call",
+  "service_request",
+  "bill",
+  "account",
+  "check",
+  "request_bill",
+  "bill_request",
+  "order",
+  "order_request",
+  "place_order",
+  "command_order",
+]);
 
 export default function AttentionClient({
   salonGroups,
@@ -26,10 +44,14 @@ export default function AttentionClient({
   const [reopeningTableIds, setReopeningTableIds] = useState<Record<string, boolean>>({});
   const [expandedQrTableId, setExpandedQrTableId] = useState<string | null>(null);
   const [undoNotice, setUndoNotice] = useState<{ tableId: string; label: string } | null>(null);
+  const [alertsEnabled, setAlertsEnabled] = useState(false);
   const [, startRefreshTransition] = useTransition();
   const refreshTimerRef = useRef<number | null>(null);
   const realtimeConnectedRef = useRef(false);
   const locallyHandledTableIdsRef = useRef<Record<string, number>>({});
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const lastAlertAtRef = useRef(0);
+  const notifyNewAlertRef = useRef<(eventType: string) => void>(() => undefined);
 
   const refreshAttention = useCallback(() => {
     if (refreshTimerRef.current !== null) return;
@@ -47,16 +69,25 @@ export default function AttentionClient({
   }, [recentlyHandled]);
 
   useEffect(() => {
+    notifyNewAlertRef.current = notifyNewAlert;
+  });
+
+  useEffect(() => {
     const channel = supabaseClient
       .channel(`tenant-attention:${tenantId}`)
       .on("broadcast", { event: "table_attention_updated" }, (event) => {
         if (event.payload?.tenantId === tenantId) {
           const tableId = typeof event.payload?.tableId === "string" ? event.payload.tableId : null;
           const action = typeof event.payload?.action === "string" ? event.payload.action : null;
+          const eventType = typeof event.payload?.eventType === "string" ? event.payload.eventType : null;
           const ignoreUntil = tableId ? locallyHandledTableIdsRef.current[tableId] ?? 0 : 0;
 
           if (action === "handled" && ignoreUntil > Date.now()) {
             return;
+          }
+
+          if (action === "created" && eventType && ALERT_EVENT_TYPES.has(eventType)) {
+            notifyNewAlertRef.current(eventType);
           }
 
           refreshAttention();
@@ -156,6 +187,83 @@ export default function AttentionClient({
       }).length,
     0,
   );
+
+  async function enableAlerts() {
+    const audioContext = getAudioContext();
+    if (audioContext?.state === "suspended") {
+      await audioContext.resume().catch(() => undefined);
+    }
+
+    if ("Notification" in window && Notification.permission === "default") {
+      await Notification.requestPermission().catch(() => undefined);
+    }
+
+    setAlertsEnabled(true);
+    playAlertTone();
+    vibrateAlert([80]);
+  }
+
+  function disableAlerts() {
+    setAlertsEnabled(false);
+  }
+
+  function notifyNewAlert(eventType: string) {
+    if (!alertsEnabled) return;
+
+    const now = Date.now();
+    if (now - lastAlertAtRef.current < 900) return;
+    lastAlertAtRef.current = now;
+
+    playAlertTone();
+    vibrateAlert([220, 90, 220]);
+
+    if ("Notification" in window && Notification.permission === "granted" && document.visibilityState !== "visible") {
+      const notification = new Notification("Nueva alerta de mesa", {
+        body: getAlertNotificationText(eventType),
+        tag: "table-attention",
+      });
+
+      window.setTimeout(() => notification.close(), 8000);
+    }
+  }
+
+  function getAudioContext() {
+    if (audioContextRef.current) return audioContextRef.current;
+
+    const AudioContextConstructor =
+      window.AudioContext ?? (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextConstructor) return null;
+
+    audioContextRef.current = new AudioContextConstructor();
+    return audioContextRef.current;
+  }
+
+  function playAlertTone() {
+    const audioContext = getAudioContext();
+    if (!audioContext || audioContext.state === "closed") return;
+
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    const startsAt = audioContext.currentTime;
+
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(880, startsAt);
+    oscillator.frequency.setValueAtTime(1040, startsAt + 0.18);
+    gain.gain.setValueAtTime(0.0001, startsAt);
+    gain.gain.exponentialRampToValueAtTime(0.18, startsAt + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startsAt + 0.42);
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start(startsAt);
+    oscillator.stop(startsAt + 0.45);
+  }
+
+  function vibrateAlert(pattern: VibratePattern) {
+    if ("vibrate" in navigator) {
+      navigator.vibrate(pattern);
+    }
+  }
 
   function onMarkHandled(tableId: string) {
     const tableLabel =
@@ -462,10 +570,24 @@ export default function AttentionClient({
             Solicitudes de servicio, cuenta y pedido enviadas desde el menu por cada mesa.
           </p>
         </div>
-        <div className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-border-box)] bg-[var(--color-foreground)] px-3 py-2 text-sm shadow-sm">
-          <BellRing size={16} className={pendingCount > 0 ? "text-[var(--color-delete)]" : "text-[var(--color-txt-secondary)]"} />
-          <span className="font-medium">{pendingCount}</span>
-          <span className="text-[var(--color-txt-secondary)]">pendientes</span>
+        <div className="flex flex-col gap-2 sm:items-end">
+          <div className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-border-box)] bg-[var(--color-foreground)] px-3 py-2 text-sm shadow-sm">
+            <BellRing size={16} className={pendingCount > 0 ? "text-[var(--color-delete)]" : "text-[var(--color-txt-secondary)]"} />
+            <span className="font-medium">{pendingCount}</span>
+            <span className="text-[var(--color-txt-secondary)]">pendientes</span>
+          </div>
+          <button
+            type="button"
+            onClick={alertsEnabled ? disableAlerts : enableAlerts}
+            className={`inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium shadow-sm transition ${
+              alertsEnabled
+                ? "border-[var(--color-button-send)] bg-[var(--color-bg-selected)] text-[var(--color-txt-selected)]"
+                : "border-[var(--color-border-box)] bg-[var(--color-foreground)] text-[var(--color-txt-secondary)] hover:border-[var(--color-button-send)]"
+            }`}
+          >
+            {alertsEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+            {alertsEnabled ? "Alertas activas" : "Activar alertas"}
+          </button>
         </div>
       </div>
 
@@ -585,6 +707,18 @@ function formatTimeLabel(value: string) {
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
   return `${hours}:${minutes}`;
+}
+
+function getAlertNotificationText(eventType: string) {
+  if (["bill", "account", "check", "request_bill", "bill_request"].includes(eventType)) {
+    return "Una mesa solicito la cuenta.";
+  }
+
+  if (["order", "order_request", "place_order", "command_order"].includes(eventType)) {
+    return "Una mesa envio un pedido.";
+  }
+
+  return "Una mesa solicito atencion.";
 }
 
 function RequestActionCard({

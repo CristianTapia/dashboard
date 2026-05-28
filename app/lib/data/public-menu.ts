@@ -6,10 +6,6 @@ type TenantRow = {
   id: string;
   name: string;
   domain: string | null;
-  address?: string | null;
-  latitude?: number | null;
-  longitude?: number | null;
-  maps_url?: string | null;
   menu_themes_enabled?: boolean | null;
   menu_theme?: string | null;
 };
@@ -29,12 +25,10 @@ type ProductRow = {
 export async function resolveTenantByPublicKey(tenantKey: string) {
   const admin = createAdmin();
 
-  const tenantSelect = "id,name,domain,address,latitude,longitude,maps_url,menu_themes_enabled,menu_theme";
+  const tenantSelect = "id,name,domain,menu_themes_enabled,menu_theme";
   const fallbackSelect = "id,name,domain";
-  const isMissingLocationColumn = (message: string) =>
-    ["address", "latitude", "longitude", "maps_url", "menu_themes_enabled", "menu_theme"].some((column) =>
-      message.includes(column),
-    );
+  const isMissingMenuThemeColumn = (message: string) =>
+    ["menu_themes_enabled", "menu_theme"].some((column) => message.includes(column));
 
   const selectTenant = async (column: "domain" | "id", value: string) => {
     const { data, error } = await admin
@@ -44,7 +38,7 @@ export async function resolveTenantByPublicKey(tenantKey: string) {
       .maybeSingle<TenantRow>();
 
     if (!error) return data;
-    if (!isMissingLocationColumn(error.message)) throw new Error(error.message);
+    if (!isMissingMenuThemeColumn(error.message)) throw new Error(error.message);
 
     const { data: fallbackData, error: fallbackError } = await admin
       .from("tenants")

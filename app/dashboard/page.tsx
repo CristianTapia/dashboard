@@ -6,7 +6,7 @@ export default async function DashboardPage() {
   const { isAdmin, isTenantAdmin } = await getTenantAccessContext();
 
   if (isAdmin) redirect("/dashboard/resumen");
-  if (isTenantAdmin) redirect("/dashboard/destacados");
+  if (isTenantAdmin) redirect("/dashboard/resumen");
 
   redirect("/dashboard/atencion");
 }

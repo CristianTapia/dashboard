@@ -74,46 +74,46 @@ export default async function ThemesPage() {
         <TenantThemeGrid currentTheme={currentTenantSettings.menuTheme} themeIcons={themeIcons} />
       ) : (
         <div className="mt-6 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-4 sm:gap-6">
-        {menuThemeOptions.map((theme) => (
-          <article
-            key={theme.value}
-            className="rounded-xl border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-4 shadow-sm transition-shadow hover:shadow-card"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-bg-selected)] text-[var(--color-txt-selected)]">
-                  {themeIcons[theme.value]}
-                </span>
-                <div>
-                  <h2 className="text-base font-semibold">{theme.label}</h2>
-                  <p className="mt-0.5 font-mono text-xs text-[var(--color-txt-secondary)]">{theme.value}</p>
+          {menuThemeOptions.map((theme) => (
+            <article
+              key={theme.value}
+              className="rounded-xl border border-[var(--color-border-box)] bg-[var(--color-foreground)] p-4 shadow-sm transition-shadow hover:shadow-card"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-bg-selected)] text-[var(--color-txt-selected)]">
+                    {themeIcons[theme.value]}
+                  </span>
+                  <div>
+                    <h2 className="text-base font-semibold">{theme.label}</h2>
+                    <p className="mt-0.5 font-mono text-xs text-[var(--color-txt-secondary)]">{theme.value}</p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <p className="mt-4 text-sm leading-6 text-[var(--color-txt-secondary)]">{theme.description}</p>
+              <p className="mt-4 text-sm leading-6 text-[var(--color-txt-secondary)]">{theme.description}</p>
 
-            <div className="mt-4 flex gap-2">
-              {theme.colors.map((color) => (
-                <span
-                  key={color}
-                  className="h-7 w-7 rounded-full border border-[var(--color-border-box)]"
-                  style={{ backgroundColor: color }}
-                  title={color}
-                />
-              ))}
-            </div>
+              <div className="mt-4 flex gap-2">
+                {theme.colors.map((color) => (
+                  <span
+                    key={color}
+                    className="h-7 w-7 rounded-full border border-[var(--color-border-box)]"
+                    style={{ backgroundColor: color }}
+                    title={color}
+                  />
+                ))}
+              </div>
 
-            <ul className="mt-4 space-y-2 text-sm text-[var(--color-txt-secondary)]">
-              {theme.details.map((detail) => (
-                <li key={detail} className="flex gap-2">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-button-send)]" />
-                  <span>{detail}</span>
-                </li>
-              ))}
-            </ul>
-          </article>
-        ))}
+              <ul className="mt-4 space-y-2 text-sm text-[var(--color-txt-secondary)]">
+                {theme.details.map((detail) => (
+                  <li key={detail} className="flex gap-2">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-button-send)]" />
+                    <span>{detail}</span>
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ))}
         </div>
       )}
     </div>

@@ -49,13 +49,19 @@ export async function resolvePublicTableByToken(tableToken: string) {
   const tenant = tenantValue ?? null;
   if (!tenant) return null;
 
+  const roomName = data.salon?.trim() || "Salon 1";
+
   return {
     table: {
       id: data.id,
       tenant_id: data.tenant_id,
       public_token: data.public_token,
       label: buildLabel(data),
-      salon: data.salon ?? "Salon 1",
+      salon: roomName,
+      room_name: roomName,
+      room: {
+        name: roomName,
+      },
       active: data.active,
     },
     tenant: {
