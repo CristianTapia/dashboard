@@ -64,13 +64,17 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { icon: <UtensilsCrossed size={iconSize} />, name: "Productos", href: "/dashboard/productos" },
     { icon: <Shapes size={iconSize} />, name: "Categorias", href: "/dashboard/categorias" },
     { icon: <ConciergeBell size={iconSize} />, name: "Mesas", href: "/dashboard/mesas" },
+    { icon: <ConciergeBell size={iconSize} />, name: "Unir mesas", href: "/dashboard/unir-mesas" },
     { icon: <Users size={iconSize} />, name: "Equipo", href: "/dashboard/usuarios" },
     { icon: <BellRing size={iconSize} />, name: "Atención", href: "/dashboard/atencion" },
 
     ...(tenantThemesEnabled ? [{ icon: <Palette size={iconSize} />, name: "Themes", href: "/dashboard/themes" }] : []),
   ];
 
-  const staffItems = [{ icon: <BellRing size={iconSize} />, name: "Atención", href: "/dashboard/atencion" }];
+  const staffItems = [
+    { icon: <BellRing size={iconSize} />, name: "Atención", href: "/dashboard/atencion" },
+    { icon: <ConciergeBell size={iconSize} />, name: "Unir mesas", href: "/dashboard/unir-mesas" },
+  ];
 
   const navItems = isAdmin
     ? [

@@ -27,11 +27,18 @@ type TableEventRow = {
   id: number;
   tenant_id: string;
   table_id: string;
+  session_id: string | null;
   event_type: string;
   metadata: Record<string, unknown> | null;
   created_at: string;
   handled_at?: string | null;
   handled_by?: string | null;
+};
+
+type TableSessionTableRow = {
+  session_id: string;
+  table_id: string;
+  joined_at: string;
 };
 
 type StaffAssignmentRow = {
@@ -83,6 +90,20 @@ function buildLabel(table: Pick<TableRow, "name" | "number">) {
   if (table.name?.trim()) return table.name.trim();
   if (table.number?.trim()) return `Mesa ${table.number.trim()}`;
   return "Mesa";
+}
+
+function buildCombinedLabel(tables: TableRow[]) {
+  return tables.map((table) => buildLabel(table)).join(" + ") || "Mesa";
+}
+
+function buildCombinedSalon(tables: TableRow[]) {
+  const salons = Array.from(new Set(tables.map((table) => table.salon?.trim() || "Salon 1")));
+  if (salons.length === 1) return salons[0];
+  return "Salones varios";
+}
+
+function getAttentionEventGroupKey(event: Pick<TableEventRow, "session_id" | "table_id">) {
+  return event.session_id ? `session:${event.session_id}` : `table:${event.table_id}`;
 }
 
 function getMenuBaseUrl() {
@@ -211,7 +232,7 @@ export async function listAttentionTables(): Promise<AttentionSalonGroup[]> {
       .order("number", { ascending: true }),
     db
       .from("table_events")
-      .select("id,tenant_id,table_id,event_type,metadata,created_at")
+      .select("id,tenant_id,table_id,session_id,event_type,metadata,created_at")
       .eq("tenant_id", tenantId)
       .is("handled_at", null)
       .in("event_type", ATTENTION_EVENT_TYPES)
@@ -229,27 +250,105 @@ export async function listAttentionTables(): Promise<AttentionSalonGroup[]> {
   if (eventsError) throw new Error(eventsError.message);
   if (assignmentsError) throw new Error(assignmentsError.message);
 
+  const tables = (tablesData ?? []) as TableRow[];
+  const events = (eventsData ?? []) as TableEventRow[];
+  const tablesById = new Map(tables.map((table) => [table.id, table]));
   const assignments = (assignmentsData ?? []) as StaffAssignmentRow[];
   const assignedSalons = new Set(assignments.map((assignment) => assignment.salon).filter(Boolean) as string[]);
   const assignedTableIds = new Set(assignments.map((assignment) => assignment.table_id).filter(Boolean) as string[]);
   const hasAssignments = assignedSalons.size > 0 || assignedTableIds.size > 0;
 
-  const eventsByTable = new Map<string, TableEventRow[]>();
-  for (const event of (eventsData ?? []) as TableEventRow[]) {
-    eventsByTable.set(event.table_id, [...(eventsByTable.get(event.table_id) ?? []), event]);
+  function canAccessTable(table: TableRow) {
+    const salon = table.salon?.trim() || "Salon 1";
+    return tenantCtx.isTenantAdmin || !hasAssignments || assignedTableIds.has(table.id) || assignedSalons.has(salon);
+  }
+
+  const eventsByGroup = new Map<string, TableEventRow[]>();
+  for (const event of events) {
+    const key = getAttentionEventGroupKey(event);
+    eventsByGroup.set(key, [...(eventsByGroup.get(key) ?? []), event]);
+  }
+
+  const sessionIds = Array.from(new Set(events.map((event) => event.session_id).filter((value): value is string => Boolean(value))));
+  const tableIdsBySession = new Map<string, string[]>();
+
+  if (sessionIds.length > 0) {
+    const { data: sessionTablesData, error: sessionTablesError } = await db
+      .from("table_session_tables")
+      .select("session_id,table_id,joined_at")
+      .eq("tenant_id", tenantId)
+      .in("session_id", sessionIds)
+      .is("left_at", null)
+      .order("joined_at", { ascending: true });
+
+    if (sessionTablesError) throw new Error(sessionTablesError.message);
+
+    for (const row of (sessionTablesData ?? []) as TableSessionTableRow[]) {
+      tableIdsBySession.set(row.session_id, [...(tableIdsBySession.get(row.session_id) ?? []), row.table_id]);
+    }
   }
 
   const grouped = new Map<string, AttentionTableCard[]>();
-  for (const table of (tablesData ?? []) as TableRow[]) {
-    const salon = table.salon?.trim() || "Salon 1";
-    if (!tenantCtx.isTenantAdmin && hasAssignments && !assignedTableIds.has(table.id) && !assignedSalons.has(salon)) {
-      continue;
+  const tableIdsRepresentedBySessionCards = new Set<string>();
+  const tableIdsWithStandaloneEvents = new Set<string>();
+
+  for (const [groupKey, groupEvents] of eventsByGroup.entries()) {
+    const sortedEvents = [...groupEvents].sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
+    const firstEvent = sortedEvents[0];
+    const isSessionGroup = groupKey.startsWith("session:");
+    const sessionId = isSessionGroup ? groupKey.slice("session:".length) : null;
+    const fallbackTableIds = Array.from(new Set(sortedEvents.map((event) => event.table_id)));
+    const tableIds = sessionId && tableIdsBySession.has(sessionId) ? tableIdsBySession.get(sessionId) ?? [] : fallbackTableIds;
+    const cardTables = tableIds
+      .map((tableId) => tablesById.get(tableId))
+      .filter((table): table is TableRow => Boolean(table));
+
+    if (cardTables.length === 0) continue;
+    if (!cardTables.some((table) => canAccessTable(table))) continue;
+
+    if (isSessionGroup) {
+      for (const table of cardTables) {
+        tableIdsRepresentedBySessionCards.add(table.id);
+      }
+    } else {
+      tableIdsWithStandaloneEvents.add(firstEvent.table_id);
     }
 
-    const events = eventsByTable.get(table.id) ?? [];
-    const orderEvents = events.filter((event) => classifyEventType(event.event_type) === "order");
+    const primaryTable = cardTables[0];
+    const salon = buildCombinedSalon(cardTables);
+    const orderEvents = sortedEvents.filter((event) => classifyEventType(event.event_type) === "order");
     const chronologicalOrderEvents = [...orderEvents].sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at));
     const latestOrderEvent = orderEvents[0] ?? null;
+    const card: AttentionTableCard = {
+      tableId: primaryTable.id,
+      tableToken: primaryTable.public_token,
+      publicUrl: `${menuBaseUrl}/${encodeURIComponent(tenantKey)}/${encodeURIComponent(primaryTable.public_token)}`,
+      label: buildCombinedLabel(cardTables),
+      number: cardTables.length === 1 ? primaryTable.number : null,
+      name: cardTables.length === 1 ? primaryTable.name : null,
+      salon,
+      serviceRequested: sortedEvents.some((event) => classifyEventType(event.event_type) === "service"),
+      billRequested: sortedEvents.some((event) => classifyEventType(event.event_type) === "bill"),
+      orderRequested: sortedEvents.some((event) => classifyEventType(event.event_type) === "order"),
+      orderSummary: extractOrderSummary(latestOrderEvent?.metadata) ?? (latestOrderEvent ? "Comanda recibida desde el menu" : null),
+      orderItemSummary: buildOrderItemSummary(orderEvents),
+      orderRequests: chronologicalOrderEvents.map((event) => ({
+        id: event.id,
+        summary: extractOrderSummary(event.metadata) ?? "Comanda recibida desde el menu",
+        receivedAt: event.created_at,
+      })),
+      pendingCount: sortedEvents.length,
+      latestRequestedAt: sortedEvents[0]?.created_at ?? null,
+    };
+
+    grouped.set(salon, [...(grouped.get(salon) ?? []), card]);
+  }
+
+  for (const table of tables) {
+    const salon = table.salon?.trim() || "Salon 1";
+    if (!canAccessTable(table)) continue;
+    if (tableIdsRepresentedBySessionCards.has(table.id) || tableIdsWithStandaloneEvents.has(table.id)) continue;
+
     const card: AttentionTableCard = {
       tableId: table.id,
       tableToken: table.public_token,
@@ -258,18 +357,14 @@ export async function listAttentionTables(): Promise<AttentionSalonGroup[]> {
       number: table.number,
       name: table.name,
       salon,
-      serviceRequested: events.some((event) => classifyEventType(event.event_type) === "service"),
-      billRequested: events.some((event) => classifyEventType(event.event_type) === "bill"),
-      orderRequested: events.some((event) => classifyEventType(event.event_type) === "order"),
-      orderSummary: extractOrderSummary(latestOrderEvent?.metadata) ?? (latestOrderEvent ? "Comanda recibida desde el menu" : null),
-      orderItemSummary: buildOrderItemSummary(orderEvents),
-      orderRequests: chronologicalOrderEvents.map((event) => ({
-        id: event.id,
-        summary: extractOrderSummary(event.metadata) ?? "Comanda recibida desde el menu",
-        receivedAt: event.created_at,
-      })),
-      pendingCount: events.length,
-      latestRequestedAt: events[0]?.created_at ?? null,
+      serviceRequested: false,
+      billRequested: false,
+      orderRequested: false,
+      orderSummary: null,
+      orderItemSummary: [],
+      orderRequests: [],
+      pendingCount: 0,
+      latestRequestedAt: null,
     };
 
     grouped.set(salon, [...(grouped.get(salon) ?? []), card]);
@@ -307,7 +402,7 @@ export async function listRecentlyHandledAttentionTables(): Promise<RecentlyHand
       .eq("active", true),
     db
       .from("table_events")
-      .select("id,tenant_id,table_id,event_type,metadata,created_at,handled_at,handled_by")
+      .select("id,tenant_id,table_id,session_id,event_type,metadata,created_at,handled_at,handled_by")
       .eq("tenant_id", tenantId)
       .gte("handled_at", windowStart)
       .in("event_type", ATTENTION_EVENT_TYPES)

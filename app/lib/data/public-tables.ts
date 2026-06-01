@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createAdmin } from "@/app/lib/supabase";
+import { resolveActiveTableSessionId } from "@/app/lib/data/table-sessions";
 
 type TenantRow = {
   id: string;
@@ -79,10 +80,15 @@ export async function createPublicTableEvent(input: {
   metadata?: Record<string, unknown>;
 }) {
   const admin = createAdmin();
+  const sessionId = await resolveActiveTableSessionId({
+    tenantId: input.tenantId,
+    tableId: input.tableId,
+  });
 
   const { error } = await admin.from("table_events").insert({
     table_id: input.tableId,
     tenant_id: input.tenantId,
+    session_id: sessionId,
     event_type: input.eventType,
     metadata: input.metadata ?? {},
   });
