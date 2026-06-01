@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createAdmin } from "@/app/lib/supabase";
+import { resolveActiveTableSessionId } from "@/app/lib/data/table-sessions";
 import { getCurrentTenantId, getCurrentUser, getTenantAccessContext, isCurrentUserAdmin } from "@/app/lib/tenant";
 
 const SERVICE_EVENT_TYPES = new Set(["service", "waiter", "call_waiter", "call_server", "waiter_call", "service_request"]);
@@ -483,13 +484,15 @@ export async function markTableAttentionHandled(tableId: string) {
   if (tableError) throw new Error(tableError.message);
   if (!table) throw new Error("Mesa no encontrada");
 
-  const { error } = await db
+  const sessionId = await resolveActiveTableSessionId({ tenantId, tableId });
+  const baseUpdate = db
     .from("table_events")
     .update({ handled_at: new Date().toISOString(), handled_by: user.id })
     .eq("tenant_id", tenantId)
-    .eq("table_id", tableId)
     .is("handled_at", null)
     .in("event_type", ATTENTION_EVENT_TYPES);
+
+  const { error } = sessionId ? await baseUpdate.eq("session_id", sessionId) : await baseUpdate.eq("table_id", tableId);
 
   if (error) throw new Error(error.message);
 
@@ -519,15 +522,17 @@ export async function reopenRecentlyHandledTableAttention(tableId: string) {
   if (tableError) throw new Error(tableError.message);
   if (!table) throw new Error("Mesa no encontrada");
 
+  const sessionId = await resolveActiveTableSessionId({ tenantId, tableId });
   const undoWindowStart = new Date(Date.now() - 15 * 60_000).toISOString();
-  const { error } = await db
+  const baseUpdate = db
     .from("table_events")
     .update({ handled_at: null, handled_by: null })
     .eq("tenant_id", tenantId)
-    .eq("table_id", tableId)
     .eq("handled_by", user.id)
     .gte("handled_at", undoWindowStart)
     .in("event_type", ATTENTION_EVENT_TYPES);
+
+  const { error } = sessionId ? await baseUpdate.eq("session_id", sessionId) : await baseUpdate.eq("table_id", tableId);
 
   if (error) throw new Error(error.message);
 

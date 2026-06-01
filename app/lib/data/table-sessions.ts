@@ -30,6 +30,10 @@ type ActiveTableSessionMembershipRow = {
   joined_at: string;
 };
 
+type PendingTableEventRow = {
+  id: number;
+};
+
 export type TableSession = {
   id: string;
   tenant_id: string;
@@ -266,6 +270,16 @@ export async function createJoinedTableSession(input: {
 
   if (sessionTablesError) throw new Error(sessionTablesError.message);
 
+  const { error: updatePendingEventsError } = await db
+    .from("table_events")
+    .update({ session_id: session.id })
+    .eq("tenant_id", input.tenantId)
+    .in("table_id", tableIds)
+    .is("session_id", null)
+    .is("handled_at", null);
+
+  if (updatePendingEventsError) throw new Error(updatePendingEventsError.message);
+
   return session;
 }
 
@@ -286,6 +300,19 @@ export async function closeTableSession(input: {
   if (!existingSession) throw new Error("Sesion no encontrada");
   if (existingSession.status !== "active") {
     throw new Error("La sesion no esta activa");
+  }
+
+  const { data: pendingEvents, error: pendingEventsError } = await db
+    .from("table_events")
+    .select("id")
+    .eq("tenant_id", input.tenantId)
+    .eq("session_id", input.sessionId)
+    .is("handled_at", null)
+    .limit(1);
+
+  if (pendingEventsError) throw new Error(pendingEventsError.message);
+  if (((pendingEvents ?? []) as PendingTableEventRow[]).length > 0) {
+    throw new Error("No puedes desunir estas mesas porque tienen pedidos o llamados pendientes.");
   }
 
   const closedAt = new Date().toISOString();
